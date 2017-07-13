@@ -30,7 +30,7 @@ a {
 code {
   background: #f8f8f8;
   font-family: 'Source Code Pro', monospace;
-  //font-size: 16px;
+  /*font-size: 16px;*/
   font-size: 100%;
 }
 
@@ -99,7 +99,7 @@ code {
   max-width: 800px;
   margin: 20px auto 80px;
   padding: 0 15px;
-  //font-size: 16px;
+  /*font-size: 16px;*/
   font-size: 100%;
   line-height: 1.7;
   color: #555;
@@ -195,7 +195,7 @@ code {
   border-radius: 3px;
   position: relative;
   margin: 40px 0;
-  //font-size: 14px;
+  /*font-size: 14px;*/
   font-size: 100%;
 }
 
@@ -314,7 +314,7 @@ code {
   }
 
   .content {
-    //font-size: 17px;
+    /*font-size: 17px;*/
     font-size: 110%;
     line-height: 1.8;
     margin: 30px auto;
@@ -322,7 +322,7 @@ code {
 
   .highlight {
     font-family: 'Source Code Pro', monospace;
-    //font-size: 16px;
+    /*font-size: 16px;*/
     font-size: 120%;
     margin: 40px 10px;
   }
