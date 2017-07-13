@@ -1,0 +1,29 @@
+BaseURL = "http://foo.bar/"
+languageCode = "en-us"
+title = "Daniels Tech Blog"
+paginate = 10
+theme = "lithium"
+pygmentsuseclasses = true
+pygmentsstyle = "tango"
+PygmentsCodeFences = true
+
+[params]
+  [params.logo]
+    url = "logo.png"
+
+[permalinks]
+    post = "/:year/:month/:day/:title/"
+    page = "/:title/"
+
+#[[menu.main]]
+#    name = "About"
+#    url = "/about/"
+
+[[menu.main]]
+    name = "Github"
+    url = "https://github.com/DanielGibson/"
+
+[[menu.main]]
+    name = "Twitter"
+    url = "https://twitter.com/Doomed_Daniel"
+
