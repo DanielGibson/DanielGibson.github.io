@@ -6,6 +6,7 @@ theme = "lithium"
 pygmentsuseclasses = true
 pygmentsstyle = "tango"
 PygmentsCodeFences = true
+relativeURLs = true
 
 [params]
   [params.logo]
