@@ -1,12 +1,17 @@
 <nav class="nav">
-  <a href="{{ .Site.BaseURL }}" class="nav-logo">
-    <img src="{{ .Site.BaseURL }}images/{{ .Site.Params.logo.url }}" 
-         width="{{ .Site.Params.logo.width }}" 
-         height="{{ .Site.Params.logo.height }}" 
-         alt="{{ .Site.Params.logo.alt }}">
+  <a href="{{ .Site.BaseURL }}" class="nav-logo" title="Home">
+    <img src="{{ .Site.BaseURL }}images/{{ .Site.Params.logo.url }}"
+      {{ if .Site.Params.logo.width }}
+         width="{{ .Site.Params.logo.width }}"
+      {{ end }} {{ if .Site.Params.logo.height }}
+         height="{{ .Site.Params.logo.height }}"
+      {{ end }} {{ if .Site.Params.logo.alt }}
+         alt="{{ .Site.Params.logo.alt }}"
+      {{ else }}alt="Home"{{ end }} >
   </a>
 
   <ul class="nav-links">
+    <li><b><a href="{{ .Site.BaseURL }}"><!--{{ .Site.Title }}-->Home</a></b></li>
     {{ range .Site.Menus.main }}
     <li><a href="{{ .URL }}">{{ .Name }}</a></li>
     {{ end }}
