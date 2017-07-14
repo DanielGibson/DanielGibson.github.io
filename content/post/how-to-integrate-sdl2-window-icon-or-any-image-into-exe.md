@@ -132,7 +132,7 @@ You can get the `width` and `height` parameters directly from the corresponding
 offers `bytes_per_pixel`, so that value is multiplied with 8.  
 `pitch` is *"the length of a row of pixels in bytes"* and can theoretically 
 be used to copy just a rectangle out of the source image. While we use the 
-whole image, it must be `my_icon.bytes_per_pixel*my_icon.width` either way.
+whole image, it must be `my_icon.bytes_per_pixel * my_icon.width` either way.
 
 {{< highlight c"linenos=table,linenostart=22" >}}
   SDL_Surface* icon = SDL_CreateRGBSurfaceFrom((void*)my_icon.pixel_data, my_icon.width,
