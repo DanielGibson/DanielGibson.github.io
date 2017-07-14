@@ -209,18 +209,6 @@ code {
   overflow: auto !important;
 }
 
-
-.article-content pre code {
-  font-family: 'Source Code Pro', monospace;
-  border-radius: 3px;
-  position: relative;
-  //margin: 40px 0;
-  font-size: 14px;
-  background: #f8f8f8;
-  text-align: left;
-}
-
-
 .archive {
   margin: 0;
   padding: 0;
