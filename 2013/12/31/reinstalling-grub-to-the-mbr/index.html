@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.20.7" />
+
+
+<title>(Re)installing GRUB to the MBR - Daniels Tech Blog</title>
+<meta property="og:title" content="(Re)installing GRUB to the MBR - Daniels Tech Blog">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="https://danielgibson.github.io/css/main.css" media="all" />
+<link rel="stylesheet" href="https://danielgibson.github.io/css/fonts.css" />
+
+
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="https://danielgibson.github.io/" class="nav-logo" title="Home">
+    <img src="https://danielgibson.github.io/images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">(Re)installing GRUB to the MBR</h1>
+
+    
+    <span class="article-date">December 31, 2013</span>
+    
+
+    <div class="article-content">
+      <p>This is just a very short roundup of the relevant commands needed to reinstall grub,
+e.g. when migrating a Linux installation to a new hard drive.</p>
+
+<ul>
+<li>boot live Linux system (from CD/DVD or USB key, I use
+<a href="http://grml.org">grml</a>, any other live Linux should do)</li>
+<li>mount root-fs of your installation (e.g. /dev/sda2) to /mnt/</li>
+<li>if they&rsquo;re in separate partitions, mount the /boot/, /usr/, &hellip;
+partitions of your installation to /mnt/boot, /mnt/usr/, &hellip;</li>
+<li><code>mount --bind</code> /dev/ and /sys/ to /mnt/dev and /mnt/sys (maybe also /proc
+for older versions of grub?), grub will need those</li>
+<li><code>chroot /mnt</code></li>
+<li>execute <code>grub-install $device</code> (e.g. /dev/sda) to install grub to the MBR of $device</li>
+<li><code>update-grub</code> to upgrade the grub menu entries</li>
+<li>If names of partitions changed, don&rsquo;t forget to adjust <code>/etc/fstab</code></li>
+<li>reboot, remove live linux</li>
+<li>configure your BIOS/UEFI to boot from that harddisk</li>
+</ul>
+
+<p>That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
+</p>
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="https://danielgibson.github.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="https://danielgibson.github.io/images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  function addLinkToHeading(h) {
+    l = document.createElement("a");
+    l.href = "#" + h.id;
+    l.innerHTML = "# ";
+    l.className = "headinglink";
+    h.insertBefore(l, h.firstChild);
+  }
+
+  for(h=1; h<=6; ++h)
+  {
+    hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      if(hs[i].id)  addLinkToHeading(hs[i]);
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+

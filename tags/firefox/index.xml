@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Firefox on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/firefox/</link>
+    <description>Recent content in Firefox on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 30 Jun 2010 01:44:36 +0200</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/firefox/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bug-Hunting: Browsers fail to load research.microsoft.com</title>
+      <link>https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</link>
+      <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</guid>
+      <description>&lt;p&gt;This is a follow-up to &lt;a href=&#34;http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541658&#34;&gt;debian bug #541658 for Iceweasel: &amp;ldquo;cannot open research.microsoft.com&amp;rdquo;&lt;/a&gt;.
+It turned out that this bug applies to all (tested) browsers with cookie-support (Iceweasel, Opera, Chrome, Arora, Kazehakase),
+but only very few people are experiencing it.&lt;br /&gt;
+First I&amp;rsquo;ll tell how to reproduce the bug, then I&amp;rsquo;ll sum up the facts I already
+collected in that bugreport and then I&amp;rsquo;ll document my further attempts to narrow down the problem.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;UPDATE:&lt;/strong&gt; The reason for that strange behaviour was found and I filed a new bugreport:
+&lt;del datetime=&#34;2010-07-02T23:57:20+00:00&#34;&gt;&lt;a href=&#34;http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=587789&#34;&gt;No. #587789&lt;/a&gt;&lt;/del&gt;&lt;br /&gt;
+&lt;strong&gt;UPDATE 2:&lt;/strong&gt; Debians Kernel maintainer considers this expected behavior and told me
+to file a bugreport upstream and I did: &lt;a href=&#34;http://bugzilla.netfilter.org/show_bug.cgi?id=662&#34;&gt;Netfilter bug #622&lt;/a&gt;.&lt;br /&gt;
+&lt;strong&gt;UPDATE 3:&lt;/strong&gt; I think Microsoft has fixed their server. Of course the Linux kernel
+should be fixed anyway but there doesn&amp;rsquo;t seem to be much interest in doing so :-/&lt;br /&gt;
+&lt;strong&gt;UPDATE 4:&lt;/strong&gt; &lt;a href=&#34;https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/net/netfilter/xt_TCPMSS.c?h=v4.12&amp;amp;id=409b545ac10d9548929557a75ad86540f59a2c83&#34;&gt;Three years later it had been fixed in the Linux kernel.&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

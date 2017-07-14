@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.20.7" />
+
+
+<title>Daniels Tech Blog</title>
+<meta property="og:title" content="Daniels Tech Blog">
+<meta property="og:type" content="website">
+
+
+
+<meta property="description" content="">
+
+
+
+
+
+<link href="https://danielgibson.github.io/index.xml" rel="alternate" type="application/rss+xml" title="Daniels Tech Blog" />
+
+
+<link rel="stylesheet" href="https://danielgibson.github.io/css/main.css" media="all" />
+<link rel="stylesheet" href="https://danielgibson.github.io/css/fonts.css" />
+
+
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="https://danielgibson.github.io/" class="nav-logo" title="Home">
+    <img src="https://danielgibson.github.io/images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <div class="archive">
+    
+      <h2 class="archive-title">2015</h2>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/" class="archive-item-link">Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</a>
+          <span class="archive-item-date">
+            July 18, 2015
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>Because of <a href="https://github.com/nothings/stb/issues/113">https://github.com/nothings/stb/issues/113</a> I was wondering how good/bad
+stb_image_write&rsquo;s PNG compression really is in comparison to other encoders.</p>
+
+<p>So I did a quick comparison between stb_image_write (v0.98) LodePNG (version 20150418),
+miniz&rsquo;s <code>tdefl_write_image_to_png_file_in_memory_ex()</code> (v1.15) and libpng (version 1.2.50
+from Ubuntu 14.04), always with the highest possible compression I could configure.</p>
+
+<p></p>
+                <a href="./2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/" class="archive-item-link">How to integrate your SDL2 window icon (or any image) into your executable</a>
+          <span class="archive-item-date">
+            April 13, 2015
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>Let&rsquo;s assume you have an image that you want to use as a window icon in your
+cross-platform application that uses <a href="http://www.libsdl.org/">libSDL2</a>.<br />
+A suitable window icon is 64x64pixels big (other sizes should work as well, though)
+and has 32bit RGBA colors, which means it contains an alpha-channel.</p>
+
+<p>Now it would be handy if the icon could just be part of the executable
+and if this could be achieved in a platform-independent way.<br />
+Furthermore it&rsquo;d be great if it didn&rsquo;t require additional dependencies (e.g. to decode image files).</p>
+
+<p>In this tutorial I&rsquo;ll show how to translate the image into C source file
+containing a struct that holds the image data + necessary metadata (width,
+height, color depth) and how to load that struct into a <code>SDL_Surface*</code>
+and to set that surface as a window icon.
+</p>
+                <a href="./2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/" class="archive-item-link">Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng</a>
+          <span class="archive-item-date">
+            March 23, 2015
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>I recently tried out Sean Barrett&rsquo;s <a href="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image.h</a>
+and was blown away by how fucking easy it is to use.<br />
+Integrating it into your project is trivial: Just add the header and somewhere do:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#define STB_IMAGE_IMPLEMENTATION</span>
+<span class="cp">#include</span> <span class="cpf">&quot;stb_image.h&quot;</span><span class="cp"></span>
+</code></pre></div>
+
+<p>That&rsquo;s all. (If you wanna use it in multiple files you just <code>#include &quot;stb_image.h&quot;</code> there without the <code>#define</code>.)</p>
+
+<p>And the API is trivial too:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
+<span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pixeldata</span><span class="p">,</span> <span class="o">*</span><span class="n">pixeldata2</span><span class="p">;</span>
+<span class="n">pixeldata</span> <span class="o">=</span> <span class="n">stbi_load</span><span class="p">(</span><span class="s">&quot;bla.jpg&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="c1">// if you have already read the image file data into a buffer:</span>
+<span class="n">pixeldata2</span> <span class="o">=</span> <span class="n">stbi_load_from_memory</span><span class="p">(</span><span class="n">bufferWithImageData</span><span class="p">,</span> <span class="n">bufferLength</span><span class="p">,</span>
+                                   <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="n">pixeldata2</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Some error happened: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">stbi_failure_reason</span><span class="p">());</span>
+</code></pre></div>
+
+<p>There&rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
+And it supports lots of common image file types including JPEG, PNG, TGA, BMP, GIF and PSD.</p>
+
+<p>So I wondered if there are any downsides regarding speed.</p>
+
+<p></p>
+                <a href="./2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
+      <h2 class="archive-title">2014</h2>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/" class="archive-item-link">How to boot Linux and Windows 7 via UEFI</a>
+          <span class="archive-item-date">
+            January 2, 2014
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>Don&rsquo;t.<br />
+It&rsquo;s a fucking pain in the ass.</p>
+
+<p><strong><em>Note:</em></strong> <em>This refers to Windows 7 (and probably Vista and Server 2008
+and older). Starting with Windows 8, the Windows installer should support
+UEFI better and things should be easier.</em></p>
+
+<p>Buy a &lt;= 2TB hard disk for Windows installations (additional Windows partitions
+can be on larger HDDs using GPT, it&rsquo;s only painful for the system partitions).
+However, if you want to use a hard drive with &gt;2TB for your Windows installation,
+you have to use GPT partitions (instead of the old MBR style which only
+supports &lt;= 2TB disks - there you can only use the space &gt; 2TB with ugly
+hacks and can&rsquo;t have a continuous partition from 2TB) - and Windows can only
+boot from GPT partitions in UEFI mode.<br />
+To make things more challenging, Windows doesn&rsquo;t offer creating a GPT partition table
+and partitions in the graphical installer (at least for Win7), so one has to use cmd.exe.<br />
+But don&rsquo;t worry, the Linux part also sucks :-)<br />
+I&rsquo;ll describe how I got <strong>Windows to install using GPT partitions</strong> on a 3TB harddisk,
+how to make an existing <strong>Linux</strong> (Debian Wheezy) installation <strong>boot via EFI (using grub-efi)</strong>
+and how I got my Mainboard <a href="http://www.asus.com/Motherboards/Z87A/">ASUS Z87-A</a>
+to boot this and GRUB to chainload (UEFI) Windows.</p>
+
+<p></p>
+                <a href="./2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
+      <h2 class="archive-title">2013</h2>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/" class="archive-item-link">(Re)installing GRUB to the MBR</a>
+          <span class="archive-item-date">
+            December 31, 2013
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>This is just a very short roundup of the relevant commands needed to reinstall grub,
+e.g. when migrating a Linux installation to a new hard drive.</p>
+
+<ul>
+<li>boot live Linux system (from CD/DVD or USB key, I use
+<a href="http://grml.org">grml</a>, any other live Linux should do)</li>
+<li>mount root-fs of your installation (e.g. /dev/sda2) to /mnt/</li>
+<li>if they&rsquo;re in separate partitions, mount the /boot/, /usr/, &hellip;
+partitions of your installation to /mnt/boot, /mnt/usr/, &hellip;</li>
+<li><code>mount --bind</code> /dev/ and /sys/ to /mnt/dev and /mnt/sys (maybe also /proc
+for older versions of grub?), grub will need those</li>
+<li><code>chroot /mnt</code></li>
+<li>execute <code>grub-install $device</code> (e.g. /dev/sda) to install grub to the MBR of $device</li>
+<li><code>update-grub</code> to upgrade the grub menu entries</li>
+<li>If names of partitions changed, don&rsquo;t forget to adjust <code>/etc/fstab</code></li>
+<li>reboot, remove live linux</li>
+<li>configure your BIOS/UEFI to boot from that harddisk</li>
+</ul>
+
+<p>That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
+</p>
+              
+            </div>
+          </div>
+        </article>
+      
+    
+      <h2 class="archive-title">2011</h2>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/" class="archive-item-link">Linux (Debian Squeeze) on Thinkpad T500</a>
+          <span class="archive-item-date">
+            January 5, 2011
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>I recently got myself a Lenovo <a href="http://www.thinkwiki.org/wiki/Category:T500">Thinkpad T500</a> (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.</p>
+
+<p>However, I shrunk the Windows 7 partition (I didn&rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &hellip;) anyway.</p>
+
+<p></p>
+                <a href="./2011/01/05/linux-debian-squeeze-on-thinkpad-t500/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
+      <h2 class="archive-title">2010</h2>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/" class="archive-item-link">Bug-Hunting: Browsers fail to load research.microsoft.com</a>
+          <span class="archive-item-date">
+            June 30, 2010
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>This is a follow-up to <a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541658">debian bug #541658 for Iceweasel: &ldquo;cannot open research.microsoft.com&rdquo;</a>.
+It turned out that this bug applies to all (tested) browsers with cookie-support (Iceweasel, Opera, Chrome, Arora, Kazehakase),
+but only very few people are experiencing it.<br />
+First I&rsquo;ll tell how to reproduce the bug, then I&rsquo;ll sum up the facts I already
+collected in that bugreport and then I&rsquo;ll document my further attempts to narrow down the problem.</p>
+
+<p><strong>UPDATE:</strong> The reason for that strange behaviour was found and I filed a new bugreport:
+<del datetime="2010-07-02T23:57:20+00:00"><a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=587789">No. #587789</a></del><br />
+<strong>UPDATE 2:</strong> Debians Kernel maintainer considers this expected behavior and told me
+to file a bugreport upstream and I did: <a href="http://bugzilla.netfilter.org/show_bug.cgi?id=662">Netfilter bug #622</a>.<br />
+<strong>UPDATE 3:</strong> I think Microsoft has fixed their server. Of course the Linux kernel
+should be fixed anyway but there doesn&rsquo;t seem to be much interest in doing so :-/<br />
+<strong>UPDATE 4:</strong> <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/net/netfilter/xt_TCPMSS.c?h=v4.12&amp;id=409b545ac10d9548929557a75ad86540f59a2c83">Three years later it had been fixed in the Linux kernel.</a></p>
+
+<p></p>
+                <a href="./2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2010/05/11/shutting-down-esata-disks-under-linux/" class="archive-item-link">Shutting down (e)SATA disks under Linux</a>
+          <span class="archive-item-date">
+            May 11, 2010
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>I&rsquo;m using a eSATA external harddrive and want to be able to safely unplug it without shutting down my PC. While just removing the drive after unmounting worked so far, I&rsquo;m not sure if it&rsquo;s really safe - I&rsquo;d really prefer to cleanly disconnect it and spinning it down before pulling the plug.
+I googled that and stumbled upon <a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/">http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/</a> which seems to be a clean and safe way to do it, so I just wrote a script to do that.
+
+It also checks if any partition of that drive is still mounted (that check might result in false positives however or might just fail when the disk is mounted by UUID or via some mapper like dmcrypt) and tells you to unmount before disconnecting the drive - however you can bypass that test with the <code>-f</code> option.</p>
+                <a href="./2010/05/11/shutting-down-esata-disks-under-linux/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/" class="archive-item-link">Unlock gnome-keyring on Login with SLiM and PAM</a>
+          <span class="archive-item-date">
+            May 5, 2010
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>My favorite desktop environment is <a href="http://www.xfce.org/">XFCE</a>, because it&rsquo;s fast, doesn&rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).
+I also use <a href="https://github.com/iwamatsu/slim">SLiM</a> as a display manager because it is slim and looks much better than xdm.</p>
+
+<p>On my Laptop I also use GNOME&rsquo;s <a href="http://projects.gnome.org/NetworkManager/">NetworkManager</a> because I haven&rsquo;t yet found a better and less bloated alternative for handling wireless networks and VPNs.
+NetworkManager is able to store your passwords (WPA-keys etc) in the <a href="http://live.gnome.org/GnomeKeyring">GNOME Keyring</a> so you don&rsquo;t need to enter them each time your laptop connects to a wireless network. But you still have to enter the password to unlock the keyring.. <em><strong>unless</strong></em> you let <a href="http://en.wikipedia.org/wiki/Pluggable_Authentication_Modules">PAM</a> handle that on login.
+
+I&rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log in with SLiM, so applications like the NetworkManager can access the keyring. I&rsquo;ll focus on how to do that with <a href="http://debian.org">Debian</a> &ldquo;squeeze&rdquo; (the current testing), but it should be directly applicable for Ubuntu (at least &ldquo;Lucid&rdquo;, for older versions you&rsquo;ll have to build your own slim package with PAM support - or maybe use the one from debian) and quite similar in any other Linux distribution.</p>
+                <a href="./2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2010/01/08/remote-administration/tech-support-with-reverse-vnc/" class="archive-item-link">Remote administration/tech-support with (reverse) VNC</a>
+          <span class="archive-item-date">
+            January 8, 2010
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, <a title="Virtual Network Computing" href="http://en.wikipedia.org/wiki/VNC">VNC</a> is my weapon of choice, if SSH isn&rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &hellip;).</p>
+
+<p>I&rsquo;ll describe how to set up a normal and reverse VNC-connections using <a title="home of x11vnc" href="http://www.karlrunge.com/x11vnc/">x11vnc</a> and <a title="TightVNC homepage" href="http://www.tightvnc.com/">TightVNC</a>.</p>
+
+<p></p>
+                <a href="./2010/01/08/remote-administration/tech-support-with-reverse-vnc/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
+      <h2 class="archive-title">2009</h2>
+      
+        <article class="archive-item">
+          <a href="https://danielgibson.github.io/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/" class="archive-item-link">MCabber - Settings and rebinding of PageUp/PageDown</a>
+          <span class="archive-item-date">
+            October 1, 2009
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a <a href="http://www.gnu.org/software/screen/screen.html">screen</a> is so much nicer.</p>
+
+<p>So I tried <a href="http://www.mcabber.com">MCabber</a>, that turned out to be really great once you&rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&rsquo;ll want to configure it to your needs.
+</p>
+                <a href="./2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
+  </div>
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="https://danielgibson.github.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="https://danielgibson.github.io/images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  function addLinkToHeading(h) {
+    l = document.createElement("a");
+    l.href = "#" + h.id;
+    l.innerHTML = "# ";
+    l.className = "headinglink";
+    h.insertBefore(l, h.firstChild);
+  }
+
+  for(h=1; h<=6; ++h)
+  {
+    hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      if(hs[i].id)  addLinkToHeading(hs[i]);
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+

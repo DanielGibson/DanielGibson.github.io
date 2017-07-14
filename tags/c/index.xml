@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/c/</link>
+    <description>Recent content in C on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 18 Jul 2015 02:29:24 +0000</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/c/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</title>
+      <link>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
+      <description>&lt;p&gt;Because of &lt;a href=&#34;https://github.com/nothings/stb/issues/113&#34;&gt;https://github.com/nothings/stb/issues/113&lt;/a&gt; I was wondering how good/bad
+stb_image_write&amp;rsquo;s PNG compression really is in comparison to other encoders.&lt;/p&gt;
+
+&lt;p&gt;So I did a quick comparison between stb_image_write (v0.98) LodePNG (version 20150418),
+miniz&amp;rsquo;s &lt;code&gt;tdefl_write_image_to_png_file_in_memory_ex()&lt;/code&gt; (v1.15) and libpng (version 1.2.50
+from Ubuntu 14.04), always with the highest possible compression I could configure.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>How to integrate your SDL2 window icon (or any image) into your executable</title>
+      <link>https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</link>
+      <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</guid>
+      <description>&lt;p&gt;Let&amp;rsquo;s assume you have an image that you want to use as a window icon in your
+cross-platform application that uses &lt;a href=&#34;http://www.libsdl.org/&#34;&gt;libSDL2&lt;/a&gt;.&lt;br /&gt;
+A suitable window icon is 64x64pixels big (other sizes should work as well, though)
+and has 32bit RGBA colors, which means it contains an alpha-channel.&lt;/p&gt;
+
+&lt;p&gt;Now it would be handy if the icon could just be part of the executable
+and if this could be achieved in a platform-independent way.&lt;br /&gt;
+Furthermore it&amp;rsquo;d be great if it didn&amp;rsquo;t require additional dependencies (e.g. to decode image files).&lt;/p&gt;
+
+&lt;p&gt;In this tutorial I&amp;rsquo;ll show how to translate the image into C source file
+containing a struct that holds the image data + necessary metadata (width,
+height, color depth) and how to load that struct into a &lt;code&gt;SDL_Surface*&lt;/code&gt;
+and to set that surface as a window icon.
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng</title>
+      <link>https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</guid>
+      <description>&lt;p&gt;I recently tried out Sean Barrett&amp;rsquo;s &lt;a href=&#34;https://github.com/nothings/stb/blob/master/stb_image.h&#34;&gt;stb_image.h&lt;/a&gt;
+and was blown away by how fucking easy it is to use.&lt;br /&gt;
+Integrating it into your project is trivial: Just add the header and somewhere do:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#define STB_IMAGE_IMPLEMENTATION&lt;/span&gt;
+&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;quot;stb_image.h&amp;quot;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;That&amp;rsquo;s all. (If you wanna use it in multiple files you just &lt;code&gt;#include &amp;quot;stb_image.h&amp;quot;&lt;/code&gt; there without the &lt;code&gt;#define&lt;/code&gt;.)&lt;/p&gt;
+
+&lt;p&gt;And the API is trivial too:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;width&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;height&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bytesPerPixel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pixeldata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pixeldata2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;pixeldata&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;stbi_load&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;quot;bla.jpg&amp;quot;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;width&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;height&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bytesPerPixel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;// if you have already read the image file data into a buffer:&lt;/span&gt;
+&lt;span class=&#34;n&#34;&gt;pixeldata2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;stbi_load_from_memory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bufferWithImageData&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bufferLength&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+                                   &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;width&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;height&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bytesPerPixel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pixeldata2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;NULL&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;quot;Some error happened: %s&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;stbi_failure_reason&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;());&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;There&amp;rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&amp;rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
+And it supports lots of common image file types including JPEG, PNG, TGA, BMP, GIF and PSD.&lt;/p&gt;
+
+&lt;p&gt;So I wondered if there are any downsides regarding speed.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

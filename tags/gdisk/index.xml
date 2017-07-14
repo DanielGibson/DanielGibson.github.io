@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gdisk on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/gdisk/</link>
+    <description>Recent content in Gdisk on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 02 Jan 2014 02:05:41 +0000</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/gdisk/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How to boot Linux and Windows 7 via UEFI</title>
+      <link>https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</guid>
+      <description>&lt;p&gt;Don&amp;rsquo;t.&lt;br /&gt;
+It&amp;rsquo;s a fucking pain in the ass.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/strong&gt; &lt;em&gt;This refers to Windows 7 (and probably Vista and Server 2008
+and older). Starting with Windows 8, the Windows installer should support
+UEFI better and things should be easier.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Buy a &amp;lt;= 2TB hard disk for Windows installations (additional Windows partitions
+can be on larger HDDs using GPT, it&amp;rsquo;s only painful for the system partitions).
+However, if you want to use a hard drive with &amp;gt;2TB for your Windows installation,
+you have to use GPT partitions (instead of the old MBR style which only
+supports &amp;lt;= 2TB disks - there you can only use the space &amp;gt; 2TB with ugly
+hacks and can&amp;rsquo;t have a continuous partition from 2TB) - and Windows can only
+boot from GPT partitions in UEFI mode.&lt;br /&gt;
+To make things more challenging, Windows doesn&amp;rsquo;t offer creating a GPT partition table
+and partitions in the graphical installer (at least for Win7), so one has to use cmd.exe.&lt;br /&gt;
+But don&amp;rsquo;t worry, the Linux part also sucks :-)&lt;br /&gt;
+I&amp;rsquo;ll describe how I got &lt;strong&gt;Windows to install using GPT partitions&lt;/strong&gt; on a 3TB harddisk,
+how to make an existing &lt;strong&gt;Linux&lt;/strong&gt; (Debian Wheezy) installation &lt;strong&gt;boot via EFI (using grub-efi)&lt;/strong&gt;
+and how I got my Mainboard &lt;a href=&#34;http://www.asus.com/Motherboards/Z87A/&#34;&gt;ASUS Z87-A&lt;/a&gt;
+to boot this and GRUB to chainload (UEFI) Windows.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Mbr on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/mbr/</link>
+    <description>Recent content in Mbr on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 31 Dec 2013 04:13:03 +0200</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/mbr/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>(Re)installing GRUB to the MBR</title>
+      <link>https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/</link>
+      <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/</guid>
+      <description>&lt;p&gt;This is just a very short roundup of the relevant commands needed to reinstall grub,
+e.g. when migrating a Linux installation to a new hard drive.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;boot live Linux system (from CD/DVD or USB key, I use
+&lt;a href=&#34;http://grml.org&#34;&gt;grml&lt;/a&gt;, any other live Linux should do)&lt;/li&gt;
+&lt;li&gt;mount root-fs of your installation (e.g. /dev/sda2) to /mnt/&lt;/li&gt;
+&lt;li&gt;if they&amp;rsquo;re in separate partitions, mount the /boot/, /usr/, &amp;hellip;
+partitions of your installation to /mnt/boot, /mnt/usr/, &amp;hellip;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mount --bind&lt;/code&gt; /dev/ and /sys/ to /mnt/dev and /mnt/sys (maybe also /proc
+for older versions of grub?), grub will need those&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chroot /mnt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;execute &lt;code&gt;grub-install $device&lt;/code&gt; (e.g. /dev/sda) to install grub to the MBR of $device&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;update-grub&lt;/code&gt; to upgrade the grub menu entries&lt;/li&gt;
+&lt;li&gt;If names of partitions changed, don&amp;rsquo;t forget to adjust &lt;code&gt;/etc/fstab&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;reboot, remove live linux&lt;/li&gt;
+&lt;li&gt;configure your BIOS/UEFI to boot from that harddisk&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;That&amp;rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
+&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

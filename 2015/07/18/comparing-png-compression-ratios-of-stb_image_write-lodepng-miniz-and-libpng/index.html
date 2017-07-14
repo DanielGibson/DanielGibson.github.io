@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.20.7" />
+
+
+<title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng - Daniels Tech Blog</title>
+<meta property="og:title" content="Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng - Daniels Tech Blog">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="https://danielgibson.github.io/css/main.css" media="all" />
+<link rel="stylesheet" href="https://danielgibson.github.io/css/fonts.css" />
+
+
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="https://danielgibson.github.io/" class="nav-logo" title="Home">
+    <img src="https://danielgibson.github.io/images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</h1>
+
+    
+    <span class="article-date">July 18, 2015</span>
+    
+
+    <div class="article-content">
+      <p>Because of <a href="https://github.com/nothings/stb/issues/113">https://github.com/nothings/stb/issues/113</a> I was wondering how good/bad
+stb_image_write&rsquo;s PNG compression really is in comparison to other encoders.</p>
+
+<p>So I did a quick comparison between stb_image_write (v0.98) LodePNG (version 20150418),
+miniz&rsquo;s <code>tdefl_write_image_to_png_file_in_memory_ex()</code> (v1.15) and libpng (version 1.2.50
+from Ubuntu 14.04), always with the highest possible compression I could configure.</p>
+
+<p></p>
+
+<p>I used four different test images, all 24bit RGB:<br />
+A screenshot from <a href="https://github.com/yquake2/zaero">Quake2: Zaero</a> in 1680x1050,
+a screenshot from <a href="https://github.com/RobertBeckebans/RBDOOM-3-BFG/">RBDoom3BFG</a> in 1392x920,
+the classic &ldquo;<a href="https://en.wikipedia.org/wiki/Lenna">Lenna</a>&rdquo; test image in 512x512
+and a <a href="http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html">colorful wallpaper with several parrots</a> in 2560x1600.<br />
+Update: I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a></p>
+
+<h1 id="results">Results:</h1>
+
+<p>I tested libpng with highest compression (<code>png_set_compression_level(png_ptr, 9);</code>) and default compression.<br />
+libpng with highest compression is used as 100%, as it almost always yields the smallest image.</p>
+
+<h2 id="doom3bfg-screenshot">Doom3BFG Screenshot:</h2>
+
+<table>
+<thead>
+<tr>
+<th>Encoder</th>
+<th>Bytes</th>
+<th>Percent</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>libpng high</td>
+<td>1133340</td>
+<td>100%</td>
+</tr>
+
+<tr>
+<td>libpng default</td>
+<td>1167675</td>
+<td>103%</td>
+</tr>
+
+<tr>
+<td>LodePNG</td>
+<td>1198051</td>
+<td>106%</td>
+</tr>
+
+<tr>
+<td>miniz</td>
+<td>1569473</td>
+<td>138%</td>
+</tr>
+
+<tr>
+<td>stb</td>
+<td>1608577</td>
+<td>142%</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="quake2-screenshot">Quake2 Screenshot:</h2>
+
+<table>
+<thead>
+<tr>
+<th>Encoder</th>
+<th>Bytes</th>
+<th>Percent</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>libpng high</td>
+<td>2082772</td>
+<td>100%</td>
+</tr>
+
+<tr>
+<td>libpng default</td>
+<td>2125051</td>
+<td>102%</td>
+</tr>
+
+<tr>
+<td>LodePNG</td>
+<td>2243547</td>
+<td>108%</td>
+</tr>
+
+<tr>
+<td>miniz</td>
+<td>2683565</td>
+<td>129%</td>
+</tr>
+
+<tr>
+<td>stb</td>
+<td>3146951</td>
+<td>151%</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="parrots">Parrots:</h2>
+
+<table>
+<thead>
+<tr>
+<th>Encoder</th>
+<th>Bytes</th>
+<th>Percent</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>libpng high</td>
+<td>5062358</td>
+<td>100%</td>
+</tr>
+
+<tr>
+<td>libpng default</td>
+<td>5195689</td>
+<td>103%</td>
+</tr>
+
+<tr>
+<td>LodePNG</td>
+<td>5328474</td>
+<td>105%</td>
+</tr>
+
+<tr>
+<td>miniz</td>
+<td>9000478</td>
+<td>178%</td>
+</tr>
+
+<tr>
+<td>stb</td>
+<td>7439122</td>
+<td>147%</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="lenna">Lenna:</h2>
+
+<table>
+<thead>
+<tr>
+<th>Encoder</th>
+<th>Bytes</th>
+<th>Percent</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>libpng high</td>
+<td>476195</td>
+<td>100%</td>
+</tr>
+
+<tr>
+<td>libpng default</td>
+<td>476196</td>
+<td>100%</td>
+</tr>
+
+<tr>
+<td>LodePNG</td>
+<td>499061</td>
+<td>105%</td>
+</tr>
+
+<tr>
+<td>miniz</td>
+<td>729880</td>
+<td>153%</td>
+</tr>
+
+<tr>
+<td>stb</td>
+<td>723394</td>
+<td>152%</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="snakebird">Snakebird:</h2>
+
+<table>
+<thead>
+<tr>
+<th>Encoder</th>
+<th>Bytes</th>
+<th>Percent</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>libpng high</td>
+<td>259338</td>
+<td>100%</td>
+</tr>
+
+<tr>
+<td>libpng default</td>
+<td>265571</td>
+<td>102%</td>
+</tr>
+
+<tr>
+<td>LodePNG</td>
+<td>291126</td>
+<td>112%</td>
+</tr>
+
+<tr>
+<td>miniz</td>
+<td>226136</td>
+<td>87%</td>
+</tr>
+
+<tr>
+<td>stb</td>
+<td>315422</td>
+<td>122%</td>
+</tr>
+</tbody>
+</table>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Sean was right with &ldquo;It looks to me like the miniz doesn&rsquo;t use PNG filters,
+so it&rsquo;s just compressing the raw image data as is, which isn&rsquo;t going to be
+very good compression either, but along a different axis.&ldquo;.<br />
+Sometimes the compression of miniz (or more correctly <code>tdefl_write_image_to_png_file_in_memory_ex()</code>)
+is better and sometimes <code>stbi_write_png()</code> is better - so it doesn&rsquo;t matter
+which one you use, if you wanna use one of them.</p>
+
+<p>However, compared to libpng and LodePNG both don&rsquo;t compress very well -
+the resulting images are 29%-78% bigger.<br />
+LodePNG on the other hand produces almost as good results as libpng (only 5%-8% bigger)
+and is significantly easier to use - integrating it in your project is easy
+(just drop the source and the header file to your project) and using it
+is about as easy as stbi_write_png().<br />
+(For image loading however I found stb_image much better than LodePNG,
+as it loads PNGs faster, see
+<a href="../../../../2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/">my other blogpost</a>.</p>
+
+<p><em>UPDATE:</em> A kinda strange case is the Snakebird-Screenshot: Sean said that
+<a href="https://twitter.com/nothings/status/622310841564577797">&ldquo;something more computer-arty &ndash; flat colors or gradients&rdquo;</a>
+will yield different results, because
+<a href="https://twitter.com/nothings/status/622310939426078720">&ldquo;that&rsquo;s one of the places where the PNG filters are beneficial&rdquo;</a>.<br />
+And he was right: In that case the <code>stbi_write_png()</code> output was only 22% bigger
+than the libpng output - but for some reason miniz, which does not seem to
+do PNG filtering, compressed even better than libpng (the resulting file was 13% smaller).</p>
+
+<h2 id="the-code">The Code:</h2>
+
+<p>Can be found at: <a href="https://gist.github.com/DanielGibson/eb322f8054c2dfef06a9">https://gist.github.com/DanielGibson/eb322f8054c2dfef06a9</a></p>
+
+<p>Needs:</p>
+
+<ul>
+<li>stb_image.h and stb_image_write.h from <a href="https://github.com/nothings/stb">https://github.com/nothings/stb</a></li>
+<li>lodepng.c and lodepng.h from <a href="http://lodev.org/lodepng/">http://lodev.org/lodepng/</a></li>
+<li>miniz.c from <a href="https://github.com/richgel999/miniz">https://github.com/richgel999/miniz</a></li>
+<li>libpng from <a href="http://libpng.org/">http://libpng.org/</a> or your Linux distro or whatever (tested v1.2.50)</li>
+</ul>
+
+<h2 id="for-reference-the-images">For Reference: The images</h2>
+
+<p>(click for full size)</p>
+
+<p><a href="../../../../images/d3bfg_libpng.png"><img src="../../../../images/d3bfg_libpng-small.png" alt="Doom 3 BFG" /></a></p>
+
+<p><a href="../../../../images/q2_libpng.png"><img src="../../../../images/q2_libpng-small.png" alt="Quake 2: Zaero" /></a></p>
+
+<p><a href="../../../../images/lenna.png"><img src="../../../../images/lenna.png" alt="Lenna" /></a></p>
+
+<p><a href="../../../../images/snakebird2_libpng.png"><img src="../../../../images/snakebird2_libpng-small.png" alt="Snakebird" /></a></p>
+
+<p>And this wallpaper of parrots: <a href="http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html">http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html</a></p>
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="https://danielgibson.github.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="https://danielgibson.github.io/images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  function addLinkToHeading(h) {
+    l = document.createElement("a");
+    l.href = "#" + h.id;
+    l.innerHTML = "# ";
+    l.className = "headinglink";
+    h.insertBefore(l, h.firstChild);
+  }
+
+  for(h=1; h<=6; ++h)
+  {
+    hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      if(hs[i].id)  addLinkToHeading(hs[i]);
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+

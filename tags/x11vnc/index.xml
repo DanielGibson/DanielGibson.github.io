@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>X11vnc on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/x11vnc/</link>
+    <description>Recent content in X11vnc on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 08 Jan 2010 02:55:18 +0200</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/x11vnc/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Remote administration/tech-support with (reverse) VNC</title>
+      <link>https://danielgibson.github.io/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</link>
+      <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</guid>
+      <description>&lt;p&gt;Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, &lt;a title=&#34;Virtual Network Computing&#34; href=&#34;http://en.wikipedia.org/wiki/VNC&#34;&gt;VNC&lt;/a&gt; is my weapon of choice, if SSH isn&amp;rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &amp;hellip;).&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ll describe how to set up a normal and reverse VNC-connections using &lt;a title=&#34;home of x11vnc&#34; href=&#34;http://www.karlrunge.com/x11vnc/&#34;&gt;x11vnc&lt;/a&gt; and &lt;a title=&#34;TightVNC homepage&#34; href=&#34;http://www.tightvnc.com/&#34;&gt;TightVNC&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>T500 on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/t500/</link>
+    <description>Recent content in T500 on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 05 Jan 2011 16:55:41 +0200</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/t500/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linux (Debian Squeeze) on Thinkpad T500</title>
+      <link>https://danielgibson.github.io/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</guid>
+      <description>&lt;p&gt;I recently got myself a Lenovo &lt;a href=&#34;http://www.thinkwiki.org/wiki/Category:T500&#34;&gt;Thinkpad T500&lt;/a&gt; (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&amp;rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.&lt;/p&gt;
+
+&lt;p&gt;However, I shrunk the Windows 7 partition (I didn&amp;rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&amp;rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&amp;rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &amp;hellip;) anyway.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

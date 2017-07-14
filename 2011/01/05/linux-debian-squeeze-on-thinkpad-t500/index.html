@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.20.7" />
+
+
+<title>Linux (Debian Squeeze) on Thinkpad T500 - Daniels Tech Blog</title>
+<meta property="og:title" content="Linux (Debian Squeeze) on Thinkpad T500 - Daniels Tech Blog">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="https://danielgibson.github.io/css/main.css" media="all" />
+<link rel="stylesheet" href="https://danielgibson.github.io/css/fonts.css" />
+
+
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="https://danielgibson.github.io/" class="nav-logo" title="Home">
+    <img src="https://danielgibson.github.io/images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">Linux (Debian Squeeze) on Thinkpad T500</h1>
+
+    
+    <span class="article-date">January 5, 2011</span>
+    
+
+    <div class="article-content">
+      <p>I recently got myself a Lenovo <a href="http://www.thinkwiki.org/wiki/Category:T500">Thinkpad T500</a> (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.</p>
+
+<p>However, I shrunk the Windows 7 partition (I didn&rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &hellip;) anyway.</p>
+
+<p></p>
+
+<h3 id="shrinking-windows">Shrinking Windows</h3>
+
+<p>There were three partitions: a small one (about 1,2GB) called SYSTEM_DRV, which seems to be a Win7 boot partition (since when does Windows have a seperate partition for that?), on the second one was the Windows installation (this is the one I shrunk) and the third one of about 9,8GB that contained Lenovo recovery stuff (double-clicking it lets you burn that stuff onto three DVDs - which may make sense because Lenovo doesn&rsquo;t ship any DVDs/CDs with the Thinkpad so if your harddrive fails you&rsquo;re fscked).
+I defragmentated the system partition and then tried to shrink it with Windows onboard-tools (<a href="http://www.howtogeek.com/howto/windows-vista/resize-a-partition-for-free-in-windows-vista/">here is a description</a>), but it was not satisfactory: even though &ldquo;only&rdquo; 24GB were used by Windows and all that preinstalled crap, I could only shrink the partition to a size of 190GB, if I recall correctly. The reason was some unmovable system file or something like that.<br />
+I wanted to shrink it to 100GB, so I used the Linux tool <a href="http://gparted.sourceforge.net/">GParted</a> from the <a href="http://grml.org/">grml Live-CD</a> to do the job, which it did without any problems: On the next boot Windows did a file system check or repair or something and kept on functioning without any complaints.</p>
+
+<h3 id="preparation">Preparation</h3>
+
+<p>Before installing Debian I got the Squeeze Beta2 netinstall ISO from
+<del datetime="2011-02-06T19:09:59+00:00"><a href="http://cdimage.debian.org/cdimage/daily-builds/squeeze_d-i/amd64/iso-cd/">http://cdimage.debian.org/cdimage/daily-builds/squeeze_d-i/amd64/iso-cd/</a></del> and burned it to a CDRW.<br />
+<br>
+<i>Update: Squeeze is now stable, use the netinstall ISO from <a href="http://debian.org/CD/netinst/">http://debian.org/CD/netinst/</a></i><br></p>
+
+<p>My T500 has got two display adapters: An Intel GMA X4500 and a AMD Mobility Radeon HD 3650. Only very recent versions of the Linux kernel (2.6.34 onwards as far as I know) support switching between them at runtime (but still X needs to be restarted) - Squeeze is still at 2.6.32, so that won&rsquo;t work without a custom kernel. See <a href="http://www.thinkwiki.org/wiki/Switchable_Graphics">the ThinkWiki</a> for further information.<br />
+One can still switch the adapters in the BIOS (press F1 after powering on the Thinkpad). Because I don&rsquo;t need much 3D power at the moment and prefer longer battery life, a better driver and a cooler laptop I chose to use the Intel Chip (&ldquo;Discrete Graphics&rdquo;). Because of that I won&rsquo;t describe how to make the Radeon work, but it shouldn&rsquo;t be too painful (either use the default free driver or install the proprietary fglrx).
+My settings in the BIOS (Config -&gt; Display) look like this:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Default Primary Video Device  [Internal]
+Boot Display Device           [Thinkpad LCD]
+Graphics Device               [Integrated Display]
+OS Detection for Switchable Graphics 
+                              [Disabled]
+</code></pre></div>
+
+<p>To install Debian you want to have Ethernet (wired LAN) ready for Internet-access, because the wireless chip in the T500 (at least in mine) needs proprietary firmware from Intel that Debian doesn&rsquo;t include by default.
+However, if you&rsquo;ve only got wireless Internet you can supply the firmware from a USB-stick, the Debian installer will prompt for that.
+<i><b>Update:</b></i> See <a href="http://wiki.debian.org/Firmware">the debian Wiki</a> for more information, including links to netinstall-ISOs that include firmware.</p>
+
+<h3 id="installing-debian">Installing Debian</h3>
+
+<p>Just insert the CD, boot, follow the instructions (I won&rsquo;t describe that in detail, because that&rsquo;s not the point of this article).
+Some notes:
+<ul>
+    <li>Make sure to use manual partitioning and use the free space (after the second NTFS partition) for your linux partitions.</li>
+    <li>If you want to use hibernate (suspend-to-disc), you&rsquo;ll need a big enough swap partition - it should be at least as big as your main memory. My T500 has 4GB of RAM, my swap partition is 6GB.</li>
+    <li>Yes, you want to install grub to the MBR</li>
+</ul>
+Because I like my debian installation to be slim I always disallow apt to install the recommended packages of packages I install, by creating a file <strong>/etc/apt/apt.conf.d/06-norecommends</strong> with the following content:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">APT
+{
+        Install-Recommends &quot;false&quot;;
+        Install-Suggests &quot;false&quot;;
+};
+</code></pre></div>
+
+<p>But of course this is optional and has nothing to do with making Debian work on a Thinkpad ;-)</p>
+
+<h4 id="getting-wifi-firmware">Getting WiFi firmware</h4>
+
+<p>After installing the basic stuff and rebooting to my new debian installation, I installed the WiFi firmware.
+First I modified <b>/etc/apt/sources.list</b> to also use the <i>contrib</i> and <i>non-free</i> repositories, so the entries looked like this:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+
+deb http://security.debian.org/ squeeze/updates main contrib non-free
+deb-src http://security.debian.org/ squeeze/updates main contrib non-free
+</code></pre></div>
+
+<p>(Yours may look slightly different, depending on the mirror you selected).
+After an <code>apt-get update</code> I installed the packages <b>firmware-linux</b> (not sure if this is really needed, maybe for the radeon) and <b>firmware-iwlwifi</b> (this one is definitely needed for wireless LAN, at least if you&rsquo;ve got a &ldquo;Intel Wifi Link 5100&rdquo; or 5300 like me).</p>
+
+<p>For using wireless LAN network-manager-gnome and the gnome-keyring (to store network keys) may come in handy. See <a href="http://caedesnotes.wordpress.com/2010/05/05/unlock-gnome-keyring-on-login-with-slim-pam/">my post on how to unlock the gnome-keyring on login when using the SLiM display manager</a> for more on that.</p>
+
+<h4 id="protecting-you-hard-disk-drive-with-hdaps">Protecting you hard disk drive with HDAPS</h4>
+
+<p>Thinkpads have a cool feature to protect the HDD from falling damage: The <a href="http://www.thinkwiki.org/wiki/Active_Protection_System">IBM Active Protection System</a>. On Linux this is supported by the HDAPS kernel driver and the hdapsd userspace daemon. To get a recent version of the kernel driver you have to install the tp-smapi driver package. It&rsquo;s available in apt in both the <strong>tp-smapi-source</strong> package and the <strong>tp-smapi-dkms</strong> package (I installed the latter).
+The hdaps daemon is also available via apt, the package is called <strong>hdapsd</strong>. It should just work out of the box.</p>
+
+<h4 id="hibernate-support">Hibernate support</h4>
+
+<p>Hibernate works out of the box. But there&rsquo;s a keyboard-shortcut to start hibernation, that doesn&rsquo;t: <strong>Fn-F12</strong>. It sends a ACPI button/suspend message and by default there is no ACPI handler for that event. This can be easily fixed, though: Just create a file <strong>/etc/acpi/events/hibernatebtn</strong> with the following content and after a reboot the button should work:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1"># /etc/acpi/events/hibernatebtn</span>
+<span class="c1"># Called when the user presses the hibernate button</span>
+
+<span class="nv">event</span><span class="o">=</span>button<span class="o">[</span> /<span class="o">]</span><span class="nb">suspend</span>
+<span class="nv">action</span><span class="o">=</span>/etc/acpi/hibernatebtn.sh
+</code></pre></div>
+
+<h4 id="disabling-the-pc-speaker">Disabling the PC speaker</h4>
+
+<p>To get rid of that annoying beep on several occasions (tab-completion, end of file in less, &hellip;), add the following to the <strong>/etc/modprobe.d/blacklist.conf</strong> file:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1"># no beeps, plz</span>
+blacklist pcspkr
+blacklist snd_pcsp
+</code></pre></div>
+
+<p>Note that this doesn&rsquo;t deactivate all beeps: The Thinkpad seems to beep independently of the OS e.g. on resume (after hibernate/standby) or when the power chord is plugged in or removed.</p>
+
+<h3 id="x-org-desktop-specific-stuff">X.org/Desktop specific stuff</h3>
+
+<p>The following stuff concerns X.org. It&rsquo;s independent from a specific desktop environment (like XFCE, GNOME, KDE, &hellip;) - but it may well be that some of this can also be done with tools from the desktop environment.</p>
+
+<h4 id="make-the-ultranav-touchpad-trackpoint-behave-the-way-i-want">Make the &ldquo;UltraNav&rdquo; (Touchpad/Trackpoint) behave the way I want</h4>
+
+<p>Both the Touchpad and the Trackpoint work out of the box. They can be further configured with a tool like <strong>gpointing-device-settings</strong> or similar tools from your desktop environment.
+However, two things could not be configured with gpointing-device-settings:
+<ol>
+<li>I want to be able to perform a <strong>click by tapping the touchpad</strong>. This should be configurable with gpointing-device-settings, but it didn&rsquo;t work anyway, so I had to do it at X.org configuration level.<br />
+I created the directory <strong>/etc/X11/xorg.conf.d/</strong> and within that directory a file called <strong>10-synaptics.conf</strong> with the following content:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># adapted from https://wiki.archlinux.org/index.php/Touchpad_Synaptics
+Section &quot;InputClass&quot;
+    Identifier &quot;touchpad catchall&quot;
+    Driver &quot;synaptics&quot;
+    MatchIsTouchpad &quot;on&quot;
+    # this enables clicking by tapping:
+    Option &quot;TapButton1&quot; &quot;1&quot; 
+EndSection
+</code></pre></div>
+
+<p></li>
+<li>I want to be able to <strong>scroll with the Trackpoint</strong> by holding down the middle mouse button and moving the nipple. Also I want to emulate the third mouse button by pressing the other two - this is just out of habit, it&rsquo;s not needed, because the middle mouse button works as well.<br />
+So I created a file name <strong>20-trackpoint.conf</strong> in the directory <strong>/etc/X11/xorg.conf.d/</strong> (see above), with the following content:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># adapted from http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint#xorg.conf.d
+Section &quot;InputClass&quot;
+        Identifier      &quot;Trackpoint Wheel Emulation&quot;
+        MatchProduct    &quot;TPPS/2 IBM TrackPoint&quot;
+        MatchDevicePath &quot;/dev/input/event*&quot;
+        Option          &quot;EmulateWheel&quot;          &quot;true&quot;
+        Option          &quot;EmulateWheelButton&quot;    &quot;2&quot;
+        Option          &quot;Emulate3Buttons&quot;       &quot;true&quot;
+        Option          &quot;XAxisMapping&quot;          &quot;6 7&quot;
+        Option          &quot;YAxisMapping&quot;          &quot;4 5&quot;
+EndSection
+</code></pre></div>
+
+<p></li>
+</ol></p>
+
+<h4 id="special-keys">Special Keys</h4>
+
+<p>The Thinkpad has a lot of special keys (or key-combinations), e.g. to configure the brightness, the volume, &hellip;<br />
+Some of them (e.g. brightness) already work, but it&rsquo;d be nice to have some additional on-screen information, other don&rsquo;t do anything without further configuration.
+(A special case is the hibernate button that I&rsquo;ve mentioned earlier, because it is configured via ACPI handlers and not in X)<br />
+I used the desktop-independent <strong>xbindkeys</strong> tool (from the identically named debian package) to support those keys. The <strong>xbindkeys-config</strong> utility is really handy to modify xbindkey&rsquo;s configuration file, <em>~/.xbindkeysrc</em>. However, for xbindkeys-config to work you need a <em>~/.xbindkeysrc</em> file (it may even be empty) or it&rsquo;ll crash, so just execute <pre><code>$ touch ~/.xbindkeysrc</code></pre> before doing anything else.
+After installing xbindkeys you should make sure it&rsquo;s started when you log into X. One way to do so is to just add the following line to the <strong>~/.profile</strong> file:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1"># ...</span>
+<span class="c1"># start xbindkeys</span>
+xbindkeys <span class="p">&amp;</span>
+</code></pre></div>
+
+<p>Also most of the scripts for the special keys use the <em>osd_cat</em> tool from the <strong>xosd-bin</strong> package to display information on the screen, so you should install it.</p>
+
+<h5 id="brightness-control">Brightness Control</h5>
+
+<p>The keys to control the display&rsquo;s brightness (Fn-Home/Pos1 and Fn-End) already work out the box. But it would be nice if the current brightness level (there are 16: 0-15) was displayed on the screen along with a nice bar.. the following script (save it to some dir in you $PATH, e.g. <strong>/usr/local/bin/</strong> and make it executable (<code>chmod 755 /usr/local/bin/brightness.sh</code>) does that:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/bash</span>
+
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span>$<span class="s2">XAUTHORITY&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c1"># kill other osd_cat processes to prevent overlapping</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>ps -A <span class="p">|</span> grep osd_cat <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                killall osd_cat
+        <span class="k">fi</span>
+        <span class="nv">i</span><span class="o">=</span><span class="k">$(</span>cat /sys/class/backlight/acpi_video0/brightness<span class="k">)</span>    
+        <span class="nb">let</span> <span class="nv">i_perc</span><span class="o">=(</span>100*$i<span class="o">)</span>/15
+        osd_cat -d <span class="m">1</span> -A center -p bottom -o <span class="m">50</span> -c yellow -s <span class="m">1</span> <span class="se">\</span>
+        -f -adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1 <span class="se">\</span>
+        -b percentage -P $i_perc -T <span class="s2">&quot;Brightness: </span>$<span class="s2">i / 15&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>Make sure the path (<em>/sys/class/backlight/acpi_video0/brightness</em>) is correct for you or change it accordingly.<br />
+Now either use <strong>xbindkeys-config</strong> to make sure this script is called if either Fn-Home or Fn-End is pressed or add the following to the <strong>~/.xbindkeysrc</strong> file (At the end I&rsquo;ll paste my complete ~/.xbindkeysrc file.):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#brightness up
+&quot;brightness.sh&quot;
+    m:0x0 + c:233
+    XF86MonBrightnessUp 
+
+#brightness down
+&quot;brightness.sh&quot;
+    m:0x0 + c:232
+    XF86MonBrightnessDown 
+</code></pre></div>
+
+<h5 id="switch-touchpad-on-off">Switch Touchpad on/off</h5>
+
+<p>Fn-F8 is meant to toggle between touchpad, Trackpoint and both.. I see no point in disabling the Trackpoint so I just use it to disable/enable the touchpad.
+So by pressing Fn-F8 you&rsquo;ll get a nice OSD info saying &ldquo;Touchpad OFF&rdquo; or &ldquo;Touchpad ON&rdquo; and the touchpad will be switched off/on.<br />
+Save the following code as <em>toggletouchpad.sh</em> somewhere in your $PATH and make it executable:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/bash</span>
+<span class="c1"># adapted from http://forums.gentoo.org/viewtopic-p-6241953.html?sid=815e3e5f2bb9ccfbef0c8ff6cb37914b#6241953</span>
+
+<span class="k">if</span> synclient -l <span class="p">|</span> grep -q TouchpadOff<span class="o">[</span>^<span class="o">[</span>:alnum:<span class="o">]]</span>*0 <span class="p">;</span> <span class="k">then</span>     
+   synclient <span class="nv">TouchpadOff</span><span class="o">=</span><span class="m">1</span>                                     
+   <span class="nv">status</span><span class="o">=</span><span class="s2">&quot;TouchPad OFF&quot;</span>                                       
+<span class="k">else</span>
+   synclient <span class="nv">TouchpadOff</span><span class="o">=</span>0
+   <span class="nv">status</span><span class="o">=</span><span class="s2">&quot;TouchPad ON&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># kill other osd_cat processes to prevent overlapping</span>
+<span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>ps -A <span class="p">|</span> grep osd_cat <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    killall osd_cat
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span>$<span class="s2">XAUTHORITY&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> $status <span class="p">|</span> osd_cat -d <span class="m">3</span> -p bottom -A center -o -50 -s <span class="m">1</span> -c green <span class="se">\</span>
+    -f -adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1 
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>Add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#toggle touchpad
+&quot;toggletouchpad.sh&quot;
+    m:0x0 + c:199
+    NoSymbol 
+</code></pre></div>
+
+<h5 id="configure-display">Configure display</h5>
+
+<p>Fn-F7 is meant to configure display output (to the internal LVDS display or the external VGA and DisplayPort ports).<br />
+With Linux/X.org these configurations can be done with <a href="http://en.wikipedia.org/wiki/Randr">RandR</a>. A nice GUI for randr is <strong>arandr</strong> (available via apt), so I just start arandr whenever Fn-F7 is pressed.
+<strong><em>Note:</em></strong> Fn-F7 is identified as the XF86Display key. XFCE has a default mapping for that (it executes <code>xrandr &ndash;auto</code> which is supposed to do something useful, but..) so you may need to disable that default mapping. In XFCE that is done in the keyboard settings.</p>
+
+<p>Add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#configure display
+&quot;arandr&quot;
+    m:0x0 + c:235
+    XF86Display 
+</code></pre></div>
+
+<h5 id="volume-keys">Volume Keys</h5>
+
+<p>There are three keys to control the volume: One for mute, one to increase the volume and one to decrease it.
+The script uses amixer (from the <strong>alsa-utils</strong> package) to change the volume and also outputs the current volume/status.
+Save it as <strong>volume.sh</strong> and make it executable:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/usr/bin/env bash</span>
+<span class="c1"># adapted from http://ztatlock.blogspot.com/2009/01/volume-control-with-amixer-and-osdcat.html</span>
+
+<span class="nv">CHANNEL</span><span class="o">=</span>Master
+
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;-h&quot;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;--help&quot;</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then</span>
+  <span class="nv">p</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$0</span><span class="k">)</span>
+  cat <span class="s">&lt;&lt;HERE</span>
+
+<span class="s">  Usage: $p &lt;channel&gt; &lt;option&gt;</span>
+<span class="s">  where option is in {+, -, m, u} or is a percent</span>
+<span class="s">  e.g. $p 50       # sets $CHANNEL to 50%</span>
+<span class="s">           $p Front m  # toggles the mute of the channel Front</span>
+
+<span class="s">HERE</span>
+  <span class="nb">exit</span> 0
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$#</span> -eq <span class="m">2</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then</span>
+  <span class="nv">CHANNEL</span><span class="o">=</span><span class="nv">$1</span>
+  <span class="nb">shift</span>
+<span class="k">fi</span>
+
+<span class="k">function</span> vol_level <span class="o">{</span>
+  amixer get <span class="nv">$C</span>HANNEL <span class="p">|</span><span class="se">\</span>
+  grep <span class="s1">&#39;Front Left:&#39;</span>  <span class="p">|</span><span class="se">\</span>
+  cut -d <span class="s2">&quot; &quot;</span> -f <span class="m">7</span>     <span class="p">|</span><span class="se">\</span>
+  sed <span class="s1">&#39;s/[^0-9]//g&#39;</span>
+<span class="o">}</span>
+
+
+<span class="k">function</span> osd <span class="o">{</span>
+  killall osd_cat <span class="p">&amp;</span>&gt; /dev/null
+  <span class="nb">echo</span> <span class="nv">$*</span> <span class="p">|</span><span class="se">\</span>
+  osd_cat -d <span class="m">2</span> -l <span class="m">1</span> -p bottom -c green -s <span class="m">1</span> -A center -o <span class="m">50</span> <span class="se">\</span>
+    -f <span class="s1">&#39;-adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1&#39;</span> <span class="p">&amp;</span>
+<span class="o">}</span>
+
+<span class="k">function</span> mute_osd <span class="o">{</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>amixer get <span class="nv">$C</span>HANNEL <span class="p">|</span> grep Playback <span class="p">|</span> grep <span class="s2">&quot;\[on\]&quot;</span> <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span>
+        <span class="k">then</span>
+                osd <span class="nv">$C</span>HANNEL Unmuted
+        <span class="k">else</span>
+                osd <span class="nv">$C</span>HANNEL Muted
+        <span class="k">fi</span>
+<span class="o">}</span>
+
+<span class="k">function</span> vol_osd <span class="o">{</span>
+  killall osd_cat <span class="p">&amp;</span>&gt; /dev/null
+  osd_cat -d <span class="m">2</span> -l <span class="m">2</span> -p bottom -c green -s <span class="m">1</span> -A center -o <span class="m">50</span> <span class="se">\</span>
+    -f <span class="s1">&#39;-adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1&#39;</span> <span class="se">\</span>
+        -T <span class="s2">&quot;Volume (</span><span class="nv">$C</span><span class="s2">HANNEL) : </span><span class="k">$(</span>vol_level<span class="k">)</span><span class="s2"> %&quot;</span> -b percentage -P <span class="k">$(</span>vol_level<span class="k">)</span> <span class="p">&amp;</span>
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> in
+  <span class="s2">&quot;+&quot;</span><span class="o">)</span>
+        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL 5%+
+        vol_osd
+        <span class="p">;;</span>
+  <span class="s2">&quot;-&quot;</span><span class="o">)</span>
+        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL 5%-
+        vol_osd
+        <span class="p">;;</span>
+  <span class="s2">&quot;m&quot;</span><span class="o">)</span>
+        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL toggle
+        mute_osd
+        <span class="p">;;</span>
+  *<span class="o">)</span>
+        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL <span class="nv">$1</span>%
+        <span class="p">;;</span>
+<span class="k">esac</span>
+</code></pre></div>
+
+<p><del datetime="2011-12-28T14:51:40+00:00"><strong><em>Note:</strong></em> Due to a bug, probably in the sound driver or hardware, muting doesn&rsquo;t really work with this script (because muting master has no effect). Maybe I&rsquo;ll fix the script to use a workaround later.</del>
+<i><b>Update:</b> Muting Master does work now (it actually has been working for months), probably due to an updated Kernel in Debian Squeeze.</i></p>
+
+<p>Add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#Volume Up
+&quot;volume.sh +&quot;
+    m:0x0 + c:123
+    XF86AudioRaiseVolume 
+
+#Volume Down
+&quot;volume.sh -&quot;
+    m:0x0 + c:122
+    XF86AudioLowerVolume 
+
+#Volume (Un)Mute
+&quot;volume.sh m&quot;
+    m:0x0 + c:121
+    XF86AudioMute
+</code></pre></div>
+
+<h5 id="lock-screen">Lock Screen</h5>
+
+<p>Fn-F2 is used to lock the screen. If you&rsquo;re using <b>xscreensaver</b> you can just call <code>xscreensaver-command -lock</code> to lock the screen.
+To do that add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#Lock Screen
+&quot;xscreensaver-command -lock&quot;
+    m:0x0 + c:160
+    XF86ScreenSaver 
+</code></pre></div>
+
+<h5 id="battery-status">Battery Status</h5>
+
+<p>Fn-F3 has a battery symbol. I&rsquo;m not sure what it&rsquo;s supposed to do, but just displaying the current battery status (percentage and if it&rsquo;s charging, discharging or whatever) may be nice.
+The following script (save it as <strong>batteryinfo.sh</strong> to you $PATH and make it executable) does exactly that:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/bash</span>
+<span class="c1"># path to your battery. make sure it&#39;s correct</span>
+<span class="nv">BAT_PATH</span><span class="o">=</span><span class="s2">&quot;/sys/class/power_supply/BAT0&quot;</span>
+
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span>$<span class="s2">XAUTHORITY&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c1"># kill other osd_cat processes to prevent overlapping</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>ps -A <span class="p">|</span> grep osd_cat <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                killall osd_cat
+        <span class="k">fi</span>
+        <span class="nv">BAT_FULL</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BA</span>T_PATH/energy_full<span class="k">)</span>
+        <span class="nv">BAT_NOW</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BA</span>T_PATH/energy_now<span class="k">)</span>
+        <span class="nv">STATUS</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BA</span>T_PATH/status<span class="k">)</span>
+        <span class="nb">let</span> <span class="nv">perc</span><span class="o">=(</span>100*<span class="nv">$BA</span>T_NOW<span class="o">)</span>/<span class="nv">$BA</span>T_FULL
+
+        osd_cat -d <span class="m">2</span> -A center -p bottom -o <span class="m">50</span> -c yellow -s <span class="m">1</span> <span class="se">\</span>
+         -f -adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1 <span class="se">\</span>
+         -b percentage -P $perc -T <span class="s2">&quot;Battery </span>$<span class="s2">perc % loaded, </span>$<span class="s2">STATUS&quot;</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+<p>Add the following to your <strong>~/.xbindkeysrc</strong> to make it work:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#Battery Status
+&quot;batteryinfo.sh&quot;
+    m:0x0 + c:244
+    XF86Battery 
+</code></pre></div>
+
+<p>I haven&rsquo;t mapped the remaining special keys (like play, pause, &hellip;) yet, but as you may already have guessed, this could easily be done with xbindkeys. Use either xbindkeys-config to do that or create the entries for the <em>~/.xbindkeysrc</em> yourself - you can get the keycodes with <code>xbindkeys -k</code>.</p>
+
+<p>My complete <strong>~/.xbindkeysrc</strong>:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1">###########################</span>
+<span class="c1"># xbindkeys configuration #</span>
+<span class="c1">###########################</span>
+<span class="c1">#</span>
+<span class="c1"># Version: 0.1.3</span>
+<span class="c1">#</span>
+<span class="c1"># If you edit this, do not forget to uncomment any lines that you change.</span>
+<span class="c1"># The pound(#) symbol may be used anywhere for comments.</span>
+<span class="c1">#</span>
+<span class="c1"># A list of keys is in /usr/include/X11/keysym.h and in</span>
+<span class="c1"># /usr/include/X11/keysymdef.h </span>
+<span class="c1"># The XK_ is not needed. </span>
+<span class="c1">#</span>
+<span class="c1"># List of modifier (on my keyboard): </span>
+<span class="c1">#   Control, Shift, Mod1 (Alt), Mod2 (NumLock), </span>
+<span class="c1">#   Mod3 (CapsLock), Mod4, Mod5 (Scroll). </span>
+<span class="c1">#</span>
+<span class="c1"># Another way to specifie a key is to use &#39;xev&#39; and set the </span>
+<span class="c1"># keycode with c:nnn or the modifier with m:nnn where nnn is </span>
+<span class="c1"># the keycode or the state returned by xev </span>
+<span class="c1">#</span>
+<span class="c1"># This file is created by xbindkey_config </span>
+<span class="c1"># The structure is : </span>
+<span class="c1"># # Remark </span>
+<span class="c1"># &quot;command&quot; </span>
+<span class="c1"># m:xxx + c:xxx </span>
+<span class="c1"># Shift+... </span>
+
+<span class="c1">#keystate_numlock = enable</span>
+<span class="c1">#keystate_scrolllock = enable</span>
+<span class="c1">#keystate_capslock = enable</span>
+
+<span class="c1">#toggle touchpad</span>
+<span class="s2">&quot;toggletouchpad.sh&quot;</span>
+    m:0x0 + c:199
+    NoSymbol 
+
+<span class="c1">#configure display</span>
+<span class="s2">&quot;arandr&quot;</span>
+    m:0x0 + c:235
+    XF86Display 
+
+<span class="c1">#brightness up</span>
+<span class="s2">&quot;brightness.sh&quot;</span>
+    m:0x0 + c:233
+    XF86MonBrightnessUp 
+
+<span class="c1">#brightness down</span>
+<span class="s2">&quot;brightness.sh&quot;</span>
+    m:0x0 + c:232
+    XF86MonBrightnessDown 
+
+<span class="c1">#Volume Up</span>
+<span class="s2">&quot;volume.sh +&quot;</span>
+    m:0x0 + c:123
+    XF86AudioRaiseVolume 
+
+<span class="c1">#Volume Down</span>
+<span class="s2">&quot;volume.sh -&quot;</span>
+    m:0x0 + c:122
+    XF86AudioLowerVolume 
+
+<span class="c1">#Volume (Un)Mute</span>
+<span class="s2">&quot;volume.sh m&quot;</span>
+    m:0x0 + c:121
+    XF86AudioMute 
+
+<span class="c1">#Lock Screen</span>
+<span class="s2">&quot;xscreensaver-command -lock&quot;</span>
+    m:0x0 + c:160
+    XF86ScreenSaver 
+
+<span class="c1">#Battery Status</span>
+<span class="s2">&quot;batteryinfo.sh&quot;</span>
+    m:0x0 + c:244
+    XF86Battery 
+
+<span class="c1">#</span>
+<span class="c1"># End of xbindkeys configuration</span>
+</code></pre></div>
+
+<h3 id="what-also-works-tested">What also works (tested)</h3>
+
+<ul>
+    <li>the webcam (tested with guvcview, vlc, google talk)</li>
+    <li>the card reader (tested with SDHC card)</li>
+    <li>Bluetooth (tested with Wiimote)</li>
+    <li>sound card</li>
+    <li>LAN, WLAN</li>
+    <li>Hibernate (suspend to disk) and Standby (suspend to RAM)</li>
+    <li>VGA out (Displayport only works with the Radeon - also on Windows - so I haven't really tested it on Linux. I guess you'd need the fglrx driver for that to work.)</li>
+    <li>Several hardware sensors (fan speed, temperatures). About half of the temperature sensors don't work, though.. but who needs 16 temperature sensors anyway?
+<strong><em>Has anyone got a clue where those sensors (temp1 ... temp16) are?</em></strong>
+</ul>
+
+<h3 id="what-doesn-t-work">What doesn&rsquo;t work</h3>
+
+<ul>
+    <li>Switching the graphics adapter. With a newer kernel this should be possible - but not without restarting X. See <a href="http://www.thinkwiki.org/wiki/Switchable_Graphics">this article at the ThinkWiki</a></li>
+    <li>Intels TurboMemory. This is supposed to speed up Windows boot, but basically is flash memory plucked into a PCI-Express port. Could be useful for Linux as well, but is not supported.</li>
+    <li>The fingerprint reader (Authentec 2810) is unsupported according to <a href="http://www.thinkwiki.org/wiki/Integrated_Fingerprint_Reader">the ThinkWiki</a>. I don't care because most fingerprint readers can be fooled easily. Also I don't like the idea of a robber not only stealing my laptop, but also cutting off my fingers.</li>
+</ul>
+
+<h3 id="untested">Untested</h3>
+
+<ul>
+    <li>WAN (UMTS) (<a href="http://www.thinkwiki.org/wiki/Ericsson_F3507g_Mobile_Broadband_Module">should work</a>)</li>
+    <li>Thinkpad 56k Modem (<a href="http://www.thinkwiki.org/wiki/ThinkPad_Modem_%28MDC-3.0,_56kbps_HDA%29">should work</a>) </li>
+    <li>Firewire (should work)</li>
+    <li>TPM (don't care)</li>
+</ul>
+
+<h3 id="update-output-of-lspci-and-lsusb"><em>Update:</em> Output of lspci and lsusb</h3>
+
+<p>I figured it may be a good idea to paste the output of lspci and lsusb. Note that the radeon is disabled via BIOS, so it isn&rsquo;t listed. I highlighted the lines listing non-working hardware.</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">caedes@Cyberdemon:~$ lspci 
+00:00.0 Host bridge: Intel Corporation Mobile 4 Series Chipset Memory Controller Hub (rev 07)
+00:02.0 VGA compatible controller: Intel Corporation Mobile 4 Series Chipset Integrated Graphics Controller (rev 07)
+00:02.1 Display controller: Intel Corporation Mobile 4 Series Chipset Integrated Graphics Controller (rev 07)
+00:03.0 Communication controller: Intel Corporation Mobile 4 Series Chipset MEI Controller (rev 07)
+00:03.3 Serial controller: Intel Corporation Mobile 4 Series Chipset AMT SOL Redirection (rev 07)
+00:19.0 Ethernet controller: Intel Corporation 82567LM Gigabit Network Connection (rev 03)
+00:1a.0 USB Controller: Intel Corporation 82801I (ICH9 Family) USB UHCI Controller #4 (rev 03)
+00:1a.1 USB Controller: Intel Corporation 82801I (ICH9 Family) USB UHCI Controller #5 (rev 03)
+00:1a.2 USB Controller: Intel Corporation 82801I (ICH9 Family) USB UHCI Controller #6 (rev 03)
+00:1a.7 USB Controller: Intel Corporation 82801I (ICH9 Family) USB2 EHCI Controller #2 (rev 03)
+00:1b.0 Audio device: Intel Corporation 82801I (ICH9 Family) HD Audio Controller (rev 03)
+00:1c.0 PCI bridge: Intel Corporation 82801I (ICH9 Family) PCI Express Port 1 (rev 03)
+00:1c.1 PCI bridge: Intel Corporation 82801I (ICH9 Family) PCI Express Port 2 (rev 03)
+00:1c.2 PCI bridge: Intel Corporation 82801I (ICH9 Family) PCI Express Port 3 (rev 03)
+00:1c.3 PCI bridge: Intel Corporation 82801I (ICH9 Family) PCI Express Port 4 (rev 03)
+00:1c.4 PCI bridge: Intel Corporation 82801I (ICH9 Family) PCI Express Port 5 (rev 03)
+00:1d.0 USB Controller: Intel Corporation 82801I (ICH9 Family) USB UHCI Controller #1 (rev 03)
+00:1d.1 USB Controller: Intel Corporation 82801I (ICH9 Family) USB UHCI Controller #2 (rev 03)
+00:1d.2 USB Controller: Intel Corporation 82801I (ICH9 Family) USB UHCI Controller #3 (rev 03)
+00:1d.7 USB Controller: Intel Corporation 82801I (ICH9 Family) USB2 EHCI Controller #1 (rev 03)
+00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev 93)
+00:1f.0 ISA bridge: Intel Corporation ICH9M-E LPC Interface Controller (rev 03)
+00:1f.2 SATA controller: Intel Corporation ICH9M/M-E SATA AHCI Controller (rev 03)
+00:1f.3 SMBus: Intel Corporation 82801I (ICH9 Family) SMBus Controller (rev 03)
+03:00.0 Network controller: Intel Corporation Ultimate N WiFi Link 5300
+<span class="hll">04:00.0 Memory controller: Intel Corporation Turbo Memory Controller (rev 11) ## doesn&#39;t work
+</span>15:00.0 CardBus bridge: Ricoh Co Ltd RL5c476 II (rev ba)
+15:00.1 FireWire (IEEE 1394): Ricoh Co Ltd R5C832 IEEE 1394 Controller (rev 04)
+15:00.2 SD Host controller: Ricoh Co Ltd R5C822 SD/SDIO/MMC/MS/MSPro Host Adapter (rev 21)
+15:00.3 System peripheral: Ricoh Co Ltd R5C843 MMC Host Controller (rev ff)
+15:00.4 System peripheral: Ricoh Co Ltd R5C592 Memory Stick Bus Host Adapter (rev 11)
+15:00.5 System peripheral: Ricoh Co Ltd xD-Picture Card Controller (rev 11)
+
+caedes@Cyberdemon:~$ lsusb 
+Bus 008 Device 002: ID 17ef:1003 Lenovo Integrated Smart Card Reader
+Bus 008 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 007 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 006 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 004 Device 004: ID 0a5c:2145 Broadcom Corp. Bluetooth with Enhanced Data Rate II
+<span class="hll">Bus 004 Device 002: ID 08ff:2810 AuthenTec, Inc. AES2810 ## doesn&#39;t work
+</span>Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 003 Device 002: ID 0bdb:1900 Ericsson Business Mobile Networks BV F3507g Mobile Broadband Module
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 001 Device 004: ID 17ef:4807 Lenovo UVC Camera
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+</code></pre></div>
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="https://danielgibson.github.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="https://danielgibson.github.io/images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  function addLinkToHeading(h) {
+    l = document.createElement("a");
+    l.href = "#" + h.id;
+    l.innerHTML = "# ";
+    l.className = "headinglink";
+    h.insertBefore(l, h.firstChild);
+  }
+
+  for(h=1; h<=6; ++h)
+  {
+    hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      if(hs[i].id)  addLinkToHeading(hs[i]);
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+

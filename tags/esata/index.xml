@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Esata on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/esata/</link>
+    <description>Recent content in Esata on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 11 May 2010 22:55:05 +0200</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/esata/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Shutting down (e)SATA disks under Linux</title>
+      <link>https://danielgibson.github.io/2010/05/11/shutting-down-esata-disks-under-linux/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/2010/05/11/shutting-down-esata-disks-under-linux/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;m using a eSATA external harddrive and want to be able to safely unplug it without shutting down my PC. While just removing the drive after unmounting worked so far, I&amp;rsquo;m not sure if it&amp;rsquo;s really safe - I&amp;rsquo;d really prefer to cleanly disconnect it and spinning it down before pulling the plug.
+I googled that and stumbled upon &lt;a href=&#34;http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/&#34;&gt;http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/&lt;/a&gt; which seems to be a clean and safe way to do it, so I just wrote a script to do that.
+
+It also checks if any partition of that drive is still mounted (that check might result in false positives however or might just fail when the disk is mounted by UUID or via some mapper like dmcrypt) and tells you to unmount before disconnecting the drive - however you can bypass that test with the &lt;code&gt;-f&lt;/code&gt; option.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

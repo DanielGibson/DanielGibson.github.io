@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Daniels Tech Blog</title>
+    <link>https://danielgibson.github.io/tags/</link>
+    <description>Recent content in Tags on Daniels Tech Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 05 Jan 2011 16:55:41 +0200</lastBuildDate>
+    
+	<atom:link href="https://danielgibson.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>2055v1x</title>
+      <link>https://danielgibson.github.io/tags/2055v1x/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/2055v1x/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Browser</title>
+      <link>https://danielgibson.github.io/tags/browser/</link>
+      <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/browser/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>C</title>
+      <link>https://danielgibson.github.io/tags/c/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/c/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Compression</title>
+      <link>https://danielgibson.github.io/tags/compression/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/compression/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Debian</title>
+      <link>https://danielgibson.github.io/tags/debian/</link>
+      <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/debian/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Debian Squeeze</title>
+      <link>https://danielgibson.github.io/tags/debian-squeeze/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/debian-squeeze/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Disconnect Disk</title>
+      <link>https://danielgibson.github.io/tags/disconnect-disk/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/disconnect-disk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Disk</title>
+      <link>https://danielgibson.github.io/tags/disk/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/disk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Diskpart</title>
+      <link>https://danielgibson.github.io/tags/diskpart/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/diskpart/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Efi</title>
+      <link>https://danielgibson.github.io/tags/efi/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/efi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Esata</title>
+      <link>https://danielgibson.github.io/tags/esata/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/esata/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Firefox</title>
+      <link>https://danielgibson.github.io/tags/firefox/</link>
+      <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/firefox/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gdisk</title>
+      <link>https://danielgibson.github.io/tags/gdisk/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/gdisk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gnome Keyring</title>
+      <link>https://danielgibson.github.io/tags/gnome-keyring/</link>
+      <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/gnome-keyring/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gpt</title>
+      <link>https://danielgibson.github.io/tags/gpt/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/gpt/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Grub</title>
+      <link>https://danielgibson.github.io/tags/grub/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/grub/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Grub Efi</title>
+      <link>https://danielgibson.github.io/tags/grub-efi/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/grub-efi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Grub2</title>
+      <link>https://danielgibson.github.io/tags/grub2/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/grub2/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Hotplug</title>
+      <link>https://danielgibson.github.io/tags/hotplug/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/hotplug/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Iceweasel</title>
+      <link>https://danielgibson.github.io/tags/iceweasel/</link>
+      <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/iceweasel/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Icon</title>
+      <link>https://danielgibson.github.io/tags/icon/</link>
+      <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/icon/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Jpeg</title>
+      <link>https://danielgibson.github.io/tags/jpeg/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/jpeg/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Libjpeg Turbo</title>
+      <link>https://danielgibson.github.io/tags/libjpeg-turbo/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/libjpeg-turbo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Libpam Gnome Keyring</title>
+      <link>https://danielgibson.github.io/tags/libpam-gnome-keyring/</link>
+      <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/libpam-gnome-keyring/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Libpng</title>
+      <link>https://danielgibson.github.io/tags/libpng/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/libpng/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Libsdl</title>
+      <link>https://danielgibson.github.io/tags/libsdl/</link>
+      <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/libsdl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Linux</title>
+      <link>https://danielgibson.github.io/tags/linux/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Lodepng</title>
+      <link>https://danielgibson.github.io/tags/lodepng/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/lodepng/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Mbr</title>
+      <link>https://danielgibson.github.io/tags/mbr/</link>
+      <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/mbr/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Mcabber</title>
+      <link>https://danielgibson.github.io/tags/mcabber/</link>
+      <pubDate>Thu, 01 Oct 2009 22:34:06 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/mcabber/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Miniz</title>
+      <link>https://danielgibson.github.io/tags/miniz/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/miniz/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Network Manager</title>
+      <link>https://danielgibson.github.io/tags/network-manager/</link>
+      <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/network-manager/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Pain</title>
+      <link>https://danielgibson.github.io/tags/pain/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/pain/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Pam</title>
+      <link>https://danielgibson.github.io/tags/pam/</link>
+      <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/pam/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Performance</title>
+      <link>https://danielgibson.github.io/tags/performance/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/performance/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Png</title>
+      <link>https://danielgibson.github.io/tags/png/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/png/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Programming</title>
+      <link>https://danielgibson.github.io/tags/programming/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Research.Microsoft.Com</title>
+      <link>https://danielgibson.github.io/tags/research.microsoft.com/</link>
+      <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/research.microsoft.com/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Reverse Vnc</title>
+      <link>https://danielgibson.github.io/tags/reverse-vnc/</link>
+      <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/reverse-vnc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Sata</title>
+      <link>https://danielgibson.github.io/tags/sata/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/sata/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Sdl2</title>
+      <link>https://danielgibson.github.io/tags/sdl2/</link>
+      <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/sdl2/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Shrink Partition</title>
+      <link>https://danielgibson.github.io/tags/shrink-partition/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/shrink-partition/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Shrink Windows</title>
+      <link>https://danielgibson.github.io/tags/shrink-windows/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/shrink-windows/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Shutdown</title>
+      <link>https://danielgibson.github.io/tags/shutdown/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/shutdown/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Slim</title>
+      <link>https://danielgibson.github.io/tags/slim/</link>
+      <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/slim/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Special Keys</title>
+      <link>https://danielgibson.github.io/tags/special-keys/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/special-keys/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Spin Down</title>
+      <link>https://danielgibson.github.io/tags/spin-down/</link>
+      <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/spin-down/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Squeeze</title>
+      <link>https://danielgibson.github.io/tags/squeeze/</link>
+      <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/squeeze/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Stb</title>
+      <link>https://danielgibson.github.io/tags/stb/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/stb/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Stb_image</title>
+      <link>https://danielgibson.github.io/tags/stb_image/</link>
+      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/stb_image/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Stb_image_write</title>
+      <link>https://danielgibson.github.io/tags/stb_image_write/</link>
+      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/stb_image_write/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>T500</title>
+      <link>https://danielgibson.github.io/tags/t500/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/t500/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Thinkpad</title>
+      <link>https://danielgibson.github.io/tags/thinkpad/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/thinkpad/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tightvnc</title>
+      <link>https://danielgibson.github.io/tags/tightvnc/</link>
+      <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/tightvnc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Uefi</title>
+      <link>https://danielgibson.github.io/tags/uefi/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/uefi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ultranav</title>
+      <link>https://danielgibson.github.io/tags/ultranav/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/ultranav/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Vnc</title>
+      <link>https://danielgibson.github.io/tags/vnc/</link>
+      <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/vnc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Wheezy</title>
+      <link>https://danielgibson.github.io/tags/wheezy/</link>
+      <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/wheezy/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Win7</title>
+      <link>https://danielgibson.github.io/tags/win7/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/win7/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Window Icon</title>
+      <link>https://danielgibson.github.io/tags/window-icon/</link>
+      <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/window-icon/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Windows</title>
+      <link>https://danielgibson.github.io/tags/windows/</link>
+      <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/windows/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>X11vnc</title>
+      <link>https://danielgibson.github.io/tags/x11vnc/</link>
+      <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/x11vnc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Xbindkeys</title>
+      <link>https://danielgibson.github.io/tags/xbindkeys/</link>
+      <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/xbindkeys/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Xterm Title</title>
+      <link>https://danielgibson.github.io/tags/xterm-title/</link>
+      <pubDate>Thu, 01 Oct 2009 22:34:06 +0000</pubDate>
+      
+      <guid>https://danielgibson.github.io/tags/xterm-title/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
