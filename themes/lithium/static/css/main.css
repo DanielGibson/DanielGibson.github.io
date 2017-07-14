@@ -298,6 +298,14 @@ code {
 }
 
 @media (min-width: 720px) {
+
+  /* if there's some margin on the left, move the heading link
+   * to the left so the heading itself is roughly where it would be
+   * without the "# " link */
+  .article-content .headinglink {
+    margin-left: -1em;
+  }
+
   .header {
     padding: 25px 0;
   }
