@@ -96,14 +96,13 @@ code {
 }
 
 .content {
-  max-width: 800px;
+  max-width: 700px;
   margin: 20px auto 80px;
   padding: 0 15px;
   font-size: 16px;
   /*font-size: 100%;*/
   line-height: 1.7;
   color: #555;
-  hyphens: auto;
 }
 
 .article-title {
@@ -127,6 +126,10 @@ code {
   border-radius: 3px;
   background: #bbb;
   color: #fff
+}
+
+.article-content {
+  hyphens: auto;
 }
 
 /* I want normal tables to have visible grids/borders */
@@ -294,7 +297,7 @@ code {
   margin-left: 2px;
 }
 
-@media (min-width: 800px) {
+@media (min-width: 720px) {
   .header {
     padding: 25px 0;
   }
