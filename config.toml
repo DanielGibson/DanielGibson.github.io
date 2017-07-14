@@ -1,4 +1,4 @@
-BaseURL = "http://foo.bar/"
+BaseURL = "https://danielgibson.github.io/"
 languageCode = "en-us"
 title = "Daniels Tech Blog"
 paginate = 10

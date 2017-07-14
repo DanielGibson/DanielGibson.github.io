@@ -136,7 +136,7 @@ For some reason, grub/os-prober didn't automatically detect the Windows installa
 
 Add the following to `/etc/grub.d/40_custom` (or, if your distro doesn't have /etc/grub.d/, add it to /etc/grub.conf or something like that):
 ```text
-menuentry &quot;Microsoft Windows 7 x86_64 UEFI-GPT&quot; {
+menuentry "Microsoft Windows 7 x86_64 UEFI-GPT" {
 	insmod part_gpt
 	insmod fat
 	insmod search_fs_uuid

@@ -135,9 +135,9 @@ be used to copy just a rectangle out of the source image. While we use the
 whole image, it must be `my_icon.bytes_per_pixel * my_icon.width` either way.
 
 {{< highlight c"linenos=table,linenostart=22" >}}
-  SDL_Surface* icon = SDL_CreateRGBSurfaceFrom((void*)my_icon.pixel_data, my_icon.width,
-      my_icon.height, my_icon.bytes_per_pixel*8, my_icon.bytes_per_pixel*my_icon.width,
-      rmask, gmask, bmask, amask);
+  SDL_Surface* icon = SDL_CreateRGBSurfaceFrom((void*)my_icon.pixel_data,
+      my_icon.width, my_icon.height, my_icon.bytes_per_pixel*8,
+      my_icon.bytes_per_pixel*my_icon.width, rmask, gmask, bmask, amask);
   
 {{< /highlight >}}
 
