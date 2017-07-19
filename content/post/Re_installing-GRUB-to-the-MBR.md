@@ -2,6 +2,7 @@
 date = "2013-12-31T04:13:03+02:00"
 title = "(Re)installing GRUB to the MBR"
 tags = [ "debian", "grub", "grub2", "mbr", "squeeze", "wheezy" ]
+ghcommentid = 1
 +++
 
 This is just a very short roundup of the relevant commands needed to reinstall grub,

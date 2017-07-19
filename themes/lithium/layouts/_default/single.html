@@ -18,7 +18,21 @@
     </div>
   </article>
 
-  {{ template "_internal/disqus.html" . }}
+  {{ if $.Params.ghcommentid }}
+
+  <hr>
+
+  <div id="gh-comments">
+    <h4>COMMENTS</h4>
+    <div id="gh-comments-list"></div>
+    <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+  </div>
+
+  <script type="text/javascript" src="{{ .Site.BaseURL }}js/github-comments.js"></script>
+  <script type="text/javascript">
+    DoGithubComments({{ $.Params.ghcommentid }});
+  </script>
+  {{ end }}
 
 </main>
 
