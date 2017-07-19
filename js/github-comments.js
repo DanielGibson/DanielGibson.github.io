@@ -58,7 +58,7 @@ function AddComments(xhreq, page_id, issueURL, comment_id)
 
         var t = "<div id='gh-comment'>";
         t += "<img src='" + comment.user.avatar_url + "' width='24px'>";
-        t += "<b><a href='" + comment.user.html_url + "'>" + comment.user.login + "</a></b>";
+        t += "<b><a href='" + comment.user.html_url + "' class='comment-user-link'>" + comment.user.login + "</a></b>";
         t += " posted at ";
         t += "<em>" + date.toUTCString() + "</em>";
         t += "<div id='gh-comment-hr'></div>";

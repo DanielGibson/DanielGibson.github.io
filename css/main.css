@@ -466,6 +466,17 @@ code {
     font-family: 'Source Code Pro', monospace;
 }
 
+.comment-user-link {
+  color: black;
+  text-decoration: none;
+}
+
+
+.comment-user-link:hover,
+.comment-user-link:focus {
+  background: #CBF8DF;
+}
+
 /* the #gh-* and .btn stuff is based on Don Williamson's:
  * https://github.com/dwilliamson/donw.io/blob/master/public/css/main.css#L843
  */
