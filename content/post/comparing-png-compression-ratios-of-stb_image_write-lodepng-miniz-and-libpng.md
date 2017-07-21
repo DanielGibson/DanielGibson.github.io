@@ -2,6 +2,7 @@
 date = "2015-07-18T02:29:24"
 title = "Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng"
 tags = [ "C", "compression", "libpng", "lodepng", "miniz", "png", "stb", "stb_image_write" ]
+ghcommentid = 11
 +++
 
 Because of https://github.com/nothings/stb/issues/113 I was wondering how good/bad

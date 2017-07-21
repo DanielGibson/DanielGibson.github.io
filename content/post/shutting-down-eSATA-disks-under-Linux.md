@@ -2,6 +2,7 @@
 date = "2010-05-11T22:55:05+02:00"
 title = "Shutting down (e)SATA disks under Linux"
 tags = [ " disconnect disk", "disk", "eSATA", "hotplug", "Linux", "SATA", "shutdown", "spin down" ]
+ghcommentid = 5
 +++
 
 I'm using a eSATA external harddrive and want to be able to safely unplug it without shutting down my PC. While just removing the drive after unmounting worked so far, I'm not sure if it's really safe - I'd really prefer to cleanly disconnect it and spinning it down before pulling the plug. 

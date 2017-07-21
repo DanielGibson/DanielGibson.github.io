@@ -2,6 +2,7 @@
 date = "2015-03-23T00:06:18"
 title = "Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng"
 tags = [ "C", "jpeg", "libjpeg-turbo", "libpng", "Linux", "lodepng", "performance", "png", "programming", "stb_image" ]
+ghcommentid = 9
 +++
 
 I recently tried out Sean Barrett's [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h)

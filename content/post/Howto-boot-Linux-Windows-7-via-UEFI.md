@@ -2,6 +2,7 @@
 date = "2014-01-02T02:05:41"
 title = "How to boot Linux and Windows 7 via UEFI"
 tags = [ "diskpart", "efi", "gdisk", "GPT", "grub", "grub-efi", "grub2", "Linux", "pain", "uefi", "Win7", "Windows" ]
+ghcommentid = 8
 +++
 
 Don't.  

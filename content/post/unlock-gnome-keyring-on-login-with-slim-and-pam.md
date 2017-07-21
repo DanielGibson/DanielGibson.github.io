@@ -2,6 +2,7 @@
 date = "2010-05-05T02:41:30+02:00"
 title = "Unlock gnome-keyring on Login with SLiM and PAM"
 tags = [ "gnome-keyring", "libpam-gnome-keyring", "Linux", "network manager", "PAM", "slim" ]
+ghcommentid = 4
 +++
 
 My favorite desktop environment is <a href="http://www.xfce.org/">XFCE</a>, because it's fast, doesn't need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).

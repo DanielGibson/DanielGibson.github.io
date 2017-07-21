@@ -2,6 +2,7 @@
 date = "2010-06-30T01:44:36+02:00"
 title = "Bug-Hunting: Browsers fail to load research.microsoft.com"
 tags = [ "browser", "debian", "firefox", "iceweasel", "Linux", "research.microsoft.com" ]
+ghcommentid = 6
 +++
 
 This is a follow-up to <a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541658">debian bug #541658 for Iceweasel: "cannot open research.microsoft.com"</a>.

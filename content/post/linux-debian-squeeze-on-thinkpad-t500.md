@@ -2,6 +2,7 @@
 date = "2011-01-05T16:55:41+02:00"
 title = "Linux (Debian Squeeze) on Thinkpad T500"
 tags = [ "Linux", "2055V1X", "debian", "debian squeeze", "shrink partition", "shrink windows", "special keys", "squeeze", "T500", "thinkpad", "ultranav", "xbindkeys" ]
+ghcommentid = 7
 +++
 
 I recently got myself a Lenovo <a href="http://www.thinkwiki.org/wiki/Category:T500">Thinkpad T500</a> (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I'd definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.

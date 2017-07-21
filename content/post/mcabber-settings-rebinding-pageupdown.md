@@ -3,6 +3,7 @@ date = "2009-10-01T22:34:06+00:00"
 draft = false
 title = "MCabber - Settings and rebinding of PageUp/PageDown"
 tags = [ "Linux", "mcabber", "xterm title" ]
+ghcommentid = 2
 +++
 
 

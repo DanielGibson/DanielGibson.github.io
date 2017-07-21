@@ -2,6 +2,7 @@
 date = "2015-04-13T00:21:27"
 title = "How to integrate your SDL2 window icon (or any image) into your executable"
 tags = [ "C", "icon", "libSDL", "SDL2", "window-icon" ]
+ghcommentid = 10
 +++
 
 Let's assume you have an image that you want to use as a window icon in your

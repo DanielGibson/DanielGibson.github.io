@@ -2,6 +2,7 @@
 date = "2010-01-08T02:55:18+02:00"
 title = "Remote administration/tech-support with (reverse) VNC"
 tags = [ "Linux", "reverse VNC", "TightVNC", "VNC", "Windows", "x11vnc" ]
+ghcommentid = 3
 +++
 
 Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, <a title="Virtual Network Computing" href="http://en.wikipedia.org/wiki/VNC">VNC</a> is my weapon of choice, if SSH isn't sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, ...).
