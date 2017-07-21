@@ -15,7 +15,7 @@
 function ParseLinkHeader(link)
 {
     var links = { };
-    if (links)
+    if (link)
     {
         var entries = link.split(",");
         for (var i in entries)
