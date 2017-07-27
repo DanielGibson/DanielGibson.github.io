@@ -16,9 +16,9 @@ relativeURLs = true
     post = "/:year/:month/:day/:title/"
     page = "/:title/"
 
-#[[menu.main]]
-#    name = "About"
-#    url = "/about/"
+[[menu.main]]
+    name = "About"
+    url = "/about/"
 
 [[menu.main]]
     name = "Github"
