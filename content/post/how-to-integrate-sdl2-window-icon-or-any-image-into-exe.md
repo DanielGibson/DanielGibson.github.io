@@ -155,7 +155,7 @@ will duplicate the contained data anyway):
 Done!
 
 This method can be used to integrate any image into your executable, of course,
-but it's added uncompressed so the executable can be pretty big.  
+but it's added uncompressed so the executable can get pretty big.  
 It's ok for a window icon (and maybe a handful of other icons or cursors),
 but if you need more data, you probably shouldn't integrate it into your
 executable, especially not uncompressed. Maybe use a zip file or something.

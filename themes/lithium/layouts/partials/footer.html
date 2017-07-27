@@ -19,22 +19,22 @@
   /* apparently it's impossible to customize the html code hugo generates for headings..
    * I want to make it easy to get a link to them (which itself is possible, hugo
    * automatically sets ids for headings that can be used as anchors),
-   * so this bit of JS prepends a clickable "#" to the heading, using the
+   * so this bit of JS prepends a clickable "# " to the heading, using the
    * id as the link target. */
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) // for <h1>, <h2>, ..., <h6>
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      // if the heading has an id, it can be linked to => add "# " link to heading
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>
