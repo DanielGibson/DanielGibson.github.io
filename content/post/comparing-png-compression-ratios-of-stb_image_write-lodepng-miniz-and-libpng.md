@@ -18,7 +18,7 @@ I used four different test images, all 24bit RGB:
 A screenshot from <a href="https://github.com/yquake2/zaero">Quake2: Zaero</a> in 1680x1050,
 a screenshot from <a href="https://github.com/RobertBeckebans/RBDOOM-3-BFG/">RBDoom3BFG</a> in 1392x920,
 the classic "<a href="https://en.wikipedia.org/wiki/Lenna">Lenna</a>" test image in 512x512
-and a <a href="http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html">colorful wallpaper with several parrots</a> in 2560x1600.  
+and a <a href="http://wallpapercave.com/w/a5QVpjx">colorful wallpaper with several parrots</a> in 2560x1600.  
 Update: I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a>
 
 # Results:
@@ -127,4 +127,6 @@ Needs:
 
 [![Snakebird](/images/snakebird2_libpng-small.png)](/images/snakebird2_libpng.png)
 
-And this wallpaper of parrots: http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html
+And a wallpaper of parrots, available at:
+http://wallpapercave.com/w/a5QVpjx or
+http://www.kanhangadvartha.com/HQW-946107.html  
