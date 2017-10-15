@@ -6,6 +6,9 @@ theme = "lithium"
 pygmentsuseclasses = true
 pygmentsstyle = "tango"
 PygmentsCodeFences = true
+# don't use the chroma highlighting stuff, it makes copying
+# from from code blocks with line numbers harder
+pygmentsUseClassic = true
 relativeURLs = true
 
 [params]
