@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>Daniels Tech Blog</title>
@@ -40,6 +40,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="./about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -118,14 +120,14 @@ and to set that surface as a window icon.
                 <p>I recently tried out Sean Barrett&rsquo;s <a href="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image.h</a>
 and was blown away by how fucking easy it is to use.<br />
 Integrating it into your project is trivial: Just add the header and somewhere do:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#define STB_IMAGE_IMPLEMENTATION</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cp">#define STB_IMAGE_IMPLEMENTATION</span>
 <span class="cp">#include</span> <span class="cpf">&quot;stb_image.h&quot;</span><span class="cp"></span>
 </code></pre></div>
 
 <p>That&rsquo;s all. (If you wanna use it in multiple files you just <code>#include &quot;stb_image.h&quot;</code> there without the <code>#define</code>.)</p>
 
 <p>And the API is trivial too:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
 <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pixeldata</span><span class="p">,</span> <span class="o">*</span><span class="n">pixeldata2</span><span class="p">;</span>
 <span class="n">pixeldata</span> <span class="o">=</span> <span class="n">stbi_load</span><span class="p">(</span><span class="s">&quot;bla.jpg&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 <span class="c1">// if you have already read the image file data into a buffer:</span>
@@ -382,20 +384,20 @@ I&rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log in w
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

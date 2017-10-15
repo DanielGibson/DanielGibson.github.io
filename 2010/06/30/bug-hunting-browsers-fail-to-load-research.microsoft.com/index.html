@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>Bug-Hunting: Browsers fail to load research.microsoft.com - Daniels Tech Blog</title>
@@ -37,6 +37,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -163,7 +165,7 @@ This is why I'd like to find out what's really broken here instead of saying "ju
 It might also be relevant that the HTTP GET requests are only about 770byte long (without overhead from headers), so even with all the headers (TCP, IP, ...) the packet containing the request will be well below 1492byte (ppp0's MTU), so clamping shouldn't even occur here!</li>
     <li> One thing that was missing until now was a <strong>wireshark-capture of a successful connection with cookies and MTU-clamping disabled</strong> on the router, so here it is:
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">## format: Number, SysTime, Source, Destination, Protocol, Info, Packet length
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>## format: Number, SysTime, Source, Destination, Protocol, Info, Packet length
 4393	2010-06-30 01:16:25.842562	192.168.0.126	131.107.65.14	TCP	32828 &gt; http [SYN] Seq=0 Win=5840 Len=0 MSS=1460 TSV=47754788 TSER=0 WS=7	74
 4394	2010-06-30 01:16:26.029084	131.107.65.14	192.168.0.126	TCP	http &gt; 32828 [SYN, ACK] Seq=0 Ack=1 Win=8192 Len=0	60
 4395	2010-06-30 01:16:26.029134	192.168.0.126	131.107.65.14	TCP	32828 &gt; http [ACK] Seq=1 Ack=1 Win=5840 Len=0	54
@@ -184,7 +186,7 @@ Why does this happen? Does Microsoft's server not accept packets that are bigger
 
 <p>I captured a wireshark dump on Windows (with MTU clamping enabled on the router) while loading a research.microsoft.com page.. and found out why it does load on windows but doesn&rsquo;t on Linux:</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">No      SysTime                    Source                Destination           Protocol Info                                                            Length
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>No      SysTime                    Source                Destination           Protocol Info                                                            Length
       1 2010-07-01 01:18:55.356502 192.168.0.126         131.107.65.14         TCP      49276 &gt; http [SYN] Seq=0 Win=8192 [TCP CHECKSUM INCORRECT] Len=0 MSS=1460 WS=2 66
       2 2010-07-01 01:18:55.541603 131.107.65.14         192.168.0.126         TCP      http &gt; 49276 [SYN, ACK] Seq=0 Ack=1 Win=8192 Len=0 MSS=1452     60
       3 2010-07-01 01:18:55.541648 192.168.0.126         131.107.65.14         TCP      49276 &gt; http [ACK] Seq=1 Ack=1 Win=65340 [TCP CHECKSUM INCORRECT] Len=0 54
@@ -245,6 +247,10 @@ I filed a bugreport at Netfilter&rsquo;s bugzilla: <a href="http://bugzilla.netf
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/6"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -275,20 +281,20 @@ I filed a bugreport at Netfilter&rsquo;s bugzilla: <a href="http://bugzilla.netf
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

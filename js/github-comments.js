@@ -110,7 +110,7 @@ function DoGithubComments(comment_id, page_id)
                 var t = "Exceeded the Github API rate limit, try again in ";
                 t += 60; // FIXME: get timestamp from request and current timestamp etc
                 t += " minutes or just view the comments directly at<br>";
-                t += "<a href='" + issueURL + "' rel='nofollow' target='_blank' rel='nofollow' class='btn'>Github</a>";
+                t += "<a href='" + issueURL + "' rel='nofollow' target='_blank' class='btn'>Github</a>";
                 document.querySelector("#gh-comments-list").insertAdjacentHTML("beforeend", t);
             }
             else

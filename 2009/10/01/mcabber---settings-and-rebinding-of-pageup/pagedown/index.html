@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>MCabber - Settings and rebinding of PageUp/PageDown - Daniels Tech Blog</title>
@@ -37,6 +37,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="../../../../../about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -95,7 +97,7 @@ Now you should have a fairly useable config.</p>
 <p>PageDown: <code>#define KEY_NPAGE  0522</code> 0522 is an octal value, convert to decimal (right to left): <strong>2</strong>*8^0+<strong>2</strong>*8^1+<strong>5</strong>*8^2 = 2*1+2*8+5*64 = 338</p>
 
 <p>PageUp is KEY_PPAGE, defined as 0523 (on my system), which translates to 339. Add the following to your mcabberrc to change the semantics of PageUp/Down and Ctrl-PageUp/Down:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"># Ctrl-PGUP/DN -&gt; move in contact list
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span># Ctrl-PGUP/DN -&gt; move in contact list
 bind MK3 = roster up
 bind MK4 = roster down
 # PGUP/DN -&gt; scroll in message history
@@ -110,7 +112,7 @@ bind 338 = buffer down
 <p><code>$ settitle.sh &ldquo;MCabber&rdquo; &amp;&amp; mcabber</code></p>
 
 <p><strong>settitle.sh</strong> looks like this:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/sh</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="ch">#!/bin/sh</span>
 <span class="nb">printf</span> <span class="s1">&#39;33]2;%s07&#39;</span> <span class="nv">$1</span>
 </code></pre></div>
     </div>
@@ -124,6 +126,10 @@ bind 338 = buffer down
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/2"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -154,20 +160,20 @@ bind 338 = buffer down
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

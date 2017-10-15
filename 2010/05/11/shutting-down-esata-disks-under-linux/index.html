@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>Shutting down (e)SATA disks under Linux - Daniels Tech Blog</title>
@@ -38,6 +38,8 @@
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
     
+    <li><a href="../../../../about/">About</a></li>
+    
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
     <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
@@ -70,7 +72,7 @@ Save the code to <code>/usr/local/sbin/disc_disk</code> (or some other directory
 Usage is quite easy: If you want to disconnect the disk represented by /dev/sdX just execute (as root or prefixed by <code>sudo</code>) <pre><code>$ disc_disk sdX</pre></code></p>
 
 <p>This should probably work with any hot-pluggable device managed by the Linux SCSI subsystem like USB memory sticks (tried that, worked for me) or real SCSI discs.</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/sh</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="ch">#!/bin/sh</span>
 <span class="c1"># simple script to shutdown and disconnect SATA-discs</span>
 <span class="c1"># (and probably other devices using Linux&#39;s SCSI-subsystem </span>
 <span class="c1"># like USB mass-storage devices)</span>
@@ -83,51 +85,51 @@ Usage is quite easy: If you want to disconnect the disk represented by /dev/sdX 
 
 <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;-h&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 	<span class="nb">echo</span> <span class="s2">&quot;Disconnects and shuts down disk.&quot;</span>
-	<span class="nb">echo</span> -e $USG
-	<span class="nb">exit</span> 0
+	<span class="nb">echo</span> -e <span class="nv">$USG</span>
+	<span class="nb">exit</span> <span class="m">0</span>
 <span class="k">fi</span>
 
-<span class="nv">FORCE</span><span class="o">=</span>0
+<span class="nv">FORCE</span><span class="o">=</span><span class="m">0</span>
 
 <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 	<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;-f&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-		<span class="nv">FORCE</span><span class="o">=</span>1
+		<span class="nv">FORCE</span><span class="o">=</span><span class="m">1</span>
 	<span class="k">else</span>
 		<span class="nb">echo</span> <span class="s2">&quot;Unknown Option </span><span class="nv">$1</span><span class="s2">&quot;</span>
-		<span class="nb">echo</span> -e $USG
-		<span class="nb">exit</span> 1
+		<span class="nb">echo</span> -e <span class="nv">$USG</span>
+		<span class="nb">exit</span> <span class="m">1</span>
 	<span class="k">fi</span>
 	<span class="nv">DEV</span><span class="o">=</span><span class="nv">$2</span>
 <span class="k">else</span>
 	<span class="nv">DEV</span><span class="o">=</span><span class="nv">$1</span>
 <span class="k">fi</span>
 
-<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$DE</span>V <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$DEV</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 	<span class="nb">echo</span> <span class="s2">&quot;Disconnects and shuts down disk.&quot;</span>
-	<span class="nb">echo</span> -e $USG
-	<span class="nb">exit</span> 1
+	<span class="nb">echo</span> -e <span class="nv">$USG</span>
+	<span class="nb">exit</span> <span class="m">1</span>
 <span class="k">fi</span>
 
-<span class="nv">DPATH</span><span class="o">=</span><span class="s2">&quot;/sys/block/</span><span class="nv">$DE</span><span class="s2">V/device/delete&quot;</span>
+<span class="nv">DPATH</span><span class="o">=</span><span class="s2">&quot;/sys/block/</span><span class="nv">$DEV</span><span class="s2">/device/delete&quot;</span>
 
-<span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$D</span>PATH <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+<span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$DPATH</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 	<span class="nb">echo</span> <span class="s2">&quot;Invalid device!&quot;</span>
-	<span class="nb">echo</span> -e $USG
-	<span class="nb">exit</span> 1
+	<span class="nb">echo</span> -e <span class="nv">$USG</span>
+	<span class="nb">exit</span> <span class="m">1</span>
 <span class="k">fi</span>
 
 <span class="c1"># really simple check, might fail (may be skipped  with -f)</span>
 <span class="c1"># (e.g. on mount /dev/sdb /mnt/sda and disc_disk sda)</span>
-<span class="k">if</span> <span class="o">[</span> <span class="nv">$F</span>ORCE -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-	<span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DE</span>V <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$FORCE</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+	<span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DEV</span> <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 		<span class="nb">echo</span> <span class="s2">&quot;Device still mounted! Unmount it before disconnecting or use -f option to enforce disconnect (dangerous!).&quot;</span>
-		<span class="nb">echo</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DE</span>V<span class="k">)</span>
-		<span class="nb">exit</span> 1
+		<span class="nb">echo</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DEV</span><span class="k">)</span>
+		<span class="nb">exit</span> <span class="m">1</span>
 	<span class="k">fi</span>
 <span class="k">fi</span>
 
-<span class="nb">echo</span> <span class="s2">&quot;Shutting down and disconnecting </span><span class="nv">$DE</span><span class="s2">V..&quot;</span>
-<span class="nb">echo</span> <span class="m">1</span> &gt; <span class="nv">$D</span>PATH
+<span class="nb">echo</span> <span class="s2">&quot;Shutting down and disconnecting </span><span class="nv">$DEV</span><span class="s2">..&quot;</span>
+<span class="nb">echo</span> <span class="m">1</span> &gt; <span class="nv">$DPATH</span>
 <span class="nb">echo</span> <span class="s2">&quot;Done.&quot;</span>
 </code></pre></div>
     </div>
@@ -141,6 +143,10 @@ Usage is quite easy: If you want to disconnect the disk represented by /dev/sdX 
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/5"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -171,20 +177,20 @@ Usage is quite easy: If you want to disconnect the disk represented by /dev/sdX 
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

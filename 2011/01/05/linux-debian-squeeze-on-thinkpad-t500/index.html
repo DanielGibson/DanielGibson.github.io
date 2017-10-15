@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>Linux (Debian Squeeze) on Thinkpad T500 - Daniels Tech Blog</title>
@@ -37,6 +37,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -82,7 +84,7 @@ I wanted to shrink it to 100GB, so I used the Linux tool <a href="http://gparted
 <p>My T500 has got two display adapters: An Intel GMA X4500 and a AMD Mobility Radeon HD 3650. Only very recent versions of the Linux kernel (2.6.34 onwards as far as I know) support switching between them at runtime (but still X needs to be restarted) - Squeeze is still at 2.6.32, so that won&rsquo;t work without a custom kernel. See <a href="http://www.thinkwiki.org/wiki/Switchable_Graphics">the ThinkWiki</a> for further information.<br />
 One can still switch the adapters in the BIOS (press F1 after powering on the Thinkpad). Because I don&rsquo;t need much 3D power at the moment and prefer longer battery life, a better driver and a cooler laptop I chose to use the Intel Chip (&ldquo;Discrete Graphics&rdquo;). Because of that I won&rsquo;t describe how to make the Radeon work, but it shouldn&rsquo;t be too painful (either use the default free driver or install the proprietary fglrx).
 My settings in the BIOS (Config -&gt; Display) look like this:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">Default Primary Video Device  [Internal]
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>Default Primary Video Device  [Internal]
 Boot Display Device           [Thinkpad LCD]
 Graphics Device               [Integrated Display]
 OS Detection for Switchable Graphics 
@@ -103,7 +105,7 @@ Some notes:
     <li>Yes, you want to install grub to the MBR</li>
 </ul>
 Because I like my debian installation to be slim I always disallow apt to install the recommended packages of packages I install, by creating a file <strong>/etc/apt/apt.conf.d/06-norecommends</strong> with the following content:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">APT
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>APT
 {
         Install-Recommends &quot;false&quot;;
         Install-Suggests &quot;false&quot;;
@@ -116,7 +118,7 @@ Because I like my debian installation to be slim I always disallow apt to instal
 
 <p>After installing the basic stuff and rebooting to my new debian installation, I installed the WiFi firmware.
 First I modified <b>/etc/apt/sources.list</b> to also use the <i>contrib</i> and <i>non-free</i> repositories, so the entries looked like this:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free
 deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free
 
 deb http://security.debian.org/ squeeze/updates main contrib non-free
@@ -136,7 +138,7 @@ The hdaps daemon is also available via apt, the package is called <strong>hdapsd
 <h4 id="hibernate-support">Hibernate support</h4>
 
 <p>Hibernate works out of the box. But there&rsquo;s a keyboard-shortcut to start hibernation, that doesn&rsquo;t: <strong>Fn-F12</strong>. It sends a ACPI button/suspend message and by default there is no ACPI handler for that event. This can be easily fixed, though: Just create a file <strong>/etc/acpi/events/hibernatebtn</strong> with the following content and after a reboot the button should work:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1"># /etc/acpi/events/hibernatebtn</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="c1"># /etc/acpi/events/hibernatebtn</span>
 <span class="c1"># Called when the user presses the hibernate button</span>
 
 <span class="nv">event</span><span class="o">=</span>button<span class="o">[</span> /<span class="o">]</span><span class="nb">suspend</span>
@@ -146,7 +148,7 @@ The hdaps daemon is also available via apt, the package is called <strong>hdapsd
 <h4 id="disabling-the-pc-speaker">Disabling the PC speaker</h4>
 
 <p>To get rid of that annoying beep on several occasions (tab-completion, end of file in less, &hellip;), add the following to the <strong>/etc/modprobe.d/blacklist.conf</strong> file:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1"># no beeps, plz</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="c1"># no beeps, plz</span>
 blacklist pcspkr
 blacklist snd_pcsp
 </code></pre></div>
@@ -164,7 +166,7 @@ However, two things could not be configured with gpointing-device-settings:
 <ol>
 <li>I want to be able to perform a <strong>click by tapping the touchpad</strong>. This should be configurable with gpointing-device-settings, but it didn&rsquo;t work anyway, so I had to do it at X.org configuration level.<br />
 I created the directory <strong>/etc/X11/xorg.conf.d/</strong> and within that directory a file called <strong>10-synaptics.conf</strong> with the following content:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"># adapted from https://wiki.archlinux.org/index.php/Touchpad_Synaptics
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span># adapted from https://wiki.archlinux.org/index.php/Touchpad_Synaptics
 Section &quot;InputClass&quot;
     Identifier &quot;touchpad catchall&quot;
     Driver &quot;synaptics&quot;
@@ -177,7 +179,7 @@ EndSection
 <p></li>
 <li>I want to be able to <strong>scroll with the Trackpoint</strong> by holding down the middle mouse button and moving the nipple. Also I want to emulate the third mouse button by pressing the other two - this is just out of habit, it&rsquo;s not needed, because the middle mouse button works as well.<br />
 So I created a file name <strong>20-trackpoint.conf</strong> in the directory <strong>/etc/X11/xorg.conf.d/</strong> (see above), with the following content:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"># adapted from http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint#xorg.conf.d
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span># adapted from http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint#xorg.conf.d
 Section &quot;InputClass&quot;
         Identifier      &quot;Trackpoint Wheel Emulation&quot;
         MatchProduct    &quot;TPPS/2 IBM TrackPoint&quot;
@@ -200,7 +202,7 @@ Some of them (e.g. brightness) already work, but it&rsquo;d be nice to have some
 (A special case is the hibernate button that I&rsquo;ve mentioned earlier, because it is configured via ACPI handlers and not in X)<br />
 I used the desktop-independent <strong>xbindkeys</strong> tool (from the identically named debian package) to support those keys. The <strong>xbindkeys-config</strong> utility is really handy to modify xbindkey&rsquo;s configuration file, <em>~/.xbindkeysrc</em>. However, for xbindkeys-config to work you need a <em>~/.xbindkeysrc</em> file (it may even be empty) or it&rsquo;ll crash, so just execute <pre><code>$ touch ~/.xbindkeysrc</code></pre> before doing anything else.
 After installing xbindkeys you should make sure it&rsquo;s started when you log into X. One way to do so is to just add the following line to the <strong>~/.profile</strong> file:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1"># ...</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="c1"># ...</span>
 <span class="c1"># start xbindkeys</span>
 xbindkeys <span class="p">&amp;</span>
 </code></pre></div>
@@ -210,24 +212,24 @@ xbindkeys <span class="p">&amp;</span>
 <h5 id="brightness-control">Brightness Control</h5>
 
 <p>The keys to control the display&rsquo;s brightness (Fn-Home/Pos1 and Fn-End) already work out the box. But it would be nice if the current brightness level (there are 16: 0-15) was displayed on the screen along with a nice bar.. the following script (save it to some dir in you $PATH, e.g. <strong>/usr/local/bin/</strong> and make it executable (<code>chmod 755 /usr/local/bin/brightness.sh</code>) does that:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/bash</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="ch">#!/bin/bash</span>
 
-<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span>$<span class="s2">XAUTHORITY&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$XAUTHORITY</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
         <span class="c1"># kill other osd_cat processes to prevent overlapping</span>
         <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>ps -A <span class="p">|</span> grep osd_cat <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
                 killall osd_cat
         <span class="k">fi</span>
         <span class="nv">i</span><span class="o">=</span><span class="k">$(</span>cat /sys/class/backlight/acpi_video0/brightness<span class="k">)</span>    
-        <span class="nb">let</span> <span class="nv">i_perc</span><span class="o">=(</span>100*$i<span class="o">)</span>/15
+        <span class="nb">let</span> <span class="nv">i_perc</span><span class="o">=(</span><span class="m">100</span>*<span class="nv">$i</span><span class="o">)</span>/15
         osd_cat -d <span class="m">1</span> -A center -p bottom -o <span class="m">50</span> -c yellow -s <span class="m">1</span> <span class="se">\</span>
         -f -adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1 <span class="se">\</span>
-        -b percentage -P $i_perc -T <span class="s2">&quot;Brightness: </span>$<span class="s2">i / 15&quot;</span>
+        -b percentage -P <span class="nv">$i_perc</span> -T <span class="s2">&quot;Brightness: </span><span class="nv">$i</span><span class="s2"> / 15&quot;</span>
 <span class="k">fi</span>
 </code></pre></div>
 
 <p>Make sure the path (<em>/sys/class/backlight/acpi_video0/brightness</em>) is correct for you or change it accordingly.<br />
 Now either use <strong>xbindkeys-config</strong> to make sure this script is called if either Fn-Home or Fn-End is pressed or add the following to the <strong>~/.xbindkeysrc</strong> file (At the end I&rsquo;ll paste my complete ~/.xbindkeysrc file.):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">#brightness up
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>#brightness up
 &quot;brightness.sh&quot;
     m:0x0 + c:233
     XF86MonBrightnessUp 
@@ -243,14 +245,14 @@ Now either use <strong>xbindkeys-config</strong> to make sure this script is cal
 <p>Fn-F8 is meant to toggle between touchpad, Trackpoint and both.. I see no point in disabling the Trackpoint so I just use it to disable/enable the touchpad.
 So by pressing Fn-F8 you&rsquo;ll get a nice OSD info saying &ldquo;Touchpad OFF&rdquo; or &ldquo;Touchpad ON&rdquo; and the touchpad will be switched off/on.<br />
 Save the following code as <em>toggletouchpad.sh</em> somewhere in your $PATH and make it executable:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/bash</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1"># adapted from http://forums.gentoo.org/viewtopic-p-6241953.html?sid=815e3e5f2bb9ccfbef0c8ff6cb37914b#6241953</span>
 
 <span class="k">if</span> synclient -l <span class="p">|</span> grep -q TouchpadOff<span class="o">[</span>^<span class="o">[</span>:alnum:<span class="o">]]</span>*0 <span class="p">;</span> <span class="k">then</span>     
    synclient <span class="nv">TouchpadOff</span><span class="o">=</span><span class="m">1</span>                                     
    <span class="nv">status</span><span class="o">=</span><span class="s2">&quot;TouchPad OFF&quot;</span>                                       
 <span class="k">else</span>
-   synclient <span class="nv">TouchpadOff</span><span class="o">=</span>0
+   synclient <span class="nv">TouchpadOff</span><span class="o">=</span><span class="m">0</span>
    <span class="nv">status</span><span class="o">=</span><span class="s2">&quot;TouchPad ON&quot;</span>
 <span class="k">fi</span>
 
@@ -258,14 +260,14 @@ Save the following code as <em>toggletouchpad.sh</em> somewhere in your $PATH an
 <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>ps -A <span class="p">|</span> grep osd_cat <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
     killall osd_cat
 <span class="k">fi</span>
-<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span>$<span class="s2">XAUTHORITY&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nb">echo</span> $status <span class="p">|</span> osd_cat -d <span class="m">3</span> -p bottom -A center -o -50 -s <span class="m">1</span> -c green <span class="se">\</span>
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$XAUTHORITY</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="nv">$status</span> <span class="p">|</span> osd_cat -d <span class="m">3</span> -p bottom -A center -o -50 -s <span class="m">1</span> -c green <span class="se">\</span>
     -f -adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1 
 <span class="k">fi</span>
 </code></pre></div>
 
 <p>Add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">#toggle touchpad
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>#toggle touchpad
 &quot;toggletouchpad.sh&quot;
     m:0x0 + c:199
     NoSymbol 
@@ -278,7 +280,7 @@ With Linux/X.org these configurations can be done with <a href="http://en.wikipe
 <strong><em>Note:</em></strong> Fn-F7 is identified as the XF86Display key. XFCE has a default mapping for that (it executes <code>xrandr &ndash;auto</code> which is supposed to do something useful, but..) so you may need to disable that default mapping. In XFCE that is done in the keyboard settings.</p>
 
 <p>Add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">#configure display
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>#configure display
 &quot;arandr&quot;
     m:0x0 + c:235
     XF86Display 
@@ -289,7 +291,7 @@ With Linux/X.org these configurations can be done with <a href="http://en.wikipe
 <p>There are three keys to control the volume: One for mute, one to increase the volume and one to decrease it.
 The script uses amixer (from the <strong>alsa-utils</strong> package) to change the volume and also outputs the current volume/status.
 Save it as <strong>volume.sh</strong> and make it executable:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/usr/bin/env bash</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="ch">#!/usr/bin/env bash</span>
 <span class="c1"># adapted from http://ztatlock.blogspot.com/2009/01/volume-control-with-amixer-and-osdcat.html</span>
 
 <span class="nv">CHANNEL</span><span class="o">=</span>Master
@@ -304,7 +306,7 @@ Save it as <strong>volume.sh</strong> and make it executable:</p>
 <span class="s">           $p Front m  # toggles the mute of the channel Front</span>
 
 <span class="s">HERE</span>
-  <span class="nb">exit</span> 0
+  <span class="nb">exit</span> <span class="m">0</span>
 <span class="k">fi</span>
 
 <span class="k">if</span> <span class="o">[</span> <span class="nv">$#</span> -eq <span class="m">2</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then</span>
@@ -313,7 +315,7 @@ Save it as <strong>volume.sh</strong> and make it executable:</p>
 <span class="k">fi</span>
 
 <span class="k">function</span> vol_level <span class="o">{</span>
-  amixer get <span class="nv">$C</span>HANNEL <span class="p">|</span><span class="se">\</span>
+  amixer get <span class="nv">$CHANNEL</span> <span class="p">|</span><span class="se">\</span>
   grep <span class="s1">&#39;Front Left:&#39;</span>  <span class="p">|</span><span class="se">\</span>
   cut -d <span class="s2">&quot; &quot;</span> -f <span class="m">7</span>     <span class="p">|</span><span class="se">\</span>
   sed <span class="s1">&#39;s/[^0-9]//g&#39;</span>
@@ -328,11 +330,11 @@ Save it as <strong>volume.sh</strong> and make it executable:</p>
 <span class="o">}</span>
 
 <span class="k">function</span> mute_osd <span class="o">{</span>
-        <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>amixer get <span class="nv">$C</span>HANNEL <span class="p">|</span> grep Playback <span class="p">|</span> grep <span class="s2">&quot;\[on\]&quot;</span> <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>amixer get <span class="nv">$CHANNEL</span> <span class="p">|</span> grep Playback <span class="p">|</span> grep <span class="s2">&quot;\[on\]&quot;</span> <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span>
         <span class="k">then</span>
-                osd <span class="nv">$C</span>HANNEL Unmuted
+                osd <span class="nv">$CHANNEL</span> Unmuted
         <span class="k">else</span>
-                osd <span class="nv">$C</span>HANNEL Muted
+                osd <span class="nv">$CHANNEL</span> Muted
         <span class="k">fi</span>
 <span class="o">}</span>
 
@@ -340,24 +342,24 @@ Save it as <strong>volume.sh</strong> and make it executable:</p>
   killall osd_cat <span class="p">&amp;</span>&gt; /dev/null
   osd_cat -d <span class="m">2</span> -l <span class="m">2</span> -p bottom -c green -s <span class="m">1</span> -A center -o <span class="m">50</span> <span class="se">\</span>
     -f <span class="s1">&#39;-adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1&#39;</span> <span class="se">\</span>
-        -T <span class="s2">&quot;Volume (</span><span class="nv">$C</span><span class="s2">HANNEL) : </span><span class="k">$(</span>vol_level<span class="k">)</span><span class="s2"> %&quot;</span> -b percentage -P <span class="k">$(</span>vol_level<span class="k">)</span> <span class="p">&amp;</span>
+        -T <span class="s2">&quot;Volume (</span><span class="nv">$CHANNEL</span><span class="s2">) : </span><span class="k">$(</span>vol_level<span class="k">)</span><span class="s2"> %&quot;</span> -b percentage -P <span class="k">$(</span>vol_level<span class="k">)</span> <span class="p">&amp;</span>
 <span class="o">}</span>
 
 <span class="k">case</span> <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> in
   <span class="s2">&quot;+&quot;</span><span class="o">)</span>
-        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL 5%+
+        amixer -q <span class="nb">set</span> <span class="nv">$CHANNEL</span> <span class="m">5</span>%+
         vol_osd
         <span class="p">;;</span>
   <span class="s2">&quot;-&quot;</span><span class="o">)</span>
-        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL 5%-
+        amixer -q <span class="nb">set</span> <span class="nv">$CHANNEL</span> <span class="m">5</span>%-
         vol_osd
         <span class="p">;;</span>
   <span class="s2">&quot;m&quot;</span><span class="o">)</span>
-        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL toggle
+        amixer -q <span class="nb">set</span> <span class="nv">$CHANNEL</span> toggle
         mute_osd
         <span class="p">;;</span>
   *<span class="o">)</span>
-        amixer -q <span class="nb">set</span> <span class="nv">$C</span>HANNEL <span class="nv">$1</span>%
+        amixer -q <span class="nb">set</span> <span class="nv">$CHANNEL</span> <span class="nv">$1</span>%
         <span class="p">;;</span>
 <span class="k">esac</span>
 </code></pre></div>
@@ -366,7 +368,7 @@ Save it as <strong>volume.sh</strong> and make it executable:</p>
 <i><b>Update:</b> Muting Master does work now (it actually has been working for months), probably due to an updated Kernel in Debian Squeeze.</i></p>
 
 <p>Add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">#Volume Up
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>#Volume Up
 &quot;volume.sh +&quot;
     m:0x0 + c:123
     XF86AudioRaiseVolume 
@@ -386,7 +388,7 @@ Save it as <strong>volume.sh</strong> and make it executable:</p>
 
 <p>Fn-F2 is used to lock the screen. If you&rsquo;re using <b>xscreensaver</b> you can just call <code>xscreensaver-command -lock</code> to lock the screen.
 To do that add the following to your <strong>~/.xbindkeysrc</strong> (or use xbindkeys-config to map the key yourself):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">#Lock Screen
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>#Lock Screen
 &quot;xscreensaver-command -lock&quot;
     m:0x0 + c:160
     XF86ScreenSaver 
@@ -396,28 +398,28 @@ To do that add the following to your <strong>~/.xbindkeysrc</strong> (or use xbi
 
 <p>Fn-F3 has a battery symbol. I&rsquo;m not sure what it&rsquo;s supposed to do, but just displaying the current battery status (percentage and if it&rsquo;s charging, discharging or whatever) may be nice.
 The following script (save it as <strong>batteryinfo.sh</strong> to you $PATH and make it executable) does exactly that:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="ch">#!/bin/bash</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1"># path to your battery. make sure it&#39;s correct</span>
 <span class="nv">BAT_PATH</span><span class="o">=</span><span class="s2">&quot;/sys/class/power_supply/BAT0&quot;</span>
 
-<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span>$<span class="s2">XAUTHORITY&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$XAUTHORITY</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
         <span class="c1"># kill other osd_cat processes to prevent overlapping</span>
         <span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>ps -A <span class="p">|</span> grep osd_cat <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
                 killall osd_cat
         <span class="k">fi</span>
-        <span class="nv">BAT_FULL</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BA</span>T_PATH/energy_full<span class="k">)</span>
-        <span class="nv">BAT_NOW</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BA</span>T_PATH/energy_now<span class="k">)</span>
-        <span class="nv">STATUS</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BA</span>T_PATH/status<span class="k">)</span>
-        <span class="nb">let</span> <span class="nv">perc</span><span class="o">=(</span>100*<span class="nv">$BA</span>T_NOW<span class="o">)</span>/<span class="nv">$BA</span>T_FULL
+        <span class="nv">BAT_FULL</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BAT_PATH</span>/energy_full<span class="k">)</span>
+        <span class="nv">BAT_NOW</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BAT_PATH</span>/energy_now<span class="k">)</span>
+        <span class="nv">STATUS</span><span class="o">=</span><span class="k">$(</span>cat <span class="nv">$BAT_PATH</span>/status<span class="k">)</span>
+        <span class="nb">let</span> <span class="nv">perc</span><span class="o">=(</span><span class="m">100</span>*<span class="nv">$BAT_NOW</span><span class="o">)</span>/<span class="nv">$BAT_FULL</span>
 
         osd_cat -d <span class="m">2</span> -A center -p bottom -o <span class="m">50</span> -c yellow -s <span class="m">1</span> <span class="se">\</span>
          -f -adobe-courier-bold-r-normal--*-240-*-*-m-*-iso8859-1 <span class="se">\</span>
-         -b percentage -P $perc -T <span class="s2">&quot;Battery </span>$<span class="s2">perc % loaded, </span>$<span class="s2">STATUS&quot;</span>
+         -b percentage -P <span class="nv">$perc</span> -T <span class="s2">&quot;Battery </span><span class="nv">$perc</span><span class="s2"> % loaded, </span><span class="nv">$STATUS</span><span class="s2">&quot;</span>
 <span class="k">fi</span>
 </code></pre></div>
 
 <p>Add the following to your <strong>~/.xbindkeysrc</strong> to make it work:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">#Battery Status
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>#Battery Status
 &quot;batteryinfo.sh&quot;
     m:0x0 + c:244
     XF86Battery 
@@ -426,7 +428,7 @@ The following script (save it as <strong>batteryinfo.sh</strong> to you $PATH an
 <p>I haven&rsquo;t mapped the remaining special keys (like play, pause, &hellip;) yet, but as you may already have guessed, this could easily be done with xbindkeys. Use either xbindkeys-config to do that or create the entries for the <em>~/.xbindkeysrc</em> yourself - you can get the keycodes with <code>xbindkeys -k</code>.</p>
 
 <p>My complete <strong>~/.xbindkeysrc</strong>:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c1">###########################</span>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="c1">###########################</span>
 <span class="c1"># xbindkeys configuration #</span>
 <span class="c1">###########################</span>
 <span class="c1">#</span>
@@ -542,7 +544,7 @@ The following script (save it as <strong>batteryinfo.sh</strong> to you $PATH an
 
 <p>I figured it may be a good idea to paste the output of lspci and lsusb. Note that the radeon is disabled via BIOS, so it isn&rsquo;t listed. I highlighted the lines listing non-working hardware.</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">caedes@Cyberdemon:~$ lspci 
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>caedes@Cyberdemon:~$ lspci 
 00:00.0 Host bridge: Intel Corporation Mobile 4 Series Chipset Memory Controller Hub (rev 07)
 00:02.0 VGA compatible controller: Intel Corporation Mobile 4 Series Chipset Integrated Graphics Controller (rev 07)
 00:02.1 Display controller: Intel Corporation Mobile 4 Series Chipset Integrated Graphics Controller (rev 07)
@@ -602,6 +604,10 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/7"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -632,20 +638,20 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

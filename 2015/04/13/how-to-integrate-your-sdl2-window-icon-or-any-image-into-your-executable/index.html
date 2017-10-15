@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>How to integrate your SDL2 window icon (or any image) into your executable - Daniels Tech Blog</title>
@@ -37,6 +37,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -98,7 +100,7 @@ into the same directory your source code (that creates the SDL2 window) lives in
 <em>&ldquo;Prefixed name&rdquo;</em> is the name the C struct will have.</p>
 
 <p>So this part is done, you can open <em>my_icon.c</em> in a text editor, it will look similar to this:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* GIMP RGBA C-Source image dump (my_icon.c) */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* GIMP RGBA C-Source image dump (my_icon.c) */</span>
 
 <span class="k">static</span> <span class="k">const</span> <span class="k">struct</span> <span class="p">{</span>
   <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">width</span><span class="p">;</span>
@@ -178,7 +180,7 @@ is used to decide whether it&rsquo;s RGB or RGBA.</p>
 18
 19
 20
-21</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="k">static</span> <span class="kt">void</span> <span class="nf">SetSDLIcon</span><span class="p">(</span><span class="n">SDL_Window</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span>
+21</code></pre></div></td><td class="code"><div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">SetSDLIcon</span><span class="p">(</span><span class="n">SDL_Window</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="c1">// this will &quot;paste&quot; the struct my_icon into this function</span>
   <span class="cp">#include</span> <span class="cpf">&quot;my_icon.c&quot;</span><span class="cp"></span>
@@ -199,7 +201,7 @@ is used to decide whether it&rsquo;s RGB or RGBA.</p>
   <span class="n">amask</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="mh">0xff000000</span><span class="p">;</span>
 <span class="cp">#endif</span>
   
-</pre></div>
+</code></pre></div>
 </td></tr></table>
 
 <p>Now create the <code>SDL_Surface*</code> using <code>SDL_CreateRGBSurfaceFrom()</code>.<br />
@@ -213,11 +215,11 @@ whole image, it must be <code>my_icon.bytes_per_pixel * my_icon.width</code> eit
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-c" data-lang="c">22
 23
 24
-25</code></pre></div></td><td class="code"><div class="highlight"><pre>  <span class="n">SDL_Surface</span><span class="o">*</span> <span class="n">icon</span> <span class="o">=</span> <span class="n">SDL_CreateRGBSurfaceFrom</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">my_icon</span><span class="p">.</span><span class="n">pixel_data</span><span class="p">,</span>
+25</code></pre></div></td><td class="code"><div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>  <span class="n">SDL_Surface</span><span class="o">*</span> <span class="n">icon</span> <span class="o">=</span> <span class="n">SDL_CreateRGBSurfaceFrom</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">my_icon</span><span class="p">.</span><span class="n">pixel_data</span><span class="p">,</span>
       <span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">height</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span>
       <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">);</span>
   
-</pre></div>
+</code></pre></div>
 </td></tr></table>
 
 <p>Finally, set the surface as window icon and free it (<code>SDL_SetWindowIcon()</code>
@@ -226,17 +228,17 @@ will duplicate the contained data anyway):</p>
 <table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-c" data-lang="c">26
 27
 28
-29</code></pre></div></td><td class="code"><div class="highlight"><pre>  <span class="n">SDL_SetWindowIcon</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">icon</span><span class="p">);</span>
+29</code></pre></div></td><td class="code"><div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>  <span class="n">SDL_SetWindowIcon</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">icon</span><span class="p">);</span>
 
   <span class="n">SDL_FreeSurface</span><span class="p">(</span><span class="n">icon</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 </td></tr></table>
 
 <p>Done!</p>
 
 <p>This method can be used to integrate any image into your executable, of course,
-but it&rsquo;s added uncompressed so the executable can be pretty big.<br />
+but it&rsquo;s added uncompressed so the executable can get pretty big.<br />
 It&rsquo;s ok for a window icon (and maybe a handful of other icons or cursors),
 but if you need more data, you probably shouldn&rsquo;t integrate it into your
 executable, especially not uncompressed. Maybe use a zip file or something.</p>
@@ -251,6 +253,10 @@ executable, especially not uncompressed. Maybe use a zip file or something.</p>
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/10"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -281,20 +287,20 @@ executable, especially not uncompressed. Maybe use a zip file or something.</p>
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

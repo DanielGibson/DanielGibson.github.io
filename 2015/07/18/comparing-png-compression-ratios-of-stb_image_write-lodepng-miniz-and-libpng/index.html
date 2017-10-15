@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng - Daniels Tech Blog</title>
@@ -37,6 +37,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -73,7 +75,7 @@ from Ubuntu 14.04), always with the highest possible compression I could configu
 A screenshot from <a href="https://github.com/yquake2/zaero">Quake2: Zaero</a> in 1680x1050,
 a screenshot from <a href="https://github.com/RobertBeckebans/RBDOOM-3-BFG/">RBDoom3BFG</a> in 1392x920,
 the classic &ldquo;<a href="https://en.wikipedia.org/wiki/Lenna">Lenna</a>&rdquo; test image in 512x512
-and a <a href="http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html">colorful wallpaper with several parrots</a> in 2560x1600.<br />
+and a <a href="http://wallpapercave.com/w/a5QVpjx">colorful wallpaper with several parrots</a> in 2560x1600.<br />
 Update: I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a></p>
 
 <h1 id="results">Results:</h1>
@@ -353,7 +355,9 @@ do PNG filtering, compressed even better than libpng (the resulting file was 13%
 
 <p><a href="../../../../images/snakebird2_libpng.png"><img src="../../../../images/snakebird2_libpng-small.png" alt="Snakebird" /></a></p>
 
-<p>And this wallpaper of parrots: <a href="http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html">http://www.wallpedes.com/colorful-parrot-wallpaper/animals-for-gt-parrot-wallpaper-desktop.html</a></p>
+<p>And a wallpaper of parrots, available at:
+<a href="http://wallpapercave.com/w/a5QVpjx">http://wallpapercave.com/w/a5QVpjx</a> or
+<a href="http://www.kanhangadvartha.com/HQW-946107.html">http://www.kanhangadvartha.com/HQW-946107.html</a></p>
     </div>
   </article>
 
@@ -365,6 +369,10 @@ do PNG filtering, compressed even better than libpng (the resulting file was 13%
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/11"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -395,20 +403,20 @@ do PNG filtering, compressed even better than libpng (the resulting file was 13%
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>

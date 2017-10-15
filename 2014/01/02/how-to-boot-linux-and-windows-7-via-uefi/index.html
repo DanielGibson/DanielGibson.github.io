@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.20.7" />
+<meta name="generator" content="Hugo 0.29" />
 
 
 <title>How to boot Linux and Windows 7 via UEFI - Daniels Tech Blog</title>
@@ -37,6 +37,8 @@
 
   <ul class="nav-links">
     <li><b><a href="https://danielgibson.github.io/">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
@@ -191,7 +193,7 @@ So what&rsquo;s missing? Oh right, the reason we suffered through all that pain 
 <p>For some reason, grub/os-prober didn&rsquo;t automatically detect the Windows installation (maybe that doesn&rsquo;t work for UEFI Windows installations, no idea, maybe it&rsquo;s fixed in newer versions of Grub..) so I did it manually:</p>
 
 <p>Add the following to <code>/etc/grub.d/40_custom</code> (or, if your distro doesn&rsquo;t have /etc/grub.d/, add it to /etc/grub.conf or something like that):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">menuentry &quot;Microsoft Windows 7 x86_64 UEFI-GPT&quot; {
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>menuentry &quot;Microsoft Windows 7 x86_64 UEFI-GPT&quot; {
 	insmod part_gpt
 	insmod fat
 	insmod search_fs_uuid
@@ -238,6 +240,10 @@ Furthermore, I would have aligned to <strong>6144 sectors</strong> (2*3072), jus
     <h4>COMMENTS</h4>
     <div id="gh-comments-list"></div>
     <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/8"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
   </div>
 
   <script type="text/javascript" src="https://danielgibson.github.io/js/github-comments.js"></script>
@@ -268,20 +274,20 @@ Furthermore, I would have aligned to <strong>6144 sectors</strong> (2*3072), jus
   <script>
   
 
-  function addLinkToHeading(h) {
-    l = document.createElement("a");
-    l.href = "#" + h.id;
-    l.innerHTML = "# ";
-    l.className = "headinglink";
-    h.insertBefore(l, h.firstChild);
-  }
-
-  for(h=1; h<=6; ++h)
+  for(h=1; h<=6; ++h) 
   {
-    hs = document.getElementsByTagName('h'+h);
+    var hs = document.getElementsByTagName('h'+h);
     for(i=0; i<hs.length; ++i)
     {
-      if(hs[i].id)  addLinkToHeading(hs[i]);
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
     }
   }
   </script>
