@@ -37,7 +37,7 @@ to that heading (and thus its section).
 
 I haven't decided on a license for my posts on this blog yet, so for now assume that they
 shouldn't be copied (except for local viewing; *Further Note: in case my blog permanently
-vanishes from the internet, feel free to host a backup, but please add a note that I wrote them*).
+vanishes from the internet, feel free to host a backup, but please add a note that I wrote the posts.*).
 
 ### Source Code Snippets in Posts
 
