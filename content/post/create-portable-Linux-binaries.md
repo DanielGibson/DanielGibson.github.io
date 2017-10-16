@@ -1,6 +1,6 @@
 +++
-date = "2017-07-22T15:37:57+02:00"
-title = "How to create portable Linux binaries (with recent libstdc++)"
+date = "2017-10-16T01:45:57+02:00"
+title = "How to create portable Linux binaries (even if you use C++11 or newer)"
 tags = [ "C", "C++", "programming", "gamedev" ]
 draft = true
 # ghcommentid = 12
@@ -32,9 +32,7 @@ extra care that is not detailed here).
     you can even link them statically if the license allows it
   * Don't link SDL or OpenAL or similar libs statically, so your users can
     easily replace your bundled libs in 5 years to get better support for the
-    latest fads in window management, audio playback, ...  
-    Ideally you only provide them as a fallback in case they're missing on the system
-    (*you're lucky, this post will show you how to do that at least for SDL*).
+    latest fads in window management, audio playback, ...[^fn:fallback]
   * Same for cURL: It regularly receives critical security updates so you should
     try to use the version on the users system. You should however _**not** link_
     against the system libcurl (more details on this below).
@@ -49,13 +47,13 @@ extra care that is not detailed here).
     different sound systems, if the lib of one is missing that shouldn't make your application fail)
   * You avoid versioned symbols - as long as a function with a given name is available at all,
     you can use it - even if it has a different version than on the system you compiled on
-  * If you use SDL2 yourself, it will do this for most system libs (esp. the graphics and sound related ones)  
+  * If you use SDL2 yourself, it will do this for most system libs (esp. the graphics and sound related ones).
     So if you choose to bundle SDL2, that will not cause many hard dependencies.
-    * Linux distributions tend to build SDL2 in a way that explicitly links against all those libs,
-      so indeed build SDL2 yourself; make sure to have the relevant development headers installed 
-* Unfortunately, for C++ APIs this is not an option - another reason to prefer plain C libs :-)
+     * Linux distributions tend to build SDL2 in a way that explicitly links against all those libs,
+       so indeed build SDL2 yourself; make sure to have the relevant development headers installed 
+* Unfortunately, for C++ APIs `dlopen()` + `dlsym()` is not an option - another reason to prefer plain C libs :-)
 
-## Basic System Libraries
+## Basic system libraries
 
 The most basic system libs you can hardly avoid are:
 
@@ -100,24 +98,25 @@ Your application (most probably) uses further system libs, like **libGL**, **lib
 even libstdc++.  
 The Mesa (open source graphics drivers) libGL uses libstdc++, so I'll use
 that to illustrate the problem (but, especially via libgcc, this problem can
-occur with any other system lib as well):  
-You have a 3D game and are using OpenGL for rendering. So you have to use the libGL
-that is installed on your users system. Now imagine your user uses a bleeding edge
-distribution like Arch Linux that always has very recent versions of everything,
-including Mesa and GCC (and thus libstdc++ and libgcc), let's assume GCC 7.2.0.  
-So their libGL expects libstdc++ 7.2.0, but you're making your game (and thus all
-the libs it loads) use libstdc++ 5.4.0 - this results in a crash, because the
-runtime linker can't find the libstdc++ 7.2.0 symbols the libGL is expecting.  
-(*Note:* As libstdc++ and libgcc are backwards compatible, using newer libs
-than the ones on the system libGL is linked against should not be a problem.
-Apparently it is on RHEL and derivates like CentOS though as they *statically*
-link libstdc++, see [this bugreport](https://bugzilla.redhat.com/show_bug.cgi?id=1417663).
-I have no solution for that and hope that they'll fix it.)
+occur with any other system lib as well):
+
+> You have a 3D game and are using OpenGL for rendering. So you have to use the libGL
+> that is installed on your users system. Now imagine your user uses a bleeding edge
+> distribution like Arch Linux that always has very recent versions of everything,
+> including Mesa and GCC, let's assume GCC 7.2.0.  
+> So their libGL expects libstdc++ 7.2.0, but you're making your game (and thus all
+> the libs it loads) use libstdc++ 5.4.0 - this results in a crash, because the
+> runtime linker can't find the libstdc++ 7.2.0 symbols the libGL is expecting.  
+> (*Note:* As libstdc++ and libgcc are backwards compatible, using newer libs
+> than the ones on the system libGL is linked against should not be a problem.[^fn:rhel])
 
 So what you *want* is to only use your bundled libs if they're newer than the
 ones on the system - and this decision has to be made *per lib*.
 This means that `rpath $ORIGIN` is not an option (because you want to make the
-decision which library path to use - system or your own - at runtime).  
+decision which library path to use - system or your own - at runtime).
+
+## A wrapper that selectively overrides system libs
+
 This leaves the option of a wrapper setting `LD_LIBRARY_PATH` (if you need to
 use the bundled versions). You'll need to put each of those libraries in a
 different directory, so you can e.g. override libstdc++ but not libgcc.  
@@ -155,14 +154,16 @@ the systems libgcc is new enough, it'd look like like:
 (libgcc's API hasn't had any additions since GCC 4.8.0, so this is even likely).  
 Afterwards it'd launch the actual application, like:  
 `execv(/path/to/game/YourGame.real, argv);`  
-where `argv` is the `argv` from the wrapper - they are just passed unchanged
-*(you could change `argv[0]` to modify the name that will show up in `ps`,
-`top` etc, but that's purely cosmetical)*.
-
-## ***TODO: how to get libopenal version?***
+where `argv` is the `argv` from the wrapper - it's just passed unchanged.[^fn:argv]
 
 So what's missing? The wrappers implementation of course, especially the part
-where we find out the version of a lib.  
+where it finds out the version of a lib.
+
+### Some implementation details of the wrapper
+
+_If you don't care about the implementation details just skip this section.
+You can find the wrapper itself [**in this Github project**](https://github.com/DanielGibson/Linux-app-wrapper/)._
+
 Because *SDL2* is awesome, it has an easy API to get the version and getting it is
 [pretty simple](https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L273-L304).
 *libstdc++* and *libgcc* don't make it that easy - however, we *do* know
@@ -170,18 +171,25 @@ Because *SDL2* is awesome, it has an easy API to get the version and getting it 
 and can use that knowledge and:
  
 * `objdump -T /path/to/libstdc++.so.6 | grep " DF .text" | grep GLIBCXX_3.4.21`  
-  to get the symbols for that version, pick one (e.g. with the shortest name)
+  to get a list of symbols libstdc++ exports for that version and pick one
+  (e.g. with the shortest name)[^fn:fnlist]
 * in the wrapper load libstdc++ with `dlopen()`
 * check if the chosen symbol is available with  
-  `dlvsym(handle, "_ZNSt13runtime_errorC1EPKc", "GLIBCXX_3.4.21")`
+  `dlvsym(handle, "_ZNSt13runtime_errorC1EPKc", "GLIBCXX_3.4.21")`[^fn:checkversion]
+  
+<!-- ***TODO: how to get libopenal version?*** -->
 
 *Note* that the symbol names are so ugly because they are C++ name mangled
 and that the name mangling (and function signature) is different for different
 architectures, so even for x86_64 and x86 the names are sometimes different,
 for other architectures they may be completely different. Point is, you need
-to look up the symbols for every CPU architecture you want to support.
+to look up the symbols for every CPU architecture you want to support.[^fn:OScc]  
+For `libgcc` the symbols look nicer (as it's a plain C lib), and symbol names
+*should* be the same on x86 vs x86_64. However, some symbols (usually functions)
+don't exist on all CPU architectures, so you still gotta check both the 32bit
+and 64bit version of the libs.
 
-Lucky for you, I've already done all the hard work for x86 and x86_64 and libgcc
+Lucky for you, I've already done all that work for x86 and x86_64 and libgcc
 and libstdc++ (also SDL2) in [**my wrapper**](https://github.com/DanielGibson/Linux-app-wrapper).  
 It furthermore supports **libcurl**, but there the version isn't checked but only
 if it's available on the system at all: Even if the systems version is older than
@@ -202,21 +210,23 @@ uses symbol versioning), so that's one reason to build it yourself.
 Another is that by default it links against OpenSSL, and libssl is not backwards compatible,
 so you'd have to ship that in addition to libcurl.. not fun. Fortunately libcurl
 supports several other SSL/TLS libraries, including [mbed TLS](https://tls.mbed.org/)
-which is easy to build and can be statically linked.
+which is easy to build, has a friendly license
+([Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0))
+and can be statically linked.
 
 ### Building mbed TLS (tested with 2.6.0)
 
 * Download and extract the source
-* Edit Makefile, change DESTDIR to something else, I'll use /opt/mbedtls/
+* Edit Makefile, change `DESTDIR` to something else, I'll use `/opt/mbedtls/`
 * Build mbedtls: `make SHARED=1 -j4`
-  - Even though I want to link statically, I build with `SHARED=1` so it gets
-    built with `-fPIC` - this is needed, as it will be used in a shared library (libcurl.so.4)
-* Install it `sudo make install` (or without sudo if DESTDIR is writable by your current user)
+  - Even though I want to link statically, I build with `SHARED=1` so it gets built with  
+    `-fPIC` - this is needed, as it will be used in a shared library (libcurl.so.4)
+* Install it: `sudo make install` (or without sudo if DESTDIR is writable by your current user)
 * Remove the dynamic mbedtls libs to make sure it will get statically linked by libcurl:
   - `sudo rm /opt/mbedtls/lib/*.so`
   - `sudo rm /opt/mbedtls/lib/*.so.*`
 
-### Building cURL itself
+### Building libcurl itself
 
 Now you can build libcurl itself (this was tested with 7.56).
 
@@ -229,7 +239,7 @@ to the certificate varies across distributions).
 Luckily cURL offers a cert "bundle" (from Mozilla) for download and can even
 compile it in. Download that bundle from https://curl.haxx.se/ca/cacert.pem 
 (If you need a custom CA certificate for self-signed certificates, you can add
-it to that file)
+it to that file).
 
 Then you execute the `./configure` script with all the options..  
 
@@ -257,3 +267,36 @@ Make sure your application links against that (`-L /opt/curl/lib`) instead of
 the system libcurl to make sure your application uses unversioned symbols.  
 Copy `/opt/curl/lib/libcurl.so.4` to `/path/to/wrapper/libs/curl/` so the wrapper
 can use it if libcurl is not found on your users system.
+
+
+[^fn:fallback]: Ideally the bundled version will only be used as a fallback in case
+    the lib is missing on the system (*you're lucky, this post will show you how to do
+    that at least for SDL*).
+
+[^fn:rhel]: Apparently it is on **Red Hat Enterprise Linux (RHEL)** and
+    derivates like **CentOS** though, because they *statically* link `libstdc++`,
+    see [this bugreport](https://bugzilla.redhat.com/show_bug.cgi?id=1417663).
+    I have no solution for that problem and hope that Red Hat will fix it.  
+    **Fedora** does the same as far as I know, but there it's *less of a problem*,
+    because Fedora has frequent releases and ships recent versions of libs,
+    so unless you're shipping a very bleeding edge libstdc++ (or the user
+    runs a very old version of Fedora), the system version will be at least
+    as new as yours and the yet to be introduced wrapper will choose
+    the system version instead.
+
+[^fn:argv]: You could change `argv[0]` to modify the name that will show up in `ps`,
+    `top` etc, but that's purely cosmetical.
+
+[^fn:fnlist]: my table with function- and version-names for libstdc++ looks like
+    [this](https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L176-L210)
+    and for libgcc it looks like
+    [this](https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L242-L263).
+
+[^fn:checkversion]: the tables mentioned in[^fn:fnlist] are used like
+    [this](https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L97-L126)
+
+[^fn:OScc]: The names could also be different for different Operating Systems,
+    as they might use different calling- and naming conventions.  
+    So while this general concept should work on other Unix-like systems
+    like \*BSD, Solaris or maybe even OSX, the names might be different - and
+    they might not even use libstdc++ but e.g. clang's libc++.
