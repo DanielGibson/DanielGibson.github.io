@@ -23,6 +23,11 @@ h6 {
   color: #222;
 }
 
+h1 {
+  /* revolutionary idea: h1 and h2 shouldn't look the same */
+  font-size: 1.666em;
+}
+
 a {
   outline: none;
 }
@@ -117,6 +122,17 @@ code {
   color: #ccc;
 }
 
+.toc {
+  font-size: 80%;
+  background: #F0F0F0;
+  padding: 5px 5px 1px 15px;
+  border-radius: 8px;
+}
+
+.toc nav {
+  margin-top: -1em;
+}
+
 .article-duration {
   margin-top: 12px;
   float: right;
@@ -195,6 +211,7 @@ code {
   color: #000;
   box-shadow: none;
 }
+
 
 
 .article-content hr {
