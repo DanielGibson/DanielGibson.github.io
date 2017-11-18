@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.29" />
+
+
+<title>How to create portable Linux binaries (even if you use C&#43;&#43;11 or newer) - Daniels Tech Blog</title>
+<meta property="og:title" content="How to create portable Linux binaries (even if you use C&#43;&#43;11 or newer) - Daniels Tech Blog">
+
+
+
+  
+
+
+
+
+
+
+<link rel="stylesheet" href="../../../../css/main.css" media="all" />
+<link rel="stylesheet" href="../../../../css/fonts.css" />
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo" title="Home">
+    <img src="../../../../images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="../../../../">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">How to create portable Linux binaries (even if you use C&#43;&#43;11 or newer)</h1>
+
+    
+    <span class="article-date">November 18, 2017</span>
+    
+
+    <br>
+    <div class="toc">
+      <b>Table of Contents:</b>
+      <nav id="TableOfContents">
+<ul>
+<li><a href="#some-general-suggestions">Some general suggestions</a></li>
+<li><a href="#basic-system-libraries">Basic system libraries</a></li>
+<li><a href="#but-what-if-i-need-a-more-recent-compiler">But what if I need a (more) recent compiler?</a></li>
+<li><a href="#a-wrapper-that-selectively-overrides-system-libs">A wrapper that selectively overrides system libs</a>
+<ul>
+<li><a href="#some-implementation-details-of-the-wrapper">Some implementation details of the wrapper</a></li>
+</ul></li>
+<li><a href="#building-a-portable-libcurl-so-4-without-versioned-symbols">Building a portable libcurl.so.4 without versioned symbols</a>
+<ul>
+<li><a href="#building-mbed-tls-tested-with-2-6-0">Building mbed TLS (tested with 2.6.0)</a></li>
+<li><a href="#building-libcurl-itself">Building libcurl itself</a></li>
+</ul></li>
+<li><a href="#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning">Bonus: Dynamic Libs on Linux and what is symbol versioning?</a>
+<ul>
+<li><a href="#dynamic-libraries-on-unix-like-systems">Dynamic Libraries on Unix-like systems</a></li>
+<li><a href="#versioned-symbols">Versioned Symbols</a>
+<ul>
+<li><a href="#example-glibc-s-memcpy">Example: glibc&rsquo;s memcpy()</a></li>
+<li><a href="#how-and-why-libcurl-uses-symbol-versioning">How and why libcurl uses symbol versioning</a></li>
+<li><a href="#more-information-on-symbol-versioning">More information on Symbol Versioning</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+    </div>
+    
+    <div class="article-content">
+      <p>Creating application binaries for Linux that run on a wide range of distributions
+is a bit tricky, as different distributions ship different versions of various
+system libraries. These are generally backwards compatible, but not forwards
+compatible, so programs linked against older versions of the libraries also
+work with newer versions, but not (necessarily) the other way around.<br />
+So you want to link your application against older versions of those libs;
+however, especially when using C++11 or newer, this is not always feasible.</p>
+
+<p>This post will show how to deal with these issues. It has a focus on videogames,
+but the general ideas apply to other kinds of applications as well (with normal GUI
+applications you may have more or more complex dependencies like Qt which may need
+extra care that is not detailed here).</p>
+
+<p>I also somehow ended up writing a short introduction into dynamic libraries and
+symbol versioning on Linux (last section of the article).</p>
+
+<p></p>
+
+<h1 id="some-general-suggestions">Some general suggestions</h1>
+
+<ul>
+<li>Keep dependencies low - the fewer libs/frameworks you need the better
+
+<ul>
+<li><a href="https://github.com/nothings/stb">stb_image.h and stb_image_write.h</a>
+are great alternatives to libPNG, libJPEG etc</li>
+<li>there are lots of other handy easy-to-use header-only libs; many are listed at
+<a href="https://github.com/nothings/single_file_libs">https://github.com/nothings/single_file_libs</a></li>
+</ul></li>
+<li>Bundle the libs you do need (note however potential problems described below)
+
+<ul>
+<li>Unless they&rsquo;re directly interacting with the system (like SDL or OpenAL),
+you can even link them statically if the license allows it</li>
+<li>Don&rsquo;t link SDL or OpenAL or similar libs statically, so your users can
+easily replace your bundled libs in 5 years to get better support for the
+latest fads in window management, audio playback, &hellip;<sup class="footnote-ref" id="fnref:fn-fallback"><a rel="footnote" href="#fn:fn-fallback">1</a></sup></li>
+<li>Same for cURL: It regularly receives critical security updates so you should
+try to use the version on the users system. You should however <em><strong>not</strong> link</em>
+against the system libcurl (more details on this below).</li>
+<li>Don&rsquo;t try to statically link libc or libstdc++, this may cause trouble
+with other system libs you&rsquo;ll use (because the system libs dynamically link
+libc and maybe libstdc++ - probably in versions different from what you
+linked statically. That causes conflicts.)</li>
+</ul></li>
+<li>For libs with a C API, it is often feasible to use them with <code>dlopen()</code> and <code>dlsym()</code>
+instead of linking them.<br />
+This is useful for several reasons:
+
+<ul>
+<li>Your application can still run if the lib is missing (e.g. if you support multiple
+different sound systems, if the lib of one is missing that shouldn&rsquo;t make your application fail)</li>
+<li>You avoid versioned symbols<sup class="footnote-ref" id="fnref:fn-versym"><a rel="footnote" href="#fn:fn-versym">2</a></sup> - as long as a function with a given name is available at all,
+you can use it - even if it has a different version than on the system you compiled on</li>
+<li>If you use SDL2 yourself, it will do this for most system libs (esp. the graphics and sound related ones).
+So if you choose to bundle SDL2, that will not cause many hard dependencies.
+
+<ul>
+<li>Linux distributions tend to build SDL2 in a way that explicitly links against all those libs,
+so indeed build SDL2 yourself; make sure to have the relevant development headers installed</li>
+</ul></li>
+</ul></li>
+<li>Unfortunately, for C++ APIs <code>dlopen()</code> + <code>dlsym()</code> is not an option - another reason to prefer plain C libs :-)</li>
+</ul>
+
+<h1 id="basic-system-libraries">Basic system libraries</h1>
+
+<p>The most basic system libs you can hardly avoid are:</p>
+
+<ul>
+<li><strong>libc</strong> (glibc: libc.so.6, libm.so.6, librt.so.1, libresolv.so.2, libpthread.so.0
+and many more) it implements the C standard lib and  standard POSIX interface to
+the system for accessing files, allocating memory, networking, threads etc.</li>
+<li><strong>libgcc</strong> (libgcc_s.so.1) both GCC and clang use it for various internal things
+and will implicitly link your executables and libs against it if needed.<br /></li>
+<li>(For C++) <strong>libstdc++</strong> (libstdc++.so.6), <code>g++</code> and <code>clang++</code> will implicitly
+link against it.</li>
+</ul>
+
+<p>To work with all (or at least most) Linux distributions released in the last years,
+you need to link against reasonably old versions of those libs.<br />
+The easiest way to do that is by building on an old distribution (in a chroot or VM).
+Now (in 2017) using <strong>Debian 7 &ldquo;Wheezy&rdquo;</strong> (old-oldstable from 2013) should
+do the trick, it comes with glibc 2.13 and GCC 4.7.2 with corresponding libgcc 4.7.2
+and libstdc++ 4.7.2 (GLIBCXX_3.4.17, CXXABI_1.3.6).<br />
+Wheezy is lacking <strong>SDL2</strong>, but it&rsquo;s a good idea to build the latest version yourself
+and bundle it with your game anyway, so just do that and link against that.</p>
+
+<p>This is all! Or is it?</p>
+
+<h1 id="but-what-if-i-need-a-more-recent-compiler">But what if I need a (more) recent compiler?</h1>
+
+<p>If you need a more recent compiler than GCC/G++ 4.7, because you
+need proper support for C++11 (or even newer), this is not enough..</p>
+
+<p>And this is where the trouble starts. Building a newer GCC version (I used 5.4.0)
+yourself (on that old system/chroot) is easy enough - but that newer GCC version will
+build its own libstdc++ and libgcc and the binaries you build with it will need these
+newer versions. (Good news: At least the old libc will be good enough to link against.)</p>
+
+<p>So you just bundle libstc++.so.6 and libgcc_s.so.1 from GCC 5.4.0 with your game, use
+<a href="http://man7.org/linux/man-pages/man8/ld.so.8.html">LD_LIBRARY_PATH</a> or
+rpath $ORIGIN (see <a href="http://man7.org/linux/man-pages/man1/ld.1.html">manpage</a> and
+<a href="http://longwei.github.io/rpath_origin/">this article</a>) to make sure your application
+uses those versions instead of those on the system and you&rsquo;re done?</p>
+
+<p>Of course it&rsquo;s never so easy.<br />
+Your application (most probably) uses further system libs, like <strong>libGL</strong>, <strong>libX</strong>*
+(or the wayland equivalents) etc - and those system libs are most probably using
+libgcc or even libstdc++.<br />
+The Mesa (open source graphics drivers) libGL uses libstdc++, so I&rsquo;ll use
+that to illustrate the problem (but, especially via libgcc, this problem can
+occur with any other system lib as well):</p>
+
+<blockquote>
+<p>You have a 3D game and are using OpenGL for rendering. So you have to use the libGL
+that is installed on your users system. Now imagine your user uses a bleeding edge
+distribution like Arch Linux that always has very recent versions of everything,
+including Mesa and GCC, let&rsquo;s assume GCC 7.2.0.<br />
+So their libGL expects libstdc++ 7.2.0, but you&rsquo;re making your game (and thus all
+the libs it loads) use libstdc++ 5.4.0 - this results in a crash, because the
+runtime linker can&rsquo;t find the libstdc++ 7.2.0 symbols the libGL is expecting.<br />
+(<em>Note:</em> As libstdc++ and libgcc are backwards compatible, using newer libs
+than the ones on the system libGL is linked against should not be a problem.<sup class="footnote-ref" id="fnref:fn-rhel"><a rel="footnote" href="#fn:fn-rhel">3</a></sup>)</p>
+</blockquote>
+
+<p>So what you <em>want</em> is to only use your bundled libs if they&rsquo;re newer than the
+ones on the system - and this decision has to be made <em>per lib</em>.
+This means that <code>rpath $ORIGIN</code> is not an option (because you want to make the
+decision which library path to use - system or your own - at runtime).</p>
+
+<h1 id="a-wrapper-that-selectively-overrides-system-libs">A wrapper that selectively overrides system libs</h1>
+
+<p>This leaves the option of a wrapper setting <code>LD_LIBRARY_PATH</code> (if you need to
+use the bundled versions). You&rsquo;ll need to put each of those libraries in a
+different directory, so you can e.g. override libstdc++ but not libgcc.<br />
+The wrapper will have to check which version of the lib is installed on the
+system and which you provide and based on that either add an <code>LD_LIBRARY_PATH</code>
+entry or not. Nice side-effect: Once you have such a wrapper, you can also
+easily use it for other libs like SDL2 as well - as long as you have a way
+to check the library versions.<br />
+This wrapper is ideally written in plain C (without further dependencies)
+and compiled with the standard GCC version of your build system/chroot
+(i.e. <strong>not</strong> the updated GCC you compiled yourself). The whole thing will look
+somehow like this:</p>
+
+<ul>
+<li>/path/to/game/
+
+<ul>
+<li>YourGame (the wrapper)</li>
+<li>YourGame.real (the actual executable of your application)</li>
+<li>libs/
+
+<ul>
+<li>stdcpp/
+
+<ul>
+<li>libstdc++.so.6</li>
+</ul></li>
+<li>gcc/
+
+<ul>
+<li>libgcc_s.so.1</li>
+</ul></li>
+<li>sdl2/
+
+<ul>
+<li>libSDL2-2.0.so.0</li>
+</ul></li>
+<li>curl/
+
+<ul>
+<li>libcurl.so.4</li>
+</ul></li>
+</ul></li>
+<li>&hellip;</li>
+</ul></li>
+</ul>
+
+<p>The wrapper will get the path to itself (for example with
+<a href="https://github.com/DanielGibson/Snippets/blob/d1e63fee882c108b6fe391db03ef5d1c3345d45a/DG_misc.h#L65-L68">this handy function</a>)
+and use that to get the full path to the bundled libs to check their versions,
+then check the system libs versions and set <code>LD_LIBRARY_PATH</code> accordingly.<br />
+Assuming your libstdc++ and libSDL2 are newer than the ones on the system, but
+the systems libgcc is new enough, it&rsquo;d look like like:<br />
+<code>setenv(&quot;LD_LIBRARY_PATH&quot;, &quot;/path/to/game/libs/stdcpp:/path/to/game/sdl2&quot;, 1);</code><br />
+(libgcc&rsquo;s API hasn&rsquo;t had any additions since GCC 4.8.0, so this is even likely).<br />
+Afterwards it&rsquo;d launch the actual application, like:<br />
+<code>execv(/path/to/game/YourGame.real, argv);</code><br />
+where <code>argv</code> is the <code>argv</code> from the wrapper - it&rsquo;s just passed unchanged.<sup class="footnote-ref" id="fnref:fn-argv"><a rel="footnote" href="#fn:fn-argv">4</a></sup></p>
+
+<p>So what&rsquo;s missing? The wrappers implementation of course, especially the part
+where it finds out the version of a lib.</p>
+
+<h2 id="some-implementation-details-of-the-wrapper">Some implementation details of the wrapper</h2>
+
+<p><em>If you don&rsquo;t care about the implementation details just skip this section.
+You can find the wrapper itself <a href="https://github.com/DanielGibson/Linux-app-wrapper/"><strong>in this Github project</strong></a>.</em></p>
+
+<p>Because <em>SDL2</em> is awesome, it has an easy API to get the version and getting it is
+<a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L273-L304">pretty simple</a>.
+<em>libstdc++</em> and <em>libgcc</em> don&rsquo;t make it that easy - however, we <em>do</em> know
+<a href="https://gcc.gnu.org/onlinedocs/libstdc++/manual/abi.html#abi.versioning">what symbol versions exist</a>
+and can use that knowledge and:</p>
+
+<ul>
+<li><code>objdump -T /path/to/libstdc++.so.6 | grep &quot; DF .text&quot; | grep GLIBCXX_3.4.21</code><br />
+to get a list of symbols libstdc++ exports for that version and pick one
+(e.g. with the shortest name)<sup class="footnote-ref" id="fnref:fn-fnlist"><a rel="footnote" href="#fn:fn-fnlist">5</a></sup></li>
+<li>in the wrapper load libstdc++ with <code>dlopen()</code></li>
+<li>check if the chosen symbol is available with<br />
+<code>dlvsym(handle, &quot;_ZNSt13runtime_errorC1EPKc&quot;, &quot;GLIBCXX_3.4.21&quot;)</code><sup class="footnote-ref" id="fnref:fn-checkversion"><a rel="footnote" href="#fn:fn-checkversion">6</a></sup>
+<br /></li>
+</ul>
+
+<!-- ***TODO: how to get libopenal version?*** -->
+
+<p><em>Note</em> that the symbol names are so ugly because they are C++ name mangled
+and that the name mangling (and function signature) is different for different
+architectures, so even for x86_64 and x86 the names are sometimes different,
+for other architectures they may be completely different. Point is, you need
+to look up the symbols for every CPU architecture you want to support.<sup class="footnote-ref" id="fnref:fn-OScc"><a rel="footnote" href="#fn:fn-OScc">7</a></sup><br />
+For <code>libgcc</code> the symbols look nicer (as it&rsquo;s a plain C lib), and symbol names
+<em>should</em> be the same on x86 vs x86_64. However, some symbols (usually functions)
+don&rsquo;t exist on all CPU architectures, so you still gotta check both the 32bit
+and 64bit version of the libs.</p>
+
+<p>Lucky for you, I&rsquo;ve already done all that work for x86 and x86_64 and libgcc
+and libstdc++ (also SDL2) in <a href="https://github.com/DanielGibson/Linux-app-wrapper"><strong>my wrapper</strong></a>.<br />
+It furthermore supports <strong>libcurl</strong>, but there the version isn&rsquo;t checked but only
+if it&rsquo;s available on the system at all: Even if the systems version is older than
+yours, it hopefully has recent security patches applied by the Linux distributor
+and thus is favorable to your version that may have freshly discovered security
+holes in a few months. You have to make sure to link against a libcurl.so.4
+<em>without</em> versioned symbols<sup class="footnote-ref" id="fnref:fn-versym"><a rel="footnote" href="#fn:fn-versym">2</a></sup> though (or use it via <code>dlopen()</code> + <code>dlsym()</code>
+and don&rsquo;t link it at all).</p>
+
+<h1 id="building-a-portable-libcurl-so-4-without-versioned-symbols">Building a portable libcurl.so.4 without versioned symbols</h1>
+
+<p>Often you&rsquo;d like to use HTTP or HTTPS and the most common cross-platform
+library to do that is libcurl. It also supports a plethora of other protocols,
+but I usually deactivate everything but http(s).
+As mentioned before, you want a libcurl with
+<em><strong>un</strong>versioned</em> symbols to link against (but the libcurl in most Linux distros
+uses symbol versioning), so that&rsquo;s one reason to build it yourself.<br />
+Another is that by default it links against OpenSSL, and libssl is not backwards compatible,
+so you&rsquo;d have to ship that in addition to libcurl.. not fun. Fortunately libcurl
+supports several other SSL/TLS libraries, including <a href="https://tls.mbed.org/">mbed TLS</a>
+which is easy to build, has a friendly license
+(<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>)
+and can be statically linked.</p>
+
+<h2 id="building-mbed-tls-tested-with-2-6-0">Building mbed TLS (tested with 2.6.0)</h2>
+
+<ul>
+<li>Download and extract the source</li>
+<li>Edit Makefile, change <code>DESTDIR</code> to something else, I&rsquo;ll use <code>/opt/mbedtls/</code></li>
+<li>Build mbedtls: <code>make SHARED=1 -j4</code>
+
+<ul>
+<li>Even though I want to link statically, I build with <code>SHARED=1</code> so it gets built with<br />
+<code>-fPIC</code> - this is needed, as it will be used in a shared library (libcurl.so.4)</li>
+</ul></li>
+<li>Install it: <code>sudo make install</code> (or without sudo if DESTDIR is writable by your current user)</li>
+<li>Remove the dynamic mbedtls libs to make sure it will get statically linked by libcurl:
+
+<ul>
+<li><code>sudo rm /opt/mbedtls/lib/*.so</code></li>
+<li><code>sudo rm /opt/mbedtls/lib/*.so.*</code></li>
+</ul></li>
+</ul>
+
+<h2 id="building-libcurl-itself">Building libcurl itself</h2>
+
+<p>Now you can build libcurl itself (this was tested with 7.56).</p>
+
+<p>First you download and extract the source, of course.</p>
+
+<p>libcurl will need CA certificates to verify the SSL certificates from HTTPS.
+libcurl packages from Linux distributions are configured to look for them
+in the system, but for a portable libcurl this is not an option (the path
+to the certificate varies across distributions).<br />
+Luckily cURL offers a cert &ldquo;bundle&rdquo; (from Mozilla) for download and can even
+compile it in. Download that bundle from <a href="https://curl.haxx.se/ca/cacert.pem">https://curl.haxx.se/ca/cacert.pem</a>
+(If you need a custom CA certificate for self-signed certificates, you can add
+it to that file).</p>
+
+<p>Then you execute the <code>./configure</code> script with all the options..</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>./configure --prefix=/opt/curl/ --enable-http --disable-ftp --disable-ldap \
+  --disable-file --disable-ldaps --disable-telnet --disable-rtsp \
+  --disable-dict --disable-tftp --disable-pop3 --disable-imap \
+  --disable-smb --disable-smtp --disable-gopher --without-libssh2 \
+  --without-librtmp --disable-versioned-symbols --without-ssl \
+  --with-mbedtls=/opt/mbedtls --with-ca-bundle=/path/to/cacert.pem
+</code></pre></div>
+
+<p><code>--prefix=/opt/curl/</code> sets the installation directory, then there&rsquo;s tons of
+options to disable protocols I don&rsquo;t care about (if you want any of them just
+leave out the corresponding <code>--disable-*</code>), <code>--disable-versioned-symbols</code>
+makes sure the libcurl symbols are not versionsed with the used SSL library name
+(Linux distros do that, I have no idea what it&rsquo;s good for), <code>--without-ssl</code>
+disables the usage of OpenSSL, <code>--with-mbedtls=/opt/mbedtls</code> enables usage of
+mbed TLS and sets where to find mbedtls (see <code>DESTDIR</code> from mbed TLS above)
+and <code>--with-ca-bundle</code> sets the path of the CA certificate bundle downloaded earlier.</p>
+
+<p>Now build it with <code>make -j4</code> and install it with <code>sudo make install</code>.</p>
+
+<p>Make sure your application links against that (<code>-L /opt/curl/lib</code>) instead of
+the system libcurl to make sure your application uses unversioned symbols.<br />
+Copy <code>/opt/curl/lib/libcurl.so.4</code> to <code>/path/to/wrapper/libs/curl/</code> so the wrapper
+can use it if libcurl is not found on your users system.</p>
+
+<h1 id="bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning">Bonus: Dynamic Libs on Linux and what is symbol versioning?</h1>
+
+<p>I wish I just could have linked some article with a nice introduction/overview
+about symbol versioning on Linux, but I couldn&rsquo;t find any..</p>
+
+<h2 id="dynamic-libraries-on-unix-like-systems">Dynamic Libraries on Unix-like systems</h2>
+
+<p>Let&rsquo;s start with a short overview of what &ldquo;dynamic libraries&rdquo; are and how
+they are used on Unix-like systems.</p>
+
+<p>First: <strong>What are dynamic libraries</strong> (aka &ldquo;shared objects&rdquo;)? They&rsquo;re the Unix equivalent
+of DLLs and usually have the file-extension <code>.so</code> (<code>.dylib</code> on OSX).<sup class="footnote-ref" id="fnref:fn-libswiki"><a rel="footnote" href="#fn:fn-libswiki">8</a></sup>
+They &ldquo;export&rdquo; &ldquo;symbols&rdquo; that can be used by programs or other libraries.</p>
+
+<p>Second: <strong>What are symbols?</strong> Symbols are things libraries &ldquo;export&rdquo; for users of the library,
+so first and foremost it&rsquo;s functions.<sup class="footnote-ref" id="fnref:fn-symexp"><a rel="footnote" href="#fn:fn-symexp">9</a></sup> It could also be global variables, but
+I think for this explanation it&rsquo;s easiest to just think about functions.</p>
+
+<p>There&rsquo;s basically two ways to use a library (and its exported functions):</p>
+
+<ol>
+<li>Link against the library (like <code>gcc -o YourApp yourapp.c -lyourlib</code>).<br />
+This is called <strong>dynamic <em>linking</em></strong>. When executing YourApp the &ldquo;runtime linker&rdquo;
+(aka &ldquo;dynamic linker&rdquo; - <a href="http://man7.org/linux/man-pages/man8/ld.so.8.html"><code>ld.so</code></a> on Linux)
+looks for  the libs is was linked against (in this case <code>libyourlib.so</code> or maybe
+<code>libyourlib.so.0</code> or similar<sup class="footnote-ref" id="fnref:fn-soname"><a rel="footnote" href="#fn:fn-soname">10</a></sup>), makes sure the lib exports all the
+functions of that lib that you&rsquo;re using and makes sure you calls to those
+functions actually call the ones in the lib.<br />
+If any of the required libraries or functions in the libraries can&rsquo;t be found,
+it produces an error and your application won&rsquo;t start.</li>
+<li>Load the library with<br />
+<code>void* libhandle = dlopen(&quot;yourlib.so.0&quot;, RTDL_LAZY);</code><br />
+get a pointer to an exported function with<br />
+<code>int(*fnpointer)(float) = dlsym(libhandle, &quot;function_name&quot;);</code><br />
+and use that function pointer to call the function, like<br />
+<code>int x = fnpointer(42.0f);</code><br />
+This is called <strong>dynamic <em>loading</em></strong>. If <code>yourlib.so.0</code> couldn&rsquo;t be found,
+<a href="http://man7.org/linux/man-pages/man3/dlopen.3.html"><strong>dlopen()</strong></a>
+just returns <code>NULL</code>, similarly if <code>function_name</code> couldn&rsquo;t be found
+<a href="http://man7.org/linux/man-pages/man3/dlsym.3.html"><strong>dlsym()</strong></a>
+returns <code>NULL</code>, so <em>dynamic loading</em>, unlike <em>dynamic linking</em>,
+allows the application developer to handle a missing
+library or function within a library in a non-fatal way.<br />
+Furthermore, <code>dlopen()</code> can be called with a path to a dynamic library
+(instead of just the library name), which allows the application to select
+the path, which is more flexible than what the <em>runtime linker</em> can do.</li>
+</ol>
+
+<p>Both the <em>runtime linker</em> and <code>dlopen()</code> (if called with just the library name without a path)
+look for libraries in several directories, including those set via <code>rpath</code> in the executable,
+via <code>LD_LIBRARY_PATH</code> via environment variable and several system specific directories
+the runtime linker knows about.
+The <a href="http://man7.org/linux/man-pages/man8/ld.so.8.html">runtime linker manpage</a>
+covers this in more detail.</p>
+
+<h2 id="versioned-symbols">Versioned Symbols</h2>
+
+<p><em><strong>Note:</strong> This is pretty Linux specific. Apparently other operating systems like
+<a href="https://people.freebsd.org/~deischen/symver/library_versioning.txt">FreeBSD</a>
+and <a href="https://docs.oracle.com/cd/E19683-01/816-5042/solarisabi-8/index.html">Solaris</a>
+support some kind of symbol versioning as well, but details may vary.
+So maybe the things I describe here are similar on other Unix-like systems, maybe not.</em></p>
+
+<p>Symbol Versioning associates a symbol (for simplicity from here on I&rsquo;ll write &ldquo;function&rdquo;
+instead, but the same applies to other kinds of exported symbols) with a version
+(represented as a string, like &ldquo;GLIBC_2.2.5&rdquo;).
+When using such a function the (compile-time) linker will not only link against
+the function-name, but also the version.<br />
+The <strong>runtime-linker</strong> will then make sure that your application will get the right
+function (right name + right version) from  a dynamic library - if that is not
+available, it will fail.</p>
+
+<p><a href="http://man7.org/linux/man-pages/man3/dlsym.3.html"><strong>dlsym()</strong></a> on the other
+hand just ignores the version and will (usually<sup class="footnote-ref" id="fnref:fn-dlsymdefault"><a rel="footnote" href="#fn:fn-dlsymdefault">11</a></sup>) return the
+<em>default</em> function pointer for the given name, regardless of version.
+At least Linux (and FreeBSD, even though their manpage doesn&rsquo;t mention it) has a
+<a href="http://man7.org/linux/man-pages/man3/dlsym.3.html"><strong>dlvsym()</strong></a> function,
+that additionally takes the version name as an argument, like<br />
+<code>int(*fnpointer)(float) = dlvsym(libhandle, &quot;function_name&quot;, &quot;VERSION_NAME&quot;);</code><br />
+As you&rsquo;d expect, it returns the function for <code>function_name</code> with version <code>VERSION_NAME</code>
+and if that combination couldn&rsquo;t be found it returns NULL; even if a function called
+<code>function_name</code> with another version (or none at all) exists.</p>
+
+<h3 id="example-glibc-s-memcpy">Example: glibc&rsquo;s memcpy()</h3>
+
+<p>Being a C standard lib, glibc of course always had a
+<a href="http://man7.org/linux/man-pages/man3/memcpy.3.html"><strong>memcpy()</strong></a> implementation.
+Historically, it used to behave like <a href="http://man7.org/linux/man-pages/man3/memmove.3.html"><strong>memmove</strong></a>,
+i.e. it supported overlapping source and destination memory ranges.<br />
+For glibc version 2.14, the developers introduced optimizations for
+<code>memcpy()</code> that makes it faster, but doesn&rsquo;t work with overlapping memory ranges.
+Thankfully, they decided to use a symbol version so this change doesn&rsquo;t break
+old binaries that (incorrectly) rely on <code>memcpy()</code> working with overlapping ranges,
+but only breaks code that&rsquo;s recompiled and linked against glibc 2.14 (or newer).<sup class="footnote-ref" id="fnref:fn-memcpy"><a rel="footnote" href="#fn:fn-memcpy">12</a></sup></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>$ readelf -s /lib/x86_64-linux-gnu/libc.so.6 | grep memcpy
+...
+1132: 00000000000943f0 106 IFUNC GLOBAL DEFAULT 13 memcpy@@GLIBC_2.14
+1134: 000000000008f14b  87 IFUNC GLOBAL DEFAULT 13 memcpy@GLIBC_2.2.5
+...
+</code></pre></div>
+
+<p>As expected, <code>memcpy</code> indeed turns up twice in the symbols of <code>libc.so.6</code> - once
+in version <code>GLIBC_2.2.5</code><sup class="footnote-ref" id="fnref:fn-glibc255"><a rel="footnote" href="#fn:fn-glibc255">13</a></sup> and once in version <code>GLIBC_2.14</code>.<br />
+You&rsquo;ll also note that before <code>GLIBC_2.2.5</code> is one <code>@</code> and before <code>GLIBC_2.14</code>
+there are two <code>@@</code> - the two <code>@@</code> indicate that this is the default version
+of that function that the compile-time linker (and apparently <code>dlsym()</code><sup class="footnote-ref" id="fnref:fn-dlsymdefault"><a rel="footnote" href="#fn:fn-dlsymdefault">11</a></sup>) will use.</p>
+
+<h3 id="how-and-why-libcurl-uses-symbol-versioning">How and why libcurl uses symbol versioning</h3>
+
+<p><strong>libcurl</strong> uses symbol versioning in a different way: There all symbols get the same
+version and only exist in one version (if it was built with symbol versioning enabled).
+The version name depends on the SSL/TLS library it&rsquo;s linked against - for
+OpenSSL it&rsquo;s <code>CURL_OPENSSL_3</code>, for GNU TLS it&rsquo;s <code>CURL_GNUTLS_3</code>,
+e.g. <code>curl_easy_init@@CURL_OPENSSL_3</code> vs <code>curl_easy_init@@CURL_GNUTLS_3</code>.
+This means that if an application is linked against an OpenSSL libcurl,
+it won&rsquo;t work with a GNU TLS libcurl.</p>
+
+<p>While the most commonly used parts of libcurl are completely independent of the
+underlying SSL/TLS implementation, it <strong><em>does</em></strong> have a few options
+that allow you to set SSL/TLS-backend specific options or even callbacks,
+like <a href="https://curl.haxx.se/libcurl/c/CURLOPT_SSLENGINE.html">CURLOPT_SSLENGINE</a> or
+<a href="https://curl.haxx.se/libcurl/c/CURLOPT_SSL_CTX_FUNCTION.html">CURLOPT_SSL_CTX_FUNCTION</a>
+and <a href="https://curl.haxx.se/libcurl/c/CURLOPT_SSL_CTX_DATA.html">CURLOPT_SSL_CTX_DATA</a>.<br />
+So to ensure greater robustness this kinda makes sense..</p>
+
+<p>However, unless you use those (or other similar things), it should be safe
+to ignore the symbol versions by compiletime-linking against an unversioned libcurl
+(as shown <a href="#building-a-portable-libcurl-so-4-without-versioned-symbols">above</a>;
+so your application works with any libcurl) or by loading it and its
+functions with <code>dlopen()</code> + <code>dlsym()</code>.</p>
+
+<h3 id="more-information-on-symbol-versioning">More information on Symbol Versioning</h3>
+
+<p>This was a very rough overview, if you want to learn more, look at:</p>
+
+<ul>
+<li><a href="https://www.technovelty.org/c/symbol-versions-and-dependencies.html">Short Article on exporting versioned symbols in a library</a></li>
+<li><a href="https://sourceware.org/binutils/docs-2.20/ld/VERSION.html">GNU ld documentation on VERSION Scripts</a> -
+those are used to define the versions; also explains how to assign versions to functions</li>
+<li><a href="https://www.akkadia.org/drepper/dsohowto.pdf">Ulrich Drepper: How To Write Shared Libraries</a>
+(especially chapters 3.3-3.7)</li>
+<li><a href="https://www.akkadia.org/drepper/symbol-versioning">Ulrich Drepper on ELF Symbol Versioning</a> -
+More low-level details</li>
+<li><a href="https://people.freebsd.org/~deischen/symver/library_versioning.txt">Symbol Versioning on FreeBSD</a></li>
+<li><a href="https://docs.oracle.com/cd/E19683-01/816-5042/solarisabi-8/index.htm">Symbol Versioning on Solaris</a></li>
+</ul>
+
+<!-- Below: Footnotes -->
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:fn-fallback"><p>Ideally the bundled version will only be used as a fallback in case
+the lib is missing on the system (<em>you&rsquo;re lucky, this post will show you how to do
+that at least for SDL</em>).</p>
+ <a class="footnote-return" href="#fnref:fn-fallback"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-versym"><p><a href="#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning">See the bonus section</a>
+for an explanation of/introduction into versioned symbols/symbol versioning.</p>
+ <a class="footnote-return" href="#fnref:fn-versym"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-rhel"><p>Apparently it is on <strong>Red Hat Enterprise Linux (RHEL)</strong> and
+derivates like <strong>CentOS</strong> though, because they <em>statically</em> link <code>libstdc++</code>,
+see <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1417663">this bugreport</a>.
+I have no solution for that problem and hope that Red Hat will fix it.<br />
+<strong>Fedora</strong> does the same as far as I know, but there it&rsquo;s <em>less of a problem</em>,
+because Fedora has frequent releases and ships recent versions of libs,
+so unless you&rsquo;re shipping a very bleeding edge libstdc++ (or the user
+runs a very old version of Fedora), the system version will be at least
+as new as yours and the yet to be introduced wrapper will choose
+the system version instead.</p>
+ <a class="footnote-return" href="#fnref:fn-rhel"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-argv"><p>You could change <code>argv[0]</code> to modify the name that will show up in <code>ps</code>,
+<code>top</code> etc, but that&rsquo;s purely cosmetical.</p>
+ <a class="footnote-return" href="#fnref:fn-argv"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-fnlist"><p>my table with function- and version-names for libstdc++ looks like
+<a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L176-L210">this</a>
+and for libgcc it looks like
+<a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L242-L263">this</a>.</p>
+ <a class="footnote-return" href="#fnref:fn-fnlist"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-checkversion"><p>the tables mentioned in<sup class="footnote-ref" id="fnref:fn-fnlist"><a rel="footnote" href="#fn:fn-fnlist">5</a></sup> are used like
+<a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L97-L126">this</a></p>
+ <a class="footnote-return" href="#fnref:fn-checkversion"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-OScc"><p>The names could also be different for different Operating Systems,
+as they might use different calling- and naming conventions.<br />
+So while this general concept should work on other Unix-like systems
+like *BSD, Solaris or maybe even OSX, the names might be different - and
+they might not even use libstdc++ but e.g. clang&rsquo;s libc++.</p>
+ <a class="footnote-return" href="#fnref:fn-OScc"><sup>[return]</sup></a></li>
+<li id="fn:fn-libswiki"><a href="https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries">Wikipedia has some more information about libraries and shared libraries</a>
+ <a class="footnote-return" href="#fnref:fn-libswiki"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-symexp"><p>Not only libraries, but also executables can export symbols - that way
+libraries loaded by the executable can use symbols of the executable.<br />
+The relevant concept for selecting which symbols are exported is called
+<a href="https://www.technovelty.org/code/why-symbol-visibility-is-good.html">&ldquo;symbol visibilty&rdquo;</a><br />
+On Linux (and AFAIK all other Unix-like systems) all symbols are exported by default,
+unless you compile with <code>-fvisibility=hidden</code>, then only functions/globals specifically
+marked (see linked article) are exported (on Windows it&rsquo;s the other way around, there
+symbols are not exported by default).</p>
+ <a class="footnote-return" href="#fnref:fn-symexp"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-soname"><p>You always link against libfoo.so, but sometimes the lib the runtime linker
+is actually looking for has a slightly different name, like libfoo.so.1
+The relevant thing is called <a href="https://en.wikipedia.org/wiki/Soname"><strong>soname</strong></a></p>
+ <a class="footnote-return" href="#fnref:fn-soname"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-dlsymdefault"><p>While apparently <code>dlsym(RTLD_DEFAULT, &quot;fun&quot;)</code> and <code>dlsym(libhandle, &quot;fun&quot;)</code>
+return the default version of <code>fun()</code>, it seems like <code>dlsym(RTLD_NEXT, &quot;fun&quot;)</code>
+returns the <em>oldest</em> version&hellip;<br />
+Note that I make these statements based on observation, I&rsquo;m not sure if there
+is a defined behavior for this and what it looks like (couldn&rsquo;t find any
+documentation on this). Observations:</p>
+
+<ul>
+<li>That <code>dlsym(RTLD_NEXT, &quot;fun&quot;)</code> returns the oldest version seems odd to me
+and there is <a href="https://sourceware.org/bugzilla/show_bug.cgi?id=14932">a 5 years old bugreport on glibc about this</a>.
+I wouldn&rsquo;t rely on this behavior.</li>
+<li>For <code>RTLD_DEFAULT</code> I could imagine both using the default version <strong>or</strong>
+(if it&rsquo;s from a library the executable is linked against) the version
+version the executable was linked against. Not sure how practical that
+is though, especially for symbols that the executable doesn&rsquo;t use &ldquo;directly&rdquo;..
+So <em>maybe</em> it only makes sense to return the default version of the actual lib here</li>
+<li>When passing a library handle (from <code>dlopen()</code>), IMHO it only makes sense
+to return the default version of the function (as it appears to be the case)</li>
+</ul>
+
+<p>If anyone knows more about this, please leave a comment!</p>
+
+<p>Note that symbol versioning is not only used for cases like memcpy(), where
+at least the function signature stayed the same, but is also used for
+functions that changed their signature, i.e. <code>VERSION1</code> takes arguments of
+different type than <code>VERSION2</code>. In that case it&rsquo;s of course important to
+get the right version and using <code>dlvsym()</code> is a good idea..</p>
+ <a class="footnote-return" href="#fnref:fn-dlsymdefault"><sup>[return]</sup></a></li>
+<li id="fn:fn-memcpy"><a href="http://www.win.tue.nl/~aeb/linux/misc/gcc-semibug.html">People were not very happy with this change anyway</a>
+ <a class="footnote-return" href="#fnref:fn-memcpy"><sup>[return]</sup></a></li>
+
+<li id="fn:fn-glibc255"><p>This is the oldest/lowest symbol version in <code>libc.so.6</code>,
+so I guess they started symbol versioning in glibc 2.2.5.</p>
+ <a class="footnote-return" href="#fnref:fn-glibc255"><sup>[return]</sup></a></li>
+</ol>
+</div>
+    </div>
+  </article>
+
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="http://blog.gibson.sh/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  for(h=1; h<=6; ++h) 
+  {
+    var hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+
