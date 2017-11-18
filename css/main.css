@@ -124,13 +124,17 @@ code {
 
 .toc {
   font-size: 80%;
-  background: #F0F0F0;
+  background: #DEFFEC;
   padding: 5px 5px 1px 15px;
   border-radius: 8px;
 }
 
 .toc nav {
   margin-top: -1em;
+}
+
+.toc nav a {
+  color: #050505;
 }
 
 .article-duration {
