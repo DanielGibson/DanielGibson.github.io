@@ -19,7 +19,7 @@
       <guid>http://blog.gibson.sh/about/</guid>
       <description>Hi, I&amp;rsquo;m Daniel.
 I like Heavy Metal and (mostly oldish) computer games.
-I write code, usually gamedev/Linux centric (no, that&amp;rsquo;s no contradiction). Sometimes I write about that. In this Blog.
+I write code, usually gamedev/Linux centric (often both). Sometimes I write about that. In this Blog.
 Some projects I&amp;rsquo;m involved with:
  Yamagi Quake II (also on Github) co-maintaining, OpenGL3 renderer, &amp;hellip; dhewm3, a source port of Doom 3: maintaining RBDoom3BFG, much of the porting to Linux + SDL Daikatana 1.3 port to Linux (and partly Mac OSX) with SDL+OpenAL, several bugfixes Snippets some header-only public domain libs (for C/C++) + other (hopefully) useful code snippets I wrote  Licenses of this Blog The source of this blog can be found at https://github.</description>
     </item>
