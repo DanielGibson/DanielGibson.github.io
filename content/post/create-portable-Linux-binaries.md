@@ -6,8 +6,8 @@ draft = true
 # ghcommentid = 12
 +++
 
-Creating binaries for Linux that run on a wide range of distributions is
-a bit tricky, as different distributions ship different versions of various
+Creating application binaries for Linux that run on a wide range of distributions
+is a bit tricky, as different distributions ship different versions of various
 system libraries. These are generally backwards compatible, but not forwards
 compatible, so programs linked against older versions of the libraries also
 work with newer versions, but not (necessarily) the other way around.  
@@ -18,6 +18,9 @@ This post will show how to deal with these issues. It has a focus on videogames,
 but the general ideas apply to other kinds of applications as well (with normal GUI
 applications you may have more or more complex dependencies like Qt which may need
 extra care that is not detailed here).
+
+I also somehow ended up writing a short introduction into dynamic libraries and
+symbol versioning on Linux (last section of the article).
 
 <!--more-->
 
@@ -45,7 +48,7 @@ extra care that is not detailed here).
   This is useful for several reasons:
   * Your application can still run if the lib is missing (e.g. if you support multiple
     different sound systems, if the lib of one is missing that shouldn't make your application fail)
-  * You avoid versioned symbols - as long as a function with a given name is available at all,
+  * You avoid versioned symbols[^fn:versym] - as long as a function with a given name is available at all,
     you can use it - even if it has a different version than on the system you compiled on
   * If you use SDL2 yourself, it will do this for most system libs (esp. the graphics and sound related ones).
     So if you choose to bundle SDL2, that will not cause many hard dependencies.
@@ -79,7 +82,7 @@ This is all! Or is it?
 ## But what if I need a (more) recent compiler?
 
 If you need a more recent compiler than GCC/G++ 4.7, because you
-want to use C++11 (or even newer), this is not enough..
+need proper support for C++11 (or even newer), this is not enough..
 
 And this is where the trouble starts. Building a newer GCC version (I used 5.4.0)
 yourself (on that old system/chroot) is easy enough - but that newer GCC version will
@@ -196,7 +199,7 @@ if it's available on the system at all: Even if the systems version is older tha
 yours, it hopefully has recent security patches applied by the Linux distributor
 and thus is favorable to your version that may have freshly discovered security
 holes in a few months. You have to make sure to link against a libcurl.so.4
-*without* versioned symbols though (or use it via `dlopen()` + `dlsym()` 
+*without* versioned symbols[^fn:versym] though (or use it via `dlopen()` + `dlsym()` 
 and don't link it at all).
 
 ## Building a portable libcurl.so.4 without versioned symbols
@@ -268,10 +271,159 @@ the system libcurl to make sure your application uses unversioned symbols.
 Copy `/opt/curl/lib/libcurl.so.4` to `/path/to/wrapper/libs/curl/` so the wrapper
 can use it if libcurl is not found on your users system.
 
+## Bonus: Dynamic Libs on Linux and what is symbol versioning?
+
+I wish I just could have linked some article with a nice introduction/overview
+about symbol versioning on Linux, but I couldn't find any..  
+
+### Dynamic Libraries on Unix-like systems
+
+Let's start with a short overview of what "dynamic libraries" are and how
+they are used on Unix-like systems.
+
+First: **What are dynamic libraries** (aka "shared objects")? They're the Unix equivalent
+of DLLs and usually have the file-extension `.so` (`.dylib` on OSX).[^fn:libswiki]
+They "export" "symbols" that can be used by programs or other libraries.
+
+Second: **What are symbols?** Symbols are things libraries "export" for users of the library,
+so first and foremost it's functions.[^fn:symexp] It could also be global variables, but
+I think for this explanation it's easiest to just think about functions.
+
+There's basically two ways to use a library (and its exported functions):
+
+1. Link against the library (like `gcc -o YourApp yourapp.c -lyourlib`).  
+   This is called **dynamic _linking_**. When executing YourApp the "runtime linker"
+   (aka "dynamic linker" - [`ld.so`](http://man7.org/linux/man-pages/man8/ld.so.8.html) on Linux)
+   looks for  the libs is was linked against (in this case `libyourlib.so` or maybe
+   `libyourlib.so.0` or similar[^fn:soname]), makes sure the lib exports all the
+   functions of that lib that you're using and makes sure you calls to those
+   functions actually call the ones in the lib.  
+   If any of the required libraries or functions in the libraries can't be found,
+   it produces an error and your application won't start.
+2. Load the library with  
+   `void* libhandle = dlopen("yourlib.so.0", RTDL_LAZY);`  
+   get a pointer to an exported function with  
+   `int(*fnpointer)(float) = dlsym(libhandle, "function_name");`  
+   and use that function pointer to call the function, like  
+   `int x = fnpointer(42.0f);`  
+   This is called **dynamic _loading_**. If `yourlib.so.0` couldn't be found,
+   [**dlopen()**](http://man7.org/linux/man-pages/man3/dlopen.3.html)
+   just returns `NULL`, similarly if `function_name` couldn't be found
+   [**dlsym()**](http://man7.org/linux/man-pages/man3/dlsym.3.html)
+   returns `NULL`, so *dynamic loading*, unlike *dynamic linking*,
+   allows the application developer to handle a missing
+   library or function within a library in a non-fatal way.  
+   Furthermore, `dlopen()` can be called with a path to a dynamic library
+   (instead of just the library name), which allows the application to select
+   the path, which is more flexible than what the *runtime linker* can do.
+
+Both the *runtime linker* and `dlopen()` (if called with just the library name without a path)
+look for libraries in several directories, including those set via `rpath` in the executable,
+via `LD_LIBRARY_PATH` via environment variable and several system specific directories
+the runtime linker knows about.
+The [runtime linker manpage](http://man7.org/linux/man-pages/man8/ld.so.8.html)
+covers this in more detail.
+
+### Versioned Symbols
+
+*__Note:__ This is pretty Linux specific. Apparently other operating systems like
+[FreeBSD](https://people.freebsd.org/~deischen/symver/library_versioning.txt)
+and [Solaris](https://docs.oracle.com/cd/E19683-01/816-5042/solarisabi-8/index.html)
+support some kind of symbol versioning as well, but details may vary.
+So maybe the things I describe here are similar on other Unix-like systems, maybe not.*
+
+Symbol Versioning associates a symbol (for simplicity from here on I'll write "function"
+instead, but the same applies to other kinds of exported symbols) with a version
+(represented as a string, like "GLIBC_2.2.5").
+When using such a function the (compile-time) linker will not only link against
+the function-name, but also the version.  
+The **runtime-linker** will then make sure that your application will get the right
+function (right name + right version) from  a dynamic library - if that is not
+available, it will fail.
+
+[**dlsym()**](http://man7.org/linux/man-pages/man3/dlsym.3.html) on the other
+hand just ignores the version and will (usually[^fn:dlsymdefault]) return the
+*default* function pointer for the given name, regardless of version.
+At least Linux (and FreeBSD, even though their manpage doesn't mention it) has a
+[**dlvsym()**](http://man7.org/linux/man-pages/man3/dlsym.3.html) function,
+that additionally takes the version name as an argument, like  
+`int(*fnpointer)(float) = dlvsym(libhandle, "function_name", "VERSION_NAME");`  
+As you'd expect, it returns the function for `function_name` with version `VERSION_NAME`
+and if that combination couldn't be found it returns NULL; even if a function called
+`function_name` with another version (or none at all) exists.
+
+#### Example: glibc's memcpy()
+
+Being a C standard lib, glibc of course always had a
+[**memcpy()**](http://man7.org/linux/man-pages/man3/memcpy.3.html) implementation.
+Historically, it used to behave like [**memmove**](http://man7.org/linux/man-pages/man3/memmove.3.html),
+i.e. it supported overlapping source and destination memory ranges.  
+For glibc version 2.14, the developers introduced optimizations for
+`memcpy()` that makes it faster, but doesn't work with overlapping memory ranges.
+Thankfully, they decided to use a symbol version so this change doesn't break
+old binaries that (incorrectly) rely on `memcpy()` working with overlapping ranges,
+but only breaks code that's recompiled and linked against glibc 2.14 (or newer).[^fn:memcpy]
+
+```text
+$ readelf -s /lib/x86_64-linux-gnu/libc.so.6 | grep memcpy
+...
+1132: 00000000000943f0 106 IFUNC GLOBAL DEFAULT 13 memcpy@@GLIBC_2.14
+1134: 000000000008f14b  87 IFUNC GLOBAL DEFAULT 13 memcpy@GLIBC_2.2.5
+...
+```
+
+As expected, `memcpy` indeed turns up twice in the symbols of `libc.so.6` - once
+in version `GLIBC_2.2.5`[^fn:glibc255] and once in version `GLIBC_2.14`.  
+You'll also note that before `GLIBC_2.2.5` is one `@` and before `GLIBC_2.14`
+there are two `@@` - the two `@@` indicate that this is the default version
+of that function that the compile-time linker (and apparently `dlsym()`[^fn:dlsymdefault]) will use.
+
+#### How and why libcurl uses symbol versioning
+
+**libcurl** uses symbol versioning in a different way: There all symbols get the same
+version and only exist in one version (if it was built with symbol versioning enabled).
+The version name depends on the SSL/TLS library it's linked against - for
+OpenSSL it's `CURL_OPENSSL_3`, for GNU TLS it's `CURL_GNUTLS_3`,
+e.g. `curl_easy_init@@CURL_OPENSSL_3` vs `curl_easy_init@@CURL_GNUTLS_3`.
+This means that if an application is linked against an OpenSSL libcurl,
+it won't work with a GNU TLS libcurl.
+
+While the most commonly used parts of libcurl are completely independent of the
+underlying SSL/TLS implementation, it ***does*** have a few options
+that allow you to set SSL/TLS-backend specific options or even callbacks,
+like [CURLOPT_SSLENGINE](https://curl.haxx.se/libcurl/c/CURLOPT_SSLENGINE.html) or
+[CURLOPT_SSL_CTX_FUNCTION](https://curl.haxx.se/libcurl/c/CURLOPT_SSL_CTX_FUNCTION.html)
+and [CURLOPT_SSL_CTX_DATA](https://curl.haxx.se/libcurl/c/CURLOPT_SSL_CTX_DATA.html).  
+So to ensure greater robustness this kinda makes sense..
+
+However, unless you use those (or other similar things), it should be safe
+to ignore the symbol versions by compiletime-linking against an unversioned libcurl
+(as shown [above](#building-a-portable-libcurl-so-4-without-versioned-symbols);
+so your application works with any libcurl) or by loading it and its
+functions with `dlopen()` + `dlsym()`.
+
+#### More information on Symbol Versioning
+
+This was a very rough overview, if you want to learn more, look at:
+
+* [Short Article on exporting versioned symbols in a library](https://www.technovelty.org/c/symbol-versions-and-dependencies.html)
+* [GNU ld documentation on VERSION Scripts](https://sourceware.org/binutils/docs-2.20/ld/VERSION.html) -
+  those are used to define the versions; also explains how to assign versions to functions
+* [Ulrich Drepper: How To Write Shared Libraries](https://www.akkadia.org/drepper/dsohowto.pdf)
+  (especially chapters 3.3-3.7)
+* [Ulrich Drepper on ELF Symbol Versioning](https://www.akkadia.org/drepper/symbol-versioning) -
+  More low-level details
+* [Symbol Versioning on FreeBSD](https://people.freebsd.org/~deischen/symver/library_versioning.txt)
+* [Symbol Versioning on Solaris](https://docs.oracle.com/cd/E19683-01/816-5042/solarisabi-8/index.htm)
+ 
+<!-- Below: Footnotes -->
 
 [^fn:fallback]: Ideally the bundled version will only be used as a fallback in case
     the lib is missing on the system (*you're lucky, this post will show you how to do
     that at least for SDL*).
+
+[^fn:versym]: [See the bonus section](#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning)
+    for an explanation of/introduction into versioned symbols/symbol versioning.
 
 [^fn:rhel]: Apparently it is on **Red Hat Enterprise Linux (RHEL)** and
     derivates like **CentOS** though, because they *statically* link `libstdc++`,
@@ -300,3 +452,50 @@ can use it if libcurl is not found on your users system.
     So while this general concept should work on other Unix-like systems
     like \*BSD, Solaris or maybe even OSX, the names might be different - and
     they might not even use libstdc++ but e.g. clang's libc++.
+
+[^fn:libswiki]: [Wikipedia has some more information about libraries and shared libraries](https://en.wikipedia.org/wiki/Library\_\(computing\)#Shared_libraries)
+
+[^fn:symexp]: Not only libraries, but also executables can export symbols - that way
+    libraries loaded by the executable can use symbols of the executable.  
+    The relevant concept for selecting which symbols are exported is called
+    ["symbol visibilty"](https://www.technovelty.org/code/why-symbol-visibility-is-good.html)  
+    On Linux (and AFAIK all other Unix-like systems) all symbols are exported by default,
+    unless you compile with `-fvisibility=hidden`, then only functions/globals specifically
+    marked (see linked article) are exported (on Windows it's the other way around, there
+    symbols are not exported by default).
+
+[^fn:soname]: You always link against libfoo.so, but sometimes the lib the runtime linker
+    is actually looking for has a slightly different name, like libfoo.so.1 
+    The relevant thing is called [**soname**](https://en.wikipedia.org/wiki/Soname)
+
+[^fn:memcpy]: [People were not very happy with this change anyway](http://www.win.tue.nl/~aeb/linux/misc/gcc-semibug.html)
+
+[^fn:glibc255]: This is the oldest/lowest symbol version in `libc.so.6`,
+    so I guess they started symbol versioning in glibc 2.2.5.
+
+[^fn:dlsymdefault]: While apparently `dlsym(RTLD_DEFAULT, "fun")` and `dlsym(libhandle, "fun")`
+    return the default version of `fun()`, it seems like `dlsym(RTLD_NEXT, "fun")`
+    returns the *oldest* version...  
+    Note that I make these statements based on observation, I'm not sure if there
+    is a defined behavior for this and what it looks like (couldn't find any
+    documentation on this). Observations:
+
+    * That `dlsym(RTLD_NEXT, "fun")` returns the oldest version seems odd to me
+      and there is [a 5 years old bugreport on glibc about this](https://sourceware.org/bugzilla/show_bug.cgi?id=14932).
+      I wouldn't rely on this behavior.
+    * For `RTLD_DEFAULT` I could imagine both using the default version **or**
+      (if it's from a library the executable is linked against) the version
+      version the executable was linked against. Not sure how practical that
+      is though, especially for symbols that the executable doesn't use "directly"..
+      So *maybe* it only makes sense to return the default version of the actual lib here
+    * When passing a library handle (from `dlopen()`), IMHO it only makes sense
+      to return the default version of the function (as it appears to be the case)
+
+    If anyone knows more about this, please leave a comment!
+
+    Note that symbol versioning is not only used for cases like memcpy(), where
+    at least the function signature stayed the same, but is also used for
+    functions that changed their signature, i.e. `VERSION1` takes arguments of
+    different type than `VERSION2`. In that case it's of course important to
+    get the right version and using `dlvsym()` is a good idea..
+

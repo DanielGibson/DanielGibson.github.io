@@ -27,7 +27,7 @@ Feel free to use my modifications to the lithium theme - I don't really care abo
 license for them, but the original lithium theme is under MIT license, so I guess so are my changes.  
 Of special interest may be [this](https://github.com/DanielGibson/DanielGibson.github.io/blob/source/themes/lithium/layouts/_default/single.html#L21-L39)
 and [this](https://github.com/DanielGibson/DanielGibson.github.io/blob/source/themes/lithium/static/js/github-comments.js)
-for Github based comments (based on [Don Williams code](http://donw.io/post/github-comments/#using-github-for-comments)
+for Github based comments (based on [Don Williamson's code](http://donw.io/post/github-comments/#using-github-for-comments)
 but adapted to use plain JS instead of JQuery) and
 [this little script](https://github.com/DanielGibson/DanielGibson.github.io/blob/source/themes/lithium/layouts/partials/footer.html#L18-L40)
 which adds clickable anchors before headings to make it easy for users to link
