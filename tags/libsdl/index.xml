@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Libsdl on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/tags/libsdl/</link>
+    <link>http://blog.gibson.sh/tags/libsdl/</link>
     <description>Recent content in Libsdl on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 13 Apr 2015 00:21:27 +0000</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/tags/libsdl/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/tags/libsdl/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>How to integrate your SDL2 window icon (or any image) into your executable</title>
-      <link>https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</link>
+      <link>http://blog.gibson.sh/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</link>
       <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</guid>
+      <guid>http://blog.gibson.sh/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</guid>
       <description>&lt;p&gt;Let&amp;rsquo;s assume you have an image that you want to use as a window icon in your
 cross-platform application that uses &lt;a href=&#34;http://www.libsdl.org/&#34;&gt;libSDL2&lt;/a&gt;.&lt;br /&gt;
 A suitable window icon is 64x64pixels big (other sizes should work as well, though)

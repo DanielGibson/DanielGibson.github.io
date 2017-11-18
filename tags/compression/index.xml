@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Compression on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/tags/compression/</link>
+    <link>http://blog.gibson.sh/tags/compression/</link>
     <description>Recent content in Compression on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Jul 2015 02:29:24 +0000</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/tags/compression/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/tags/compression/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</title>
-      <link>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
+      <link>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
       <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
+      <guid>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
       <description>&lt;p&gt;Because of &lt;a href=&#34;https://github.com/nothings/stb/issues/113&#34;&gt;https://github.com/nothings/stb/issues/113&lt;/a&gt; I was wondering how good/bad
 stb_image_write&amp;rsquo;s PNG compression really is in comparison to other encoders.&lt;/p&gt;
 

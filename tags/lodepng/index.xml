@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Lodepng on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/tags/lodepng/</link>
+    <link>http://blog.gibson.sh/tags/lodepng/</link>
     <description>Recent content in Lodepng on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Jul 2015 02:29:24 +0000</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/tags/lodepng/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/tags/lodepng/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</title>
-      <link>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
+      <link>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
       <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
+      <guid>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
       <description>&lt;p&gt;Because of &lt;a href=&#34;https://github.com/nothings/stb/issues/113&#34;&gt;https://github.com/nothings/stb/issues/113&lt;/a&gt; I was wondering how good/bad
 stb_image_write&amp;rsquo;s PNG compression really is in comparison to other encoders.&lt;/p&gt;
 
@@ -29,10 +29,10 @@ from Ubuntu 14.04), always with the highest possible compression I could configu
     
     <item>
       <title>Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng</title>
-      <link>https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</link>
+      <link>http://blog.gibson.sh/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</link>
       <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</guid>
+      <guid>http://blog.gibson.sh/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</guid>
       <description>&lt;p&gt;I recently tried out Sean Barrett&amp;rsquo;s &lt;a href=&#34;https://github.com/nothings/stb/blob/master/stb_image.h&#34;&gt;stb_image.h&lt;/a&gt;
 and was blown away by how fucking easy it is to use.&lt;br /&gt;
 Integrating it into your project is trivial: Just add the header and somewhere do:&lt;/p&gt;

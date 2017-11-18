@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Pages on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/page/</link>
+    <link>http://blog.gibson.sh/page/</link>
     <description>Recent content in Pages on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 26 Jul 2017 12:47:47 +0200</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/page/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/page/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>About</title>
-      <link>https://danielgibson.github.io/about/</link>
+      <link>http://blog.gibson.sh/about/</link>
       <pubDate>Wed, 26 Jul 2017 12:47:47 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/about/</guid>
+      <guid>http://blog.gibson.sh/about/</guid>
       <description>Some projects I&amp;rsquo;m involved with:
  Yamagi Quake II (also on Github) co-maintaining, OpenGL3 renderer, &amp;hellip; dhewm3, a source port of Doom 3: maintaining RBDoom3BFG, much of the porting to Linux + SDL Daikatana 1.3 port to Linux (and partly Mac OSX) with SDL+OpenAL, several bugfixes Snippets some header-only public domain libs (for C/C++) + other (hopefully) useful code snippets I wrote  Licenses of this blog The source of this blog can be found at https://github.</description>
     </item>

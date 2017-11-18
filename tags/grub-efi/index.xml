@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Grub Efi on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/tags/grub-efi/</link>
+    <link>http://blog.gibson.sh/tags/grub-efi/</link>
     <description>Recent content in Grub Efi on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 02 Jan 2014 02:05:41 +0000</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/tags/grub-efi/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/tags/grub-efi/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>How to boot Linux and Windows 7 via UEFI</title>
-      <link>https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</link>
+      <link>http://blog.gibson.sh/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</link>
       <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</guid>
+      <guid>http://blog.gibson.sh/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</guid>
       <description>&lt;p&gt;Don&amp;rsquo;t.&lt;br /&gt;
 It&amp;rsquo;s a fucking pain in the ass.&lt;/p&gt;
 

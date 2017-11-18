@@ -31,6 +31,7 @@ code {
   background: #f8f8f8;
   font-family: 'Source Code Pro', monospace;
   font-size: 16px;
+  hyphens: none; /* breaking inline-code sections with hyphens looks bad */
   /*font-size: 100%;*/
 }
 
@@ -157,6 +158,17 @@ code {
 
 .article-content p {
   margin: 15px 0 25px;
+}
+
+.footnotes {
+  /* font should be a bit smaller in footnotes */
+  font-size: 90%;
+}
+
+.footnotes p {
+  /* this makes sure that the [return] part of multi-line footnotes is
+   * close to the last line of the footnote */
+  margin: 15px 0 0px;
 }
 
 .article-content a {

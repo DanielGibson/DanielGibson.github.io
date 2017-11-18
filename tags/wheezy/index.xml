@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Wheezy on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/tags/wheezy/</link>
+    <link>http://blog.gibson.sh/tags/wheezy/</link>
     <description>Recent content in Wheezy on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 31 Dec 2013 04:13:03 +0200</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/tags/wheezy/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/tags/wheezy/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>(Re)installing GRUB to the MBR</title>
-      <link>https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/</link>
+      <link>http://blog.gibson.sh/2013/12/31/reinstalling-grub-to-the-mbr/</link>
       <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/</guid>
+      <guid>http://blog.gibson.sh/2013/12/31/reinstalling-grub-to-the-mbr/</guid>
       <description>&lt;p&gt;This is just a very short roundup of the relevant commands needed to reinstall grub,
 e.g. when migrating a Linux installation to a new hard drive.&lt;/p&gt;
 

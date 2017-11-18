@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/post/</link>
+    <link>http://blog.gibson.sh/post/</link>
     <description>Recent content in Posts on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Jul 2015 02:29:24 +0000</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</title>
-      <link>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
+      <link>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
       <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
+      <guid>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
       <description>&lt;p&gt;Because of &lt;a href=&#34;https://github.com/nothings/stb/issues/113&#34;&gt;https://github.com/nothings/stb/issues/113&lt;/a&gt; I was wondering how good/bad
 stb_image_write&amp;rsquo;s PNG compression really is in comparison to other encoders.&lt;/p&gt;
 
@@ -29,10 +29,10 @@ from Ubuntu 14.04), always with the highest possible compression I could configu
     
     <item>
       <title>How to integrate your SDL2 window icon (or any image) into your executable</title>
-      <link>https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</link>
+      <link>http://blog.gibson.sh/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</link>
       <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</guid>
+      <guid>http://blog.gibson.sh/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</guid>
       <description>&lt;p&gt;Let&amp;rsquo;s assume you have an image that you want to use as a window icon in your
 cross-platform application that uses &lt;a href=&#34;http://www.libsdl.org/&#34;&gt;libSDL2&lt;/a&gt;.&lt;br /&gt;
 A suitable window icon is 64x64pixels big (other sizes should work as well, though)
@@ -51,10 +51,10 @@ and to set that surface as a window icon.
     
     <item>
       <title>Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng</title>
-      <link>https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</link>
+      <link>http://blog.gibson.sh/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</link>
       <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</guid>
+      <guid>http://blog.gibson.sh/2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/</guid>
       <description>&lt;p&gt;I recently tried out Sean Barrett&amp;rsquo;s &lt;a href=&#34;https://github.com/nothings/stb/blob/master/stb_image.h&#34;&gt;stb_image.h&lt;/a&gt;
 and was blown away by how fucking easy it is to use.&lt;br /&gt;
 Integrating it into your project is trivial: Just add the header and somewhere do:&lt;/p&gt;
@@ -85,10 +85,10 @@ And it supports lots of common image file types including JPEG, PNG, TGA, BMP, G
     
     <item>
       <title>How to boot Linux and Windows 7 via UEFI</title>
-      <link>https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</link>
+      <link>http://blog.gibson.sh/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</link>
       <pubDate>Thu, 02 Jan 2014 02:05:41 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</guid>
+      <guid>http://blog.gibson.sh/2014/01/02/how-to-boot-linux-and-windows-7-via-uefi/</guid>
       <description>&lt;p&gt;Don&amp;rsquo;t.&lt;br /&gt;
 It&amp;rsquo;s a fucking pain in the ass.&lt;/p&gt;
 
@@ -116,10 +116,10 @@ to boot this and GRUB to chainload (UEFI) Windows.&lt;/p&gt;
     
     <item>
       <title>(Re)installing GRUB to the MBR</title>
-      <link>https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/</link>
+      <link>http://blog.gibson.sh/2013/12/31/reinstalling-grub-to-the-mbr/</link>
       <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2013/12/31/reinstalling-grub-to-the-mbr/</guid>
+      <guid>http://blog.gibson.sh/2013/12/31/reinstalling-grub-to-the-mbr/</guid>
       <description>&lt;p&gt;This is just a very short roundup of the relevant commands needed to reinstall grub,
 e.g. when migrating a Linux installation to a new hard drive.&lt;/p&gt;
 
@@ -145,10 +145,10 @@ for older versions of grub?), grub will need those&lt;/li&gt;
     
     <item>
       <title>Linux (Debian Squeeze) on Thinkpad T500</title>
-      <link>https://danielgibson.github.io/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</link>
+      <link>http://blog.gibson.sh/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</link>
       <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</guid>
+      <guid>http://blog.gibson.sh/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</guid>
       <description>&lt;p&gt;I recently got myself a Lenovo &lt;a href=&#34;http://www.thinkwiki.org/wiki/Category:T500&#34;&gt;Thinkpad T500&lt;/a&gt; (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&amp;rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.&lt;/p&gt;
 
 &lt;p&gt;However, I shrunk the Windows 7 partition (I didn&amp;rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&amp;rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&amp;rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &amp;hellip;) anyway.&lt;/p&gt;
@@ -158,10 +158,10 @@ for older versions of grub?), grub will need those&lt;/li&gt;
     
     <item>
       <title>Bug-Hunting: Browsers fail to load research.microsoft.com</title>
-      <link>https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</link>
+      <link>http://blog.gibson.sh/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</link>
       <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</guid>
+      <guid>http://blog.gibson.sh/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</guid>
       <description>&lt;p&gt;This is a follow-up to &lt;a href=&#34;http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541658&#34;&gt;debian bug #541658 for Iceweasel: &amp;ldquo;cannot open research.microsoft.com&amp;rdquo;&lt;/a&gt;.
 It turned out that this bug applies to all (tested) browsers with cookie-support (Iceweasel, Opera, Chrome, Arora, Kazehakase),
 but only very few people are experiencing it.&lt;br /&gt;
@@ -181,10 +181,10 @@ should be fixed anyway but there doesn&amp;rsquo;t seem to be much interest in d
     
     <item>
       <title>Shutting down (e)SATA disks under Linux</title>
-      <link>https://danielgibson.github.io/2010/05/11/shutting-down-esata-disks-under-linux/</link>
+      <link>http://blog.gibson.sh/2010/05/11/shutting-down-esata-disks-under-linux/</link>
       <pubDate>Tue, 11 May 2010 22:55:05 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2010/05/11/shutting-down-esata-disks-under-linux/</guid>
+      <guid>http://blog.gibson.sh/2010/05/11/shutting-down-esata-disks-under-linux/</guid>
       <description>&lt;p&gt;I&amp;rsquo;m using a eSATA external harddrive and want to be able to safely unplug it without shutting down my PC. While just removing the drive after unmounting worked so far, I&amp;rsquo;m not sure if it&amp;rsquo;s really safe - I&amp;rsquo;d really prefer to cleanly disconnect it and spinning it down before pulling the plug.
 I googled that and stumbled upon &lt;a href=&#34;http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/&#34;&gt;http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/&lt;/a&gt; which seems to be a clean and safe way to do it, so I just wrote a script to do that.
 
@@ -193,10 +193,10 @@ It also checks if any partition of that drive is still mounted (that check might
     
     <item>
       <title>Unlock gnome-keyring on Login with SLiM and PAM</title>
-      <link>https://danielgibson.github.io/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/</link>
+      <link>http://blog.gibson.sh/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/</link>
       <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/</guid>
+      <guid>http://blog.gibson.sh/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/</guid>
       <description>&lt;p&gt;My favorite desktop environment is &lt;a href=&#34;http://www.xfce.org/&#34;&gt;XFCE&lt;/a&gt;, because it&amp;rsquo;s fast, doesn&amp;rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).
 I also use &lt;a href=&#34;https://github.com/iwamatsu/slim&#34;&gt;SLiM&lt;/a&gt; as a display manager because it is slim and looks much better than xdm.&lt;/p&gt;
 
@@ -208,10 +208,10 @@ I&amp;rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log 
     
     <item>
       <title>Remote administration/tech-support with (reverse) VNC</title>
-      <link>https://danielgibson.github.io/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</link>
+      <link>http://blog.gibson.sh/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</link>
       <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</guid>
+      <guid>http://blog.gibson.sh/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</guid>
       <description>&lt;p&gt;Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, &lt;a title=&#34;Virtual Network Computing&#34; href=&#34;http://en.wikipedia.org/wiki/VNC&#34;&gt;VNC&lt;/a&gt; is my weapon of choice, if SSH isn&amp;rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &amp;hellip;).&lt;/p&gt;
 
 &lt;p&gt;I&amp;rsquo;ll describe how to set up a normal and reverse VNC-connections using &lt;a title=&#34;home of x11vnc&#34; href=&#34;http://www.karlrunge.com/x11vnc/&#34;&gt;x11vnc&lt;/a&gt; and &lt;a title=&#34;TightVNC homepage&#34; href=&#34;http://www.tightvnc.com/&#34;&gt;TightVNC&lt;/a&gt;.&lt;/p&gt;
@@ -221,10 +221,10 @@ I&amp;rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log 
     
     <item>
       <title>MCabber - Settings and rebinding of PageUp/PageDown</title>
-      <link>https://danielgibson.github.io/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</link>
+      <link>http://blog.gibson.sh/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</link>
       <pubDate>Thu, 01 Oct 2009 22:34:06 +0000</pubDate>
       
-      <guid>https://danielgibson.github.io/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</guid>
+      <guid>http://blog.gibson.sh/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</guid>
       <description>&lt;p&gt;After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&amp;rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a &lt;a href=&#34;http://www.gnu.org/software/screen/screen.html&#34;&gt;screen&lt;/a&gt; is so much nicer.&lt;/p&gt;
 
 &lt;p&gt;So I tried &lt;a href=&#34;http://www.mcabber.com&#34;&gt;MCabber&lt;/a&gt;, that turned out to be really great once you&amp;rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&amp;rsquo;ll want to configure it to your needs.

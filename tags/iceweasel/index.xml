@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Iceweasel on Daniels Tech Blog</title>
-    <link>https://danielgibson.github.io/tags/iceweasel/</link>
+    <link>http://blog.gibson.sh/tags/iceweasel/</link>
     <description>Recent content in Iceweasel on Daniels Tech Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 30 Jun 2010 01:44:36 +0200</lastBuildDate>
     
-	<atom:link href="https://danielgibson.github.io/tags/iceweasel/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.gibson.sh/tags/iceweasel/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Bug-Hunting: Browsers fail to load research.microsoft.com</title>
-      <link>https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</link>
+      <link>http://blog.gibson.sh/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</link>
       <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
       
-      <guid>https://danielgibson.github.io/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</guid>
+      <guid>http://blog.gibson.sh/2010/06/30/bug-hunting-browsers-fail-to-load-research.microsoft.com/</guid>
       <description>&lt;p&gt;This is a follow-up to &lt;a href=&#34;http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541658&#34;&gt;debian bug #541658 for Iceweasel: &amp;ldquo;cannot open research.microsoft.com&amp;rdquo;&lt;/a&gt;.
 It turned out that this bug applies to all (tested) browsers with cookie-support (Iceweasel, Opera, Chrome, Arora, Kazehakase),
 but only very few people are experiencing it.&lt;br /&gt;
