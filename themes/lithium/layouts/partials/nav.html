@@ -1,6 +1,6 @@
 <nav class="nav">
-  <a href="{{ .Site.BaseURL }}" class="nav-logo" title="Home">
-    <img src="{{ .Site.BaseURL }}images/{{ .Site.Params.logo.url }}"
+  <a href="/" class="nav-logo" title="Home">
+    <img src="/images/{{ .Site.Params.logo.url }}"
       {{ if .Site.Params.logo.width }}
          width="{{ .Site.Params.logo.width }}"
       {{ end }} {{ if .Site.Params.logo.height }}
@@ -11,7 +11,7 @@
   </a>
 
   <ul class="nav-links">
-    <li><b><a href="{{ .Site.BaseURL }}"><!--{{ .Site.Title }}-->Home</a></b></li>
+    <li><b><a href="/"><!--{{ .Site.Title }}-->Home</a></b></li>
     {{ range .Site.Menus.main }}
     <li><a href="{{ .URL }}">{{ .Name }}</a></li>
     {{ end }}
