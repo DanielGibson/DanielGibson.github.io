@@ -1,9 +1,10 @@
 +++
-date = "2017-10-16T01:45:57+02:00"
+date = "2017-11-18T21:45:57+02:00"
 title = "How to create portable Linux binaries (even if you use C++11 or newer)"
 tags = [ "C", "C++", "programming", "gamedev" ]
 draft = true
-# ghcommentid = 12
+toc = true
+ghcommentid = 12
 +++
 
 Creating application binaries for Linux that run on a wide range of distributions
@@ -24,10 +25,11 @@ symbol versioning on Linux (last section of the article).
 
 <!--more-->
 
-## Some general suggestions
+# Some general suggestions
 
 * Keep dependencies low - the fewer libs/frameworks you need the better
-  * stb_image.h and stb_image_write.h are great alternatives to libPNG, libJPEG etc
+  * [stb_image.h and stb_image_write.h](https://github.com/nothings/stb)
+    are great alternatives to libPNG, libJPEG etc
   * there are lots of other handy easy-to-use header-only libs; many are listed at
     https://github.com/nothings/single_file_libs
 * Bundle the libs you do need (note however potential problems described below)
@@ -56,7 +58,7 @@ symbol versioning on Linux (last section of the article).
        so indeed build SDL2 yourself; make sure to have the relevant development headers installed 
 * Unfortunately, for C++ APIs `dlopen()` + `dlsym()` is not an option - another reason to prefer plain C libs :-)
 
-## Basic system libraries
+# Basic system libraries
 
 The most basic system libs you can hardly avoid are:
 
@@ -79,7 +81,7 @@ and bundle it with your game anyway, so just do that and link against that.
 
 This is all! Or is it?
 
-## But what if I need a (more) recent compiler?
+# But what if I need a (more) recent compiler?
 
 If you need a more recent compiler than GCC/G++ 4.7, because you
 need proper support for C++11 (or even newer), this is not enough..
@@ -97,8 +99,8 @@ uses those versions instead of those on the system and you're done?
 
 Of course it's never so easy.  
 Your application (most probably) uses further system libs, like **libGL**, **libX**\*
-(or the wayland equivalents) etc - and those system are most probably using libgcc or
-even libstdc++.  
+(or the wayland equivalents) etc - and those system libs are most probably using
+libgcc or even libstdc++.  
 The Mesa (open source graphics drivers) libGL uses libstdc++, so I'll use
 that to illustrate the problem (but, especially via libgcc, this problem can
 occur with any other system lib as well):
@@ -118,7 +120,7 @@ ones on the system - and this decision has to be made *per lib*.
 This means that `rpath $ORIGIN` is not an option (because you want to make the
 decision which library path to use - system or your own - at runtime).
 
-## A wrapper that selectively overrides system libs
+# A wrapper that selectively overrides system libs
 
 This leaves the option of a wrapper setting `LD_LIBRARY_PATH` (if you need to
 use the bundled versions). You'll need to put each of those libraries in a
@@ -162,7 +164,7 @@ where `argv` is the `argv` from the wrapper - it's just passed unchanged.[^fn:ar
 So what's missing? The wrappers implementation of course, especially the part
 where it finds out the version of a lib.
 
-### Some implementation details of the wrapper
+## Some implementation details of the wrapper
 
 _If you don't care about the implementation details just skip this section.
 You can find the wrapper itself [**in this Github project**](https://github.com/DanielGibson/Linux-app-wrapper/)._
@@ -202,7 +204,7 @@ holes in a few months. You have to make sure to link against a libcurl.so.4
 *without* versioned symbols[^fn:versym] though (or use it via `dlopen()` + `dlsym()` 
 and don't link it at all).
 
-## Building a portable libcurl.so.4 without versioned symbols
+# Building a portable libcurl.so.4 without versioned symbols
 
 Often you'd like to use HTTP or HTTPS and the most common cross-platform
 library to do that is libcurl. It also supports a plethora of other protocols,
@@ -217,7 +219,7 @@ which is easy to build, has a friendly license
 ([Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0))
 and can be statically linked.
 
-### Building mbed TLS (tested with 2.6.0)
+## Building mbed TLS (tested with 2.6.0)
 
 * Download and extract the source
 * Edit Makefile, change `DESTDIR` to something else, I'll use `/opt/mbedtls/`
@@ -229,7 +231,7 @@ and can be statically linked.
   - `sudo rm /opt/mbedtls/lib/*.so`
   - `sudo rm /opt/mbedtls/lib/*.so.*`
 
-### Building libcurl itself
+## Building libcurl itself
 
 Now you can build libcurl itself (this was tested with 7.56).
 
@@ -271,12 +273,12 @@ the system libcurl to make sure your application uses unversioned symbols.
 Copy `/opt/curl/lib/libcurl.so.4` to `/path/to/wrapper/libs/curl/` so the wrapper
 can use it if libcurl is not found on your users system.
 
-## Bonus: Dynamic Libs on Linux and what is symbol versioning?
+# Bonus: Dynamic Libs on Linux and what is symbol versioning?
 
 I wish I just could have linked some article with a nice introduction/overview
 about symbol versioning on Linux, but I couldn't find any..  
 
-### Dynamic Libraries on Unix-like systems
+## Dynamic Libraries on Unix-like systems
 
 Let's start with a short overview of what "dynamic libraries" are and how
 they are used on Unix-like systems.
@@ -324,7 +326,7 @@ the runtime linker knows about.
 The [runtime linker manpage](http://man7.org/linux/man-pages/man8/ld.so.8.html)
 covers this in more detail.
 
-### Versioned Symbols
+## Versioned Symbols
 
 *__Note:__ This is pretty Linux specific. Apparently other operating systems like
 [FreeBSD](https://people.freebsd.org/~deischen/symver/library_versioning.txt)
@@ -352,7 +354,7 @@ As you'd expect, it returns the function for `function_name` with version `VERSI
 and if that combination couldn't be found it returns NULL; even if a function called
 `function_name` with another version (or none at all) exists.
 
-#### Example: glibc's memcpy()
+### Example: glibc's memcpy()
 
 Being a C standard lib, glibc of course always had a
 [**memcpy()**](http://man7.org/linux/man-pages/man3/memcpy.3.html) implementation.
@@ -378,7 +380,7 @@ You'll also note that before `GLIBC_2.2.5` is one `@` and before `GLIBC_2.14`
 there are two `@@` - the two `@@` indicate that this is the default version
 of that function that the compile-time linker (and apparently `dlsym()`[^fn:dlsymdefault]) will use.
 
-#### How and why libcurl uses symbol versioning
+### How and why libcurl uses symbol versioning
 
 **libcurl** uses symbol versioning in a different way: There all symbols get the same
 version and only exist in one version (if it was built with symbol versioning enabled).
@@ -402,7 +404,7 @@ to ignore the symbol versions by compiletime-linking against an unversioned libc
 so your application works with any libcurl) or by loading it and its
 functions with `dlopen()` + `dlsym()`.
 
-#### More information on Symbol Versioning
+### More information on Symbol Versioning
 
 This was a very rough overview, if you want to learn more, look at:
 
@@ -415,7 +417,8 @@ This was a very rough overview, if you want to learn more, look at:
   More low-level details
 * [Symbol Versioning on FreeBSD](https://people.freebsd.org/~deischen/symver/library_versioning.txt)
 * [Symbol Versioning on Solaris](https://docs.oracle.com/cd/E19683-01/816-5042/solarisabi-8/index.htm)
- 
+
+
 <!-- Below: Footnotes -->
 
 [^fn:fallback]: Ideally the bundled version will only be used as a fallback in case
