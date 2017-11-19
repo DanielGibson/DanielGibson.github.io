@@ -32,9 +32,9 @@ Now try to open a sub page of http://research.microsoft.com (to make sure it's n
 	<li><strong>Not everyone is affected by the bug.</strong> In fact it seems like very few people are affected.</li>
 	<li>Despite Sasha claiming something else in the original bug report, the <strong>issue doesn't seem to be browser-related</strong>. As mentioned before, either all (modern) browsers (that use cookies correctly) on a system work or none. So far I haven't heard of a system where one browser does work (e.g. IE) and the other (e.g. Firefox/Iceweasel) doesn't.</li>
 	<li>The problem appears to be <strong>related to cookies</strong>:  Only if the request (HTTP GET) to the server contains cookies, loading the page fails. This is why the first time the page is visited, it works.
-If a cookie is sent, there is no answer from the server, see the following log from wireshark (The lines beginning with "##" are comments from me):
+	If a cookie is sent, there is no answer from the server, see the following log from wireshark (The lines beginning with "##" are comments from me):
 
-```text
+{{< highlight text >}}
 ## the format: number, system time, source, destination, protocol, info, time
 11	01:03:08.075023	192.168.0.155	192.168.0.1	DNS	Standard query A research.microsoft.com	4.574382
 12	01:03:08.076905	192.168.0.1	192.168.0.155	DNS	Standard query response A 131.107.65.14	4.576264
@@ -59,13 +59,13 @@ Cookie: s_cc=true;s_sq=msnportalbetarmc%3D%2526pid%253DMicrosoft%252520Research%
 
 ## This seems like a valid HTTP-Request to me, also all required "\r\n" sequences are present.
 17	01:03:11.287018	192.168.0.155	131.107.65.14	HTTP	[TCP Retransmission] GET / HTTP/1.1 	7.786377
-```
+{{< /highlight >}}
 
 Note that there is the Retransmission because the server didn't send any answer. There were several more retransmissions until the TCP-stack or Iceweasel (whoever controls that) finally gave up.
 
 The following wireshark-log is from a connection that was made after all *.microsoft.com cookies were deleted. The page was displayed correctly. The first steps (DNS resolving, TCP-Handshake) are omitted, because they're identical.
 
-```text
+{{< highlight text >}}
 912	01:13:11.994985	192.168.0.155	131.107.65.14	HTTP	GET / HTTP/1.1 	608.494344
 ## with following content:
 GET / HTTP/1.1
@@ -83,7 +83,7 @@ Connection: keep-alive
 913	01:13:12.189427	131.107.65.14	192.168.0.155	HTTP	HTTP/1.1 302 Found  (text/html)	608.688786
 ## this time the connection was accepted and an answer was sent
 # more stuff following (transmission of content), but it doesn't matter here
-``` 
+{{< /highlight >}}
 </li>
 	<li>This mess seems to be somehow related to<strong> MTU-clamping</strong> on the router (see <a href="https://blue-labs.org/howto/mtu-mss.php">https://blue-labs.org/howto/mtu-mss.php</a> for more information).
 I'll describe my setup briefly: I have a debian (Lenny i386, Kernel 2.6.26-2-686) based box that acts as a router/NAT. It connects to the internet with an external DSL-modem (attached to one NIC) using pppoe. All computers in my LAN use this box as a gateway to connect to the internet, which, apart from this issue, works pretty well. The router is connected to the LAN with a 3com GBit switch (at a Intel 82574L GBit NIC)  and there's also a 3com WLAN access point. The "debian boxes" I'm referring to are a Lenny AMD64 box connected to the LAN also with a similar Intel GBit NIC a Squeeze i386 laptop normally connected via Intel ipw2200 wireless (but connecting via wired LAN didn't make a difference either).
