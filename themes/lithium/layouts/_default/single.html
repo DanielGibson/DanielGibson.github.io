@@ -12,7 +12,13 @@
     {{ if eq .Section "post" }}
     <span class="article-date">{{ .Date.Format "January 2, 2006" }}</span>
     {{ end }}
-
+{{ if .Params.toc }}
+    <br>
+    <div class="toc">
+      <b>Table of Contents:</b>
+      {{.TableOfContents}}
+    </div>
+{{ end }}
     <div class="article-content">
       {{ .Content }}
     </div>

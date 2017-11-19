@@ -6,7 +6,7 @@ draft = false
 
 Hi, I'm Daniel.  
 I like Heavy Metal and (mostly oldish) computer games.  
-I write code, usually gamedev/Linux centric (no, that's no contradiction).
+I write code, usually gamedev/Linux centric (often both).
 Sometimes I write about that. In this Blog.
 
 Some projects I'm involved with:
@@ -21,7 +21,7 @@ Some projects I'm involved with:
 * [**Snippets**](https://github.com/DanielGibson/Snippets/) some header-only
   public domain libs (for C/C++) + other (hopefully) useful code snippets I wrote
 
-## Licenses of this blog
+## Licenses of this Blog
 
 The source of this blog can be found at https://github.com/DanielGibson/DanielGibson.github.io/
 It's built with hugo and uses python-pygmentize for the syntax-highlighted codeblocks.
