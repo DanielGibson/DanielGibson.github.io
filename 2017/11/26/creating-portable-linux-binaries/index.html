@@ -8,11 +8,27 @@
 
 <title>How to create portable Linux binaries (even if you need a recent compiler) - ./gibson.sh --blog</title>
 <meta property="og:title" content="How to create portable Linux binaries (even if you need a recent compiler) - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="Creating application binaries for Linux that run on a wide range of distributions
+is a bit tricky, as different distributions ship different versions of various
+system libraries. These are usually backwards compatible, but not forwards
+compatible, so programs linked against older versions of the libraries also
+work with newer versions, but not (necessarily) the other way around.
+So you want to link your application against older versions of those libs;
+however, especially when using C&#43;&#43;11 or newer, this is not always feasible.
+
+This post will show how to deal with these issues. It has a focus on videogames,
+but the general ideas apply to other kinds of applications as well (with normal GUI
+applications you may have more or more complex dependencies like Qt which may need
+extra care that is not detailed here).
+
+I also somehow ended up writing a short introduction into dynamic libraries and
+symbol versioning on Linux (last section of the article).
+
+" />
 
 
-
-  
-
+<meta name="twitter:creator" content="@Doomed_Daniel" />
 
 
 
