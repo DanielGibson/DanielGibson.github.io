@@ -1,6 +1,7 @@
 +++
 date = "2010-01-08T02:55:18+02:00"
 title = "Remote administration/tech-support with (reverse) VNC"
+slug = "remote-administrationtech-support-with-reverse-vnc"
 tags = [ "Linux", "reverse VNC", "TightVNC", "VNC", "Windows", "x11vnc" ]
 ghcommentid = 3
 +++

@@ -1,6 +1,7 @@
 +++
 date = "2017-11-18T21:45:57+02:00"
-title = "How to create portable Linux binaries (even if you use C++11 or newer)"
+title = "How to create portable Linux binaries (even if you need a recent compiler)"
+slug = "creating-portable-linux-binaries"
 tags = [ "C", "C++", "programming", "gamedev" ]
 draft = true
 toc = true

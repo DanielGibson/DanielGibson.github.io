@@ -1,6 +1,7 @@
 BaseURL = "http://blog.gibson.sh"
 languageCode = "en-us"
-title = "Daniels Tech Blog"
+# title = "Daniels Tech Blog"
+title = "./gibson.sh --blog"
 paginate = 10
 theme = "lithium"
 pygmentsuseclasses = true
@@ -16,8 +17,8 @@ relativeURLs = true
     url = "logo.png"
 
 [permalinks]
-    post = "/:year/:month/:day/:title/"
-    page = "/:title/"
+    post = "/:year/:month/:day/:slug"
+    page = "/:slug"
 
 [[menu.main]]
     name = "About"
