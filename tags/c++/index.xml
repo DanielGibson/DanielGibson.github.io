@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43; on ./gibson.sh --blog</title>
+    <link>http://blog.gibson.sh/tags/c&#43;&#43;/</link>
+    <description>Recent content in C&#43;&#43; on ./gibson.sh --blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Nov 2017 00:45:57 +0200</lastBuildDate>
+    
+	<atom:link href="http://blog.gibson.sh/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How to create portable Linux binaries (even if you need a recent compiler)</title>
+      <link>http://blog.gibson.sh/2017/11/26/creating-portable-linux-binaries/</link>
+      <pubDate>Sun, 26 Nov 2017 00:45:57 +0200</pubDate>
+      
+      <guid>http://blog.gibson.sh/2017/11/26/creating-portable-linux-binaries/</guid>
+      <description>&lt;p&gt;Creating application binaries for Linux that run on a wide range of distributions
+is a bit tricky, as different distributions ship different versions of various
+system libraries. These are usually backwards compatible, but not forwards
+compatible, so programs linked against older versions of the libraries also
+work with newer versions, but not (necessarily) the other way around.&lt;br /&gt;
+So you want to link your application against older versions of those libs;
+however, especially when using C++11 or newer, this is not always feasible.&lt;/p&gt;
+
+&lt;p&gt;This post will show how to deal with these issues. It has a focus on videogames,
+but the general ideas apply to other kinds of applications as well (with normal GUI
+applications you may have more or more complex dependencies like Qt which may need
+extra care that is not detailed here).&lt;/p&gt;
+
+&lt;p&gt;I also somehow ended up writing a short introduction into dynamic libraries and
+symbol versioning on Linux (last section of the article).&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

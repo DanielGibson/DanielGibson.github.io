@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Disk on Daniels Tech Blog</title>
+    <title>Disk on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/disk/</link>
-    <description>Recent content in Disk on Daniels Tech Blog</description>
+    <description>Recent content in Disk on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 11 May 2010 22:55:05 +0200</lastBuildDate>

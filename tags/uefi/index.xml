@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Uefi on Daniels Tech Blog</title>
+    <title>Uefi on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/uefi/</link>
-    <description>Recent content in Uefi on Daniels Tech Blog</description>
+    <description>Recent content in Uefi on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 02 Jan 2014 02:05:41 +0000</lastBuildDate>

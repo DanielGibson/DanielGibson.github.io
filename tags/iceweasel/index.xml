@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Iceweasel on Daniels Tech Blog</title>
+    <title>Iceweasel on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/iceweasel/</link>
-    <description>Recent content in Iceweasel on Daniels Tech Blog</description>
+    <description>Recent content in Iceweasel on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 30 Jun 2010 01:44:36 +0200</lastBuildDate>

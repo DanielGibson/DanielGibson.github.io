@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Daniels Tech Blog</title>
+    <title>Posts on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/post/</link>
-    <description>Recent content in Posts on Daniels Tech Blog</description>
+    <description>Recent content in Posts on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Jul 2015 02:29:24 +0000</lastBuildDate>
@@ -208,10 +208,10 @@ I&amp;rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log 
     
     <item>
       <title>Remote administration/tech-support with (reverse) VNC</title>
-      <link>http://blog.gibson.sh/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</link>
+      <link>http://blog.gibson.sh/2010/01/08/remote-administrationtech-support-with-reverse-vnc/</link>
       <pubDate>Fri, 08 Jan 2010 02:55:18 +0200</pubDate>
       
-      <guid>http://blog.gibson.sh/2010/01/08/remote-administration/tech-support-with-reverse-vnc/</guid>
+      <guid>http://blog.gibson.sh/2010/01/08/remote-administrationtech-support-with-reverse-vnc/</guid>
       <description>&lt;p&gt;Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, &lt;a title=&#34;Virtual Network Computing&#34; href=&#34;http://en.wikipedia.org/wiki/VNC&#34;&gt;VNC&lt;/a&gt; is my weapon of choice, if SSH isn&amp;rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &amp;hellip;).&lt;/p&gt;
 
 &lt;p&gt;I&amp;rsquo;ll describe how to set up a normal and reverse VNC-connections using &lt;a title=&#34;home of x11vnc&#34; href=&#34;http://www.karlrunge.com/x11vnc/&#34;&gt;x11vnc&lt;/a&gt; and &lt;a title=&#34;TightVNC homepage&#34; href=&#34;http://www.tightvnc.com/&#34;&gt;TightVNC&lt;/a&gt;.&lt;/p&gt;
@@ -221,10 +221,10 @@ I&amp;rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log 
     
     <item>
       <title>MCabber - Settings and rebinding of PageUp/PageDown</title>
-      <link>http://blog.gibson.sh/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</link>
+      <link>http://blog.gibson.sh/2009/10/01/mcabber-settings-rebinding-pageup-down/</link>
       <pubDate>Thu, 01 Oct 2009 22:34:06 +0000</pubDate>
       
-      <guid>http://blog.gibson.sh/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</guid>
+      <guid>http://blog.gibson.sh/2009/10/01/mcabber-settings-rebinding-pageup-down/</guid>
       <description>&lt;p&gt;After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&amp;rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a &lt;a href=&#34;http://www.gnu.org/software/screen/screen.html&#34;&gt;screen&lt;/a&gt; is so much nicer.&lt;/p&gt;
 
 &lt;p&gt;So I tried &lt;a href=&#34;http://www.mcabber.com&#34;&gt;MCabber&lt;/a&gt;, that turned out to be really great once you&amp;rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&amp;rsquo;ll want to configure it to your needs.

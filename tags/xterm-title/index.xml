@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Xterm Title on Daniels Tech Blog</title>
+    <title>Xterm Title on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/xterm-title/</link>
-    <description>Recent content in Xterm Title on Daniels Tech Blog</description>
+    <description>Recent content in Xterm Title on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 01 Oct 2009 22:34:06 +0000</lastBuildDate>
@@ -13,10 +13,10 @@
     
     <item>
       <title>MCabber - Settings and rebinding of PageUp/PageDown</title>
-      <link>http://blog.gibson.sh/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</link>
+      <link>http://blog.gibson.sh/2009/10/01/mcabber-settings-rebinding-pageup-down/</link>
       <pubDate>Thu, 01 Oct 2009 22:34:06 +0000</pubDate>
       
-      <guid>http://blog.gibson.sh/2009/10/01/mcabber---settings-and-rebinding-of-pageup/pagedown/</guid>
+      <guid>http://blog.gibson.sh/2009/10/01/mcabber-settings-rebinding-pageup-down/</guid>
       <description>&lt;p&gt;After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&amp;rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a &lt;a href=&#34;http://www.gnu.org/software/screen/screen.html&#34;&gt;screen&lt;/a&gt; is so much nicer.&lt;/p&gt;
 
 &lt;p&gt;So I tried &lt;a href=&#34;http://www.mcabber.com&#34;&gt;MCabber&lt;/a&gt;, that turned out to be really great once you&amp;rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&amp;rsquo;ll want to configure it to your needs.

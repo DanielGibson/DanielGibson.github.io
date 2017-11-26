@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Firefox on Daniels Tech Blog</title>
+    <title>Firefox on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/firefox/</link>
-    <description>Recent content in Firefox on Daniels Tech Blog</description>
+    <description>Recent content in Firefox on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 30 Jun 2010 01:44:36 +0200</lastBuildDate>

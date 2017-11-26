@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Performance on Daniels Tech Blog</title>
+    <title>Performance on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/performance/</link>
-    <description>Recent content in Performance on Daniels Tech Blog</description>
+    <description>Recent content in Performance on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 23 Mar 2015 00:06:18 +0000</lastBuildDate>
