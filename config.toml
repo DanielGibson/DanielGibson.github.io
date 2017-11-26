@@ -13,6 +13,8 @@ pygmentsUseClassic = true
 relativeURLs = true
 
 [params]
+  twitterhandle = "@Doomed_Daniel"
+  description = "Daniel Gibson's Blog"
   [params.logo]
     url = "logo.png"
 
