@@ -8,11 +8,33 @@
 
 <title>How to boot Linux and Windows 7 via UEFI - ./gibson.sh --blog</title>
 <meta property="og:title" content="How to boot Linux and Windows 7 via UEFI - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="Don&rsquo;t.
+It&rsquo;s a fucking pain in the ass.
 
+Note: This refers to Windows 7 (and probably Vista and Server 2008
+and older). Starting with Windows 8, the Windows installer should support
+UEFI better and things should be easier.
 
+Buy a &lt;= 2TB hard disk for Windows installations (additional Windows partitions
+can be on larger HDDs using GPT, it&rsquo;s only painful for the system partitions).
+However, if you want to use a hard drive with &gt;2TB for your Windows installation,
+you have to use GPT partitions (instead of the old MBR style which only
+supports &lt;= 2TB disks - there you can only use the space &gt; 2TB with ugly
+hacks and can&rsquo;t have a continuous partition from 2TB) - and Windows can only
+boot from GPT partitions in UEFI mode.
+To make things more challenging, Windows doesn&rsquo;t offer creating a GPT partition table
+and partitions in the graphical installer (at least for Win7), so one has to use cmd.exe.
+But don&rsquo;t worry, the Linux part also sucks :-)
+I&rsquo;ll describe how I got Windows to install using GPT partitions on a 3TB harddisk,
+how to make an existing Linux (Debian Wheezy) installation boot via EFI (using grub-efi)
+and how I got my Mainboard ASUS Z87-A
+to boot this and GRUB to chainload (UEFI) Windows.
 
-  
+" />
 
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
 
 
@@ -20,7 +42,6 @@
 
 <link rel="stylesheet" href="../../../../css/main.css" media="all" />
 <link rel="stylesheet" href="../../../../css/fonts.css" />
-
 
 
   </head>

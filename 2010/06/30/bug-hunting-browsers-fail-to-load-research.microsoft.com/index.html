@@ -8,11 +8,25 @@
 
 <title>Bug-Hunting: Browsers fail to load research.microsoft.com - ./gibson.sh --blog</title>
 <meta property="og:title" content="Bug-Hunting: Browsers fail to load research.microsoft.com - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="This is a follow-up to debian bug #541658 for Iceweasel: &ldquo;cannot open research.microsoft.com&rdquo;.
+It turned out that this bug applies to all (tested) browsers with cookie-support (Iceweasel, Opera, Chrome, Arora, Kazehakase),
+but only very few people are experiencing it.
+First I&rsquo;ll tell how to reproduce the bug, then I&rsquo;ll sum up the facts I already
+collected in that bugreport and then I&rsquo;ll document my further attempts to narrow down the problem.
 
+UPDATE: The reason for that strange behaviour was found and I filed a new bugreport:
+No. #587789
+UPDATE 2: Debians Kernel maintainer considers this expected behavior and told me
+to file a bugreport upstream and I did: Netfilter bug #622.
+UPDATE 3: I think Microsoft has fixed their server. Of course the Linux kernel
+should be fixed anyway but there doesn&rsquo;t seem to be much interest in doing so :-/
+UPDATE 4: Three years later it had been fixed in the Linux kernel.
 
+" />
 
-  
-
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
 
 
@@ -20,7 +34,6 @@
 
 <link rel="stylesheet" href="../../../../css/main.css" media="all" />
 <link rel="stylesheet" href="../../../../css/fonts.css" />
-
 
 
   </head>

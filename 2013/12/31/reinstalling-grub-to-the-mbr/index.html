@@ -8,11 +8,31 @@
 
 <title>(Re)installing GRUB to the MBR - ./gibson.sh --blog</title>
 <meta property="og:title" content="(Re)installing GRUB to the MBR - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="This is just a very short roundup of the relevant commands needed to reinstall grub,
+e.g. when migrating a Linux installation to a new hard drive.
 
 
+boot live Linux system (from CD/DVD or USB key, I use
+grml, any other live Linux should do)
+mount root-fs of your installation (e.g. /dev/sda2) to /mnt/
+if they&rsquo;re in separate partitions, mount the /boot/, /usr/, &hellip;
+partitions of your installation to /mnt/boot, /mnt/usr/, &hellip;
+mount --bind /dev/ and /sys/ to /mnt/dev and /mnt/sys (maybe also /proc
+for older versions of grub?), grub will need those
+chroot /mnt
+execute grub-install $device (e.g. /dev/sda) to install grub to the MBR of $device
+update-grub to upgrade the grub menu entries
+If names of partitions changed, don&rsquo;t forget to adjust /etc/fstab
+reboot, remove live linux
+configure your BIOS/UEFI to boot from that harddisk
 
-  
 
+That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
+" />
+
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
 
 
@@ -20,7 +40,6 @@
 
 <link rel="stylesheet" href="../../../../css/main.css" media="all" />
 <link rel="stylesheet" href="../../../../css/fonts.css" />
-
 
 
   </head>

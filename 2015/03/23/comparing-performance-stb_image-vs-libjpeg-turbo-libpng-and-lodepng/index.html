@@ -8,11 +8,36 @@
 
 <title>Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng - ./gibson.sh --blog</title>
 <meta property="og:title" content="Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="I recently tried out Sean Barrett&rsquo;s stb_image.h
+and was blown away by how fucking easy it is to use.
+Integrating it into your project is trivial: Just add the header and somewhere do:
+#define STB_IMAGE_IMPLEMENTATION
+#include &quot;stb_image.h&quot;
 
 
+That&rsquo;s all. (If you wanna use it in multiple files you just #include &quot;stb_image.h&quot; there without the #define.)
 
-  
+And the API is trivial too:
+int width, height, bytesPerPixel;
+unsigned char *pixeldata, *pixeldata2;
+pixeldata = stbi_load(&quot;bla.jpg&quot;, &amp;width, &amp;height, &amp;bytesPerPixel, 0);
+// if you have already read the image file data into a buffer:
+pixeldata2 = stbi_load_from_memory(bufferWithImageData, bufferLength,
+                                   &amp;width, &amp;height, &amp;bytesPerPixel, 0);
+if(pixeldata2 == NULL)
+    printf(&quot;Some error happened: %s\n&quot;, stbi_failure_reason());
 
+
+There&rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
+And it supports lots of common image file types including JPEG, PNG, TGA, BMP, GIF and PSD.
+
+So I wondered if there are any downsides regarding speed.
+
+" />
+
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
 
 
@@ -20,7 +45,6 @@
 
 <link rel="stylesheet" href="../../../../css/main.css" media="all" />
 <link rel="stylesheet" href="../../../../css/fonts.css" />
-
 
 
   </head>

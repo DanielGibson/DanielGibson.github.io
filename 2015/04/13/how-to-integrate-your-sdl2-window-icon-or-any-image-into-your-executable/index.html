@@ -8,11 +8,24 @@
 
 <title>How to integrate your SDL2 window icon (or any image) into your executable - ./gibson.sh --blog</title>
 <meta property="og:title" content="How to integrate your SDL2 window icon (or any image) into your executable - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="Let&rsquo;s assume you have an image that you want to use as a window icon in your
+cross-platform application that uses libSDL2.
+A suitable window icon is 64x64pixels big (other sizes should work as well, though)
+and has 32bit RGBA colors, which means it contains an alpha-channel.
 
+Now it would be handy if the icon could just be part of the executable
+and if this could be achieved in a platform-independent way.
+Furthermore it&rsquo;d be great if it didn&rsquo;t require additional dependencies (e.g. to decode image files).
 
+In this tutorial I&rsquo;ll show how to translate the image into C source file
+containing a struct that holds the image data &#43; necessary metadata (width,
+height, color depth) and how to load that struct into a SDL_Surface*
+and to set that surface as a window icon.
+" />
 
-  
-
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
 
 
@@ -20,7 +33,6 @@
 
 <link rel="stylesheet" href="../../../../css/main.css" media="all" />
 <link rel="stylesheet" href="../../../../css/fonts.css" />
-
 
 
   </head>

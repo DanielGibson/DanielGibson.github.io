@@ -8,11 +8,17 @@
 
 <title>Unlock gnome-keyring on Login with SLiM and PAM - ./gibson.sh --blog</title>
 <meta property="og:title" content="Unlock gnome-keyring on Login with SLiM and PAM - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="My favorite desktop environment is XFCE, because it&rsquo;s fast, doesn&rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).
+I also use SLiM as a display manager because it is slim and looks much better than xdm.
 
+On my Laptop I also use GNOME&rsquo;s NetworkManager because I haven&rsquo;t yet found a better and less bloated alternative for handling wireless networks and VPNs.
+NetworkManager is able to store your passwords (WPA-keys etc) in the GNOME Keyring so you don&rsquo;t need to enter them each time your laptop connects to a wireless network. But you still have to enter the password to unlock the keyring.. unless you let PAM handle that on login.
 
+I&rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log in with SLiM, so applications like the NetworkManager can access the keyring. I&rsquo;ll focus on how to do that with Debian &ldquo;squeeze&rdquo; (the current testing), but it should be directly applicable for Ubuntu (at least &ldquo;Lucid&rdquo;, for older versions you&rsquo;ll have to build your own slim package with PAM support - or maybe use the one from debian) and quite similar in any other Linux distribution." />
 
-  
-
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
 
 
@@ -20,7 +26,6 @@
 
 <link rel="stylesheet" href="../../../../css/main.css" media="all" />
 <link rel="stylesheet" href="../../../../css/fonts.css" />
-
 
 
   </head>
