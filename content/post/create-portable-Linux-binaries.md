@@ -1,5 +1,5 @@
 +++
-date = "2017-11-18T21:45:57+02:00"
+date = "2017-11-26T00:45:57+02:00"
 title = "How to create portable Linux binaries (even if you need a recent compiler)"
 slug = "creating-portable-linux-binaries"
 tags = [ "C", "C++", "programming", "gamedev" ]
@@ -10,7 +10,7 @@ ghcommentid = 12
 
 Creating application binaries for Linux that run on a wide range of distributions
 is a bit tricky, as different distributions ship different versions of various
-system libraries. These are generally backwards compatible, but not forwards
+system libraries. These are usually backwards compatible, but not forwards
 compatible, so programs linked against older versions of the libraries also
 work with newer versions, but not (necessarily) the other way around.  
 So you want to link your application against older versions of those libs;
@@ -262,9 +262,10 @@ Then you execute the `./configure` script with all the options..
 options to disable protocols I don't care about (if you want any of them just
 leave out the corresponding `--disable-*`), `--disable-versioned-symbols`
 makes sure the libcurl symbols are not versionsed with the used SSL library name
-(Linux distros do that, I have no idea what it's good for), `--without-ssl`
-disables the usage of OpenSSL, `--with-mbedtls=/opt/mbedtls` enables usage of
-mbed TLS and sets where to find mbedtls (see `DESTDIR` from mbed TLS above)
+(Linux distributions often do that, see [below](#how-and-why-libcurl-uses-symbol-versioning)
+ for a guess why they do it), `--without-ssl` disables the usage of OpenSSL,
+`--with-mbedtls=/opt/mbedtls` enables usage of mbed TLS and sets where to
+find mbedtls (see `DESTDIR` from mbed TLS above)
 and `--with-ca-bundle` sets the path of the CA certificate bundle downloaded earlier.
 
 Now build it with `make -j4` and install it with `sudo make install`.
@@ -322,7 +323,7 @@ There's basically two ways to use a library (and its exported functions):
 
 Both the *runtime linker* and `dlopen()` (if called with just the library name without a path)
 look for libraries in several directories, including those set via `rpath` in the executable,
-via `LD_LIBRARY_PATH` via environment variable and several system specific directories
+with the `LD_LIBRARY_PATH` environment variable and several system specific directories
 the runtime linker knows about.
 The [runtime linker manpage](http://man7.org/linux/man-pages/man8/ld.so.8.html)
 covers this in more detail.
@@ -362,7 +363,7 @@ Being a C standard lib, glibc of course always had a
 Historically, it used to behave like [**memmove**](http://man7.org/linux/man-pages/man3/memmove.3.html),
 i.e. it supported overlapping source and destination memory ranges.  
 For glibc version 2.14, the developers introduced optimizations for
-`memcpy()` that makes it faster, but doesn't work with overlapping memory ranges.
+`memcpy()` that make it faster, but don't work with overlapping memory ranges.
 Thankfully, they decided to use a symbol version so this change doesn't break
 old binaries that (incorrectly) rely on `memcpy()` working with overlapping ranges,
 but only breaks code that's recompiled and linked against glibc 2.14 (or newer).[^fn:memcpy]
@@ -376,7 +377,7 @@ $ readelf -s /lib/x86_64-linux-gnu/libc.so.6 | grep memcpy
 ```
 
 As expected, `memcpy` indeed turns up twice in the symbols of `libc.so.6` - once
-in version `GLIBC_2.2.5`[^fn:glibc255] and once in version `GLIBC_2.14`.  
+in version `GLIBC_2.2.5`[^fn:glibc225] and once in version `GLIBC_2.14`.  
 You'll also note that before `GLIBC_2.2.5` is one `@` and before `GLIBC_2.14`
 there are two `@@` - the two `@@` indicate that this is the default version
 of that function that the compile-time linker (and apparently `dlsym()`[^fn:dlsymdefault]) will use.
@@ -423,8 +424,16 @@ This was a very rough overview, if you want to learn more, look at:
 <!-- Below: Footnotes -->
 
 [^fn:fallback]: Ideally the bundled version will only be used as a fallback in case
-    the lib is missing on the system (*you're lucky, this post will show you how to do
-    that at least for SDL*).
+    the lib is missing on the system. *You're lucky, this post will show you how to do
+    that at least for SDL.* For OpenAL it's not as easy, as up to now there has been no
+    good, portable way to get the version of the system `libopenal.so.1`, at least not without
+    creating a full OpenAL context and using `alGetString(AL_VERSION);`. However OpenAL-soft's
+    awesome maintainer *KittyCat* has added an "un-exposed" function accessible via `dlsym()`
+    that returns the same thing as `alGetString(AL_VERSION)`, but without needing any context,
+    called `alsoft_get_version()`, see [this commit](https://github.com/kcat/openal-soft/commit/2f5b86dd381ac36d09951e05777ccb97237fa06e)
+    - so future versions (probably from 1.19 on?) can be detected that way.  
+    (Yes, this is a nonstandard OpenAL-soft only thing, but I don't think any other OpenAL
+     implementation is relevant on Linux.)
 
 [^fn:versym]: [See the bonus section](#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning)
     for an explanation of/introduction into versioned symbols/symbol versioning.
@@ -474,7 +483,7 @@ This was a very rough overview, if you want to learn more, look at:
 
 [^fn:memcpy]: [People were not very happy with this change anyway](http://www.win.tue.nl/~aeb/linux/misc/gcc-semibug.html)
 
-[^fn:glibc255]: This is the oldest/lowest symbol version in `libc.so.6`,
+[^fn:glibc225]: This is the oldest/lowest symbol version in `libc.so.6`,
     so I guess they started symbol versioning in glibc 2.2.5.
 
 [^fn:dlsymdefault]: While apparently `dlsym(RTLD_DEFAULT, "fun")` and `dlsym(libhandle, "fun")`
