@@ -153,7 +153,16 @@ So if you choose to bundle SDL2, that will not cause many hard dependencies.
 so indeed build SDL2 yourself; make sure to have the relevant development headers installed</li>
 </ul></li>
 </ul></li>
-<li>Unfortunately, for C++ APIs <code>dlopen()</code> + <code>dlsym()</code> is not an option - another reason to prefer plain C libs :-)</li>
+<li>Unfortunately, for C++ APIs <code>dlopen()</code> + <code>dlsym()</code> is not an option - another reason to prefer plain C libs :-)
+
+<ul>
+<li>If you end up using libs with a C++ API, bundle them, maybe even link them statically.
+If that&rsquo;s not feasible, don&rsquo;t use them.<br />
+GCC (g++) broke ABI compatibility of C++ libs (except for libstdc++ apparently) with GCC 5.1
+by introducing <a href="https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html">&ldquo;ABI tags&rdquo;</a>.
+This can also affect libraries built with some g++ vs clang++ versions;
+clang introduced support for ABI tags in <a href="http://releases.llvm.org/3.9.0/tools/clang/docs/ReleaseNotes.html#id4">version 3.9</a>.</li>
+</ul></li>
 </ul>
 
 <h1 id="basic-system-libraries">Basic system libraries</h1>
@@ -423,7 +432,7 @@ They &ldquo;export&rdquo; &ldquo;symbols&rdquo; that can be used by programs or 
 so first and foremost it&rsquo;s functions.<sup class="footnote-ref" id="fnref:fn-symexp"><a rel="footnote" href="#fn:fn-symexp">9</a></sup> It could also be global variables, but
 I think for this explanation it&rsquo;s easiest to just think about functions.</p>
 
-<p>There&rsquo;s basically two ways to use a library (and its exported functions):</p>
+<p>There are basically two ways to use a library (and its exported functions):</p>
 
 <ol>
 <li>Link against the library (like <code>gcc -o YourApp yourapp.c -lyourlib</code>).<br />

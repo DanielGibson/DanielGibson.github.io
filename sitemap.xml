@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.gibson.sh/2017/11/26/creating-portable-linux-binaries/</loc>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.gibson.sh/about/</loc>
     <lastmod>2017-07-26T12:47:47+02:00</lastmod>
   </url>
@@ -64,7 +69,7 @@
   
   <url>
     <loc>http://blog.gibson.sh/</loc>
-    <lastmod>2017-07-26T12:47:47+02:00</lastmod>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -82,7 +87,13 @@
   
   <url>
     <loc>http://blog.gibson.sh/tags/c/</loc>
-    <lastmod>2015-07-18T02:29:24+00:00</lastmod>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.gibson.sh/tags/c&#43;&#43;/</loc>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -142,6 +153,12 @@
   <url>
     <loc>http://blog.gibson.sh/tags/firefox/</loc>
     <lastmod>2010-06-30T01:44:36+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.gibson.sh/tags/gamedev/</loc>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -297,13 +314,13 @@
   
   <url>
     <loc>http://blog.gibson.sh/post/</loc>
-    <lastmod>2015-07-18T02:29:24+00:00</lastmod>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.gibson.sh/tags/programming/</loc>
-    <lastmod>2015-03-23T00:06:18+00:00</lastmod>
+    <lastmod>2017-11-26T23:12:23+02:00</lastmod>
     <priority>0</priority>
   </url>
   

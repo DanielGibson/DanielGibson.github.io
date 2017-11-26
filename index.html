@@ -55,6 +55,40 @@
 
   <div class="archive">
     
+      <h2 class="archive-title">2017</h2>
+      
+        <article class="archive-item">
+          <a href="./2017/11/26/creating-portable-linux-binaries/" class="archive-item-link">How to create portable Linux binaries (even if you need a recent compiler)</a>
+          <span class="archive-item-date">
+            November 26, 2017
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <p>Creating application binaries for Linux that run on a wide range of distributions
+is a bit tricky, as different distributions ship different versions of various
+system libraries. These are usually backwards compatible, but not forwards
+compatible, so programs linked against older versions of the libraries also
+work with newer versions, but not (necessarily) the other way around.<br />
+So you want to link your application against older versions of those libs;
+however, especially when using C++11 or newer, this is not always feasible.</p>
+
+<p>This post will show how to deal with these issues. It has a focus on videogames,
+but the general ideas apply to other kinds of applications as well (with normal GUI
+applications you may have more or more complex dependencies like Qt which may need
+extra care that is not detailed here).</p>
+
+<p>I also somehow ended up writing a short introduction into dynamic libraries and
+symbol versioning on Linux (last section of the article).</p>
+
+<p></p>
+                <a href="./2017/11/26/creating-portable-linux-binaries/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
       <h2 class="archive-title">2015</h2>
       
         <article class="archive-item">

@@ -32,9 +32,18 @@
     <item>
       <title>C</title>
       <link>http://blog.gibson.sh/tags/c/</link>
-      <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
+      <pubDate>Sun, 26 Nov 2017 23:12:23 +0200</pubDate>
       
       <guid>http://blog.gibson.sh/tags/c/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>http://blog.gibson.sh/tags/c&#43;&#43;/</link>
+      <pubDate>Sun, 26 Nov 2017 23:12:23 +0200</pubDate>
+      
+      <guid>http://blog.gibson.sh/tags/c&#43;&#43;/</guid>
       <description></description>
     </item>
     
@@ -116,6 +125,15 @@
       <pubDate>Wed, 30 Jun 2010 01:44:36 +0200</pubDate>
       
       <guid>http://blog.gibson.sh/tags/firefox/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gamedev</title>
+      <link>http://blog.gibson.sh/tags/gamedev/</link>
+      <pubDate>Sun, 26 Nov 2017 23:12:23 +0200</pubDate>
+      
+      <guid>http://blog.gibson.sh/tags/gamedev/</guid>
       <description></description>
     </item>
     
@@ -338,7 +356,7 @@
     <item>
       <title>Programming</title>
       <link>http://blog.gibson.sh/tags/programming/</link>
-      <pubDate>Mon, 23 Mar 2015 00:06:18 +0000</pubDate>
+      <pubDate>Sun, 26 Nov 2017 23:12:23 +0200</pubDate>
       
       <guid>http://blog.gibson.sh/tags/programming/</guid>
       <description></description>
