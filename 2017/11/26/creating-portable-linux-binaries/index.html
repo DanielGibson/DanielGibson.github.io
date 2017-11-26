@@ -6,8 +6,8 @@
 <meta name="generator" content="Hugo 0.29" />
 
 
-<title>How to create portable Linux binaries (even if you use C&#43;&#43;11 or newer) - Daniels Tech Blog</title>
-<meta property="og:title" content="How to create portable Linux binaries (even if you use C&#43;&#43;11 or newer) - Daniels Tech Blog">
+<title>How to create portable Linux binaries (even if you need a recent compiler) - ./gibson.sh --blog</title>
+<meta property="og:title" content="How to create portable Linux binaries (even if you need a recent compiler) - ./gibson.sh --blog">
 
 
 
@@ -53,10 +53,10 @@
   <article class="article">
     
 
-    <h1 class="article-title">How to create portable Linux binaries (even if you use C&#43;&#43;11 or newer)</h1>
+    <h1 class="article-title">How to create portable Linux binaries (even if you need a recent compiler)</h1>
 
     
-    <span class="article-date">November 18, 2017</span>
+    <span class="article-date">November 26, 2017</span>
     
 
     <br>
@@ -93,7 +93,7 @@
     <div class="article-content">
       <p>Creating application binaries for Linux that run on a wide range of distributions
 is a bit tricky, as different distributions ship different versions of various
-system libraries. These are generally backwards compatible, but not forwards
+system libraries. These are usually backwards compatible, but not forwards
 compatible, so programs linked against older versions of the libraries also
 work with newer versions, but not (necessarily) the other way around.<br />
 So you want to link your application against older versions of those libs;
@@ -392,9 +392,10 @@ it to that file).</p>
 options to disable protocols I don&rsquo;t care about (if you want any of them just
 leave out the corresponding <code>--disable-*</code>), <code>--disable-versioned-symbols</code>
 makes sure the libcurl symbols are not versionsed with the used SSL library name
-(Linux distros do that, I have no idea what it&rsquo;s good for), <code>--without-ssl</code>
-disables the usage of OpenSSL, <code>--with-mbedtls=/opt/mbedtls</code> enables usage of
-mbed TLS and sets where to find mbedtls (see <code>DESTDIR</code> from mbed TLS above)
+(Linux distributions often do that, see <a href="#how-and-why-libcurl-uses-symbol-versioning">below</a>
+ for a guess why they do it), <code>--without-ssl</code> disables the usage of OpenSSL,
+<code>--with-mbedtls=/opt/mbedtls</code> enables usage of mbed TLS and sets where to
+find mbedtls (see <code>DESTDIR</code> from mbed TLS above)
 and <code>--with-ca-bundle</code> sets the path of the CA certificate bundle downloaded earlier.</p>
 
 <p>Now build it with <code>make -j4</code> and install it with <code>sudo make install</code>.</p>
@@ -454,7 +455,7 @@ the path, which is more flexible than what the <em>runtime linker</em> can do.</
 
 <p>Both the <em>runtime linker</em> and <code>dlopen()</code> (if called with just the library name without a path)
 look for libraries in several directories, including those set via <code>rpath</code> in the executable,
-via <code>LD_LIBRARY_PATH</code> via environment variable and several system specific directories
+with the <code>LD_LIBRARY_PATH</code> environment variable and several system specific directories
 the runtime linker knows about.
 The <a href="http://man7.org/linux/man-pages/man8/ld.so.8.html">runtime linker manpage</a>
 covers this in more detail.</p>
@@ -494,7 +495,7 @@ and if that combination couldn&rsquo;t be found it returns NULL; even if a funct
 Historically, it used to behave like <a href="http://man7.org/linux/man-pages/man3/memmove.3.html"><strong>memmove</strong></a>,
 i.e. it supported overlapping source and destination memory ranges.<br />
 For glibc version 2.14, the developers introduced optimizations for
-<code>memcpy()</code> that makes it faster, but doesn&rsquo;t work with overlapping memory ranges.
+<code>memcpy()</code> that make it faster, but don&rsquo;t work with overlapping memory ranges.
 Thankfully, they decided to use a symbol version so this change doesn&rsquo;t break
 old binaries that (incorrectly) rely on <code>memcpy()</code> working with overlapping ranges,
 but only breaks code that&rsquo;s recompiled and linked against glibc 2.14 (or newer).<sup class="footnote-ref" id="fnref:fn-memcpy"><a rel="footnote" href="#fn:fn-memcpy">12</a></sup></p>
@@ -506,7 +507,7 @@ but only breaks code that&rsquo;s recompiled and linked against glibc 2.14 (or n
 </code></pre></div>
 
 <p>As expected, <code>memcpy</code> indeed turns up twice in the symbols of <code>libc.so.6</code> - once
-in version <code>GLIBC_2.2.5</code><sup class="footnote-ref" id="fnref:fn-glibc255"><a rel="footnote" href="#fn:fn-glibc255">13</a></sup> and once in version <code>GLIBC_2.14</code>.<br />
+in version <code>GLIBC_2.2.5</code><sup class="footnote-ref" id="fnref:fn-glibc225"><a rel="footnote" href="#fn:fn-glibc225">13</a></sup> and once in version <code>GLIBC_2.14</code>.<br />
 You&rsquo;ll also note that before <code>GLIBC_2.2.5</code> is one <code>@</code> and before <code>GLIBC_2.14</code>
 there are two <code>@@</code> - the two <code>@@</code> indicate that this is the default version
 of that function that the compile-time linker (and apparently <code>dlsym()</code><sup class="footnote-ref" id="fnref:fn-dlsymdefault"><a rel="footnote" href="#fn:fn-dlsymdefault">11</a></sup>) will use.</p>
@@ -558,8 +559,16 @@ More low-level details</li>
 
 <ol>
 <li id="fn:fn-fallback"><p>Ideally the bundled version will only be used as a fallback in case
-the lib is missing on the system (<em>you&rsquo;re lucky, this post will show you how to do
-that at least for SDL</em>).</p>
+the lib is missing on the system. <em>You&rsquo;re lucky, this post will show you how to do
+that at least for SDL.</em> For OpenAL it&rsquo;s not as easy, as up to now there has been no
+good, portable way to get the version of the system <code>libopenal.so.1</code>, at least not without
+creating a full OpenAL context and using <code>alGetString(AL_VERSION);</code>. However OpenAL-soft&rsquo;s
+awesome maintainer <em>KittyCat</em> has added an &ldquo;un-exposed&rdquo; function accessible via <code>dlsym()</code>
+that returns the same thing as <code>alGetString(AL_VERSION)</code>, but without needing any context,
+called <code>alsoft_get_version()</code>, see <a href="https://github.com/kcat/openal-soft/commit/2f5b86dd381ac36d09951e05777ccb97237fa06e">this commit</a>
+- so future versions (probably from 1.19 on?) can be detected that way.<br />
+(Yes, this is a nonstandard OpenAL-soft only thing, but I don&rsquo;t think any other OpenAL
+ implementation is relevant on Linux.)</p>
  <a class="footnote-return" href="#fnref:fn-fallback"><sup>[return]</sup></a></li>
 
 <li id="fn:fn-versym"><p><a href="#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning">See the bonus section</a>
@@ -647,9 +656,9 @@ get the right version and using <code>dlvsym()</code> is a good idea..</p>
 <li id="fn:fn-memcpy"><a href="http://www.win.tue.nl/~aeb/linux/misc/gcc-semibug.html">People were not very happy with this change anyway</a>
  <a class="footnote-return" href="#fnref:fn-memcpy"><sup>[return]</sup></a></li>
 
-<li id="fn:fn-glibc255"><p>This is the oldest/lowest symbol version in <code>libc.so.6</code>,
+<li id="fn:fn-glibc225"><p>This is the oldest/lowest symbol version in <code>libc.so.6</code>,
 so I guess they started symbol versioning in glibc 2.2.5.</p>
- <a class="footnote-return" href="#fnref:fn-glibc255"><sup>[return]</sup></a></li>
+ <a class="footnote-return" href="#fnref:fn-glibc225"><sup>[return]</sup></a></li>
 </ol>
 </div>
     </div>
