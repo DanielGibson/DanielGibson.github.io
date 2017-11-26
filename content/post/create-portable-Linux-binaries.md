@@ -1,9 +1,9 @@
 +++
-date = "2017-11-26T00:45:57+02:00"
+date = "2017-11-26T23:12:23+02:00"
 title = "How to create portable Linux binaries (even if you need a recent compiler)"
 slug = "creating-portable-linux-binaries"
 tags = [ "C", "C++", "programming", "gamedev" ]
-draft = true
+draft = false
 toc = true
 ghcommentid = 12
 +++
@@ -58,6 +58,12 @@ symbol versioning on Linux (last section of the article).
      * Linux distributions tend to build SDL2 in a way that explicitly links against all those libs,
        so indeed build SDL2 yourself; make sure to have the relevant development headers installed 
 * Unfortunately, for C++ APIs `dlopen()` + `dlsym()` is not an option - another reason to prefer plain C libs :-)
+  * If you end up using libs with a C++ API, bundle them, maybe even link them statically.
+    If that's not feasible, don't use them.  
+    GCC (g++) broke ABI compatibility of C++ libs (except for libstdc++ apparently) with GCC 5.1
+    by introducing ["ABI tags"](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html).
+    This can also affect libraries built with some g++ vs clang++ versions;
+    clang introduced support for ABI tags in [version 3.9](http://releases.llvm.org/3.9.0/tools/clang/docs/ReleaseNotes.html#id4).
 
 # Basic system libraries
 
@@ -293,7 +299,7 @@ Second: **What are symbols?** Symbols are things libraries "export" for users of
 so first and foremost it's functions.[^fn:symexp] It could also be global variables, but
 I think for this explanation it's easiest to just think about functions.
 
-There's basically two ways to use a library (and its exported functions):
+There are basically two ways to use a library (and its exported functions):
 
 1. Link against the library (like `gcc -o YourApp yourapp.c -lyourlib`).  
    This is called **dynamic _linking_**. When executing YourApp the "runtime linker"
