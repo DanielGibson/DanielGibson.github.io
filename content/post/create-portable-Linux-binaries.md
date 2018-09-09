@@ -53,13 +53,13 @@ symbol versioning on Linux (last section of the article).
     different sound systems, if the lib of one is missing that shouldn't make your application fail)
   * You avoid versioned symbols[^fn:versym] - as long as a function with a given name is available at all,
     you can use it - even if it has a different version than on the system you compiled on
-  * If you use SDL2 yourself, it will do this for most system libs (esp. the graphics and sound related ones).
+  * If you build SDL2 yourself, it will by default do this for most system libs (esp. the graphics and sound related ones).
     So if you choose to bundle SDL2, that will not cause many hard dependencies.
      * Linux distributions tend to build SDL2 in a way that explicitly links against all those libs,
        so indeed build SDL2 yourself; make sure to have the relevant development headers installed 
 * Unfortunately, for C++ APIs `dlopen()` + `dlsym()` is not an option - another reason to prefer plain C libs :-)
-  * If you end up using libs with a C++ API, bundle them, maybe even link them statically.
-    If that's not feasible, don't use them.  
+  * If you end up using libs with a C++ API and they're not header-only anyway, bundle them,
+    maybe even link them statically. If that's not feasible, don't use them.  
     GCC (g++) broke ABI compatibility of C++ libs (except for libstdc++ apparently) with GCC 5.1
     by introducing ["ABI tags"](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html).
     This can also affect libraries built with some g++ vs clang++ versions;
@@ -90,8 +90,8 @@ This is all! Or is it?
 
 # But what if I need a (more) recent compiler?
 
-If you need a more recent compiler than GCC/G++ 4.7, because you
-need proper support for C++11 (or even newer), this is not enough..
+If you need a more recent compiler than GCC/G++ 4.7, for example because you
+need C++11 (or even newer) features not supported by GCC 4.7, this is not enough..
 
 And this is where the trouble starts. Building a newer GCC version (I used 5.4.0)
 yourself (on that old system/chroot) is easy enough - but that newer GCC version will
@@ -162,7 +162,7 @@ and use that to get the full path to the bundled libs to check their versions,
 then check the system libs versions and set `LD_LIBRARY_PATH` accordingly.  
 Assuming your libstdc++ and libSDL2 are newer than the ones on the system, but
 the systems libgcc is new enough, it'd look like like:  
-`setenv("LD_LIBRARY_PATH", "/path/to/game/libs/stdcpp:/path/to/game/sdl2", 1);`  
+`setenv("LD_LIBRARY_PATH", "/path/to/game/libs/stdcpp:/path/to/game/libs/sdl2", 1);`  
 (libgcc's API hasn't had any additions since GCC 4.8.0, so this is even likely).  
 Afterwards it'd launch the actual application, like:  
 `execv(/path/to/game/YourGame.real, argv);`  

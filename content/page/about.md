@@ -9,11 +9,11 @@ I like Heavy Metal and (mostly oldish) computer games.
 I write code, usually gamedev/Linux centric (often both).
 Sometimes I write about that. In this Blog.
 
-Some projects I'm involved with:
+Some for-fun/free-time projects I'm involved with:
 
 * [**Yamagi Quake II**](https://www.yamagi.org/quake2/) ([also on Github](https://github.com/yquake2/yquake2))
   co-maintaining, OpenGL3 renderer, ...
-* [**dhewm3**](https://github.com/dhewm/dhewm3/), a source port of Doom 3: maintaining
+* [**dhewm3**](https://dhewm3.org), a source port of Doom 3: maintaining
 * [**RBDoom3BFG**](https://github.com/RobertBeckebans/RBDOOM-3-BFG/), much of the porting 
   to Linux + SDL
 * [**Daikatana 1.3**](https://bitbucket.org/daikatana13/daikatana)
@@ -30,7 +30,7 @@ It's built with hugo and uses python-pygmentize for the syntax-highlighted codeb
 
 Feel free to use my modifications to the lithium theme - I don't really care about any specific
 license for them, but the original lithium theme is under MIT license, so I guess so are my changes.  
-Of special interest may be [this](https://github.com/DanielGibson/DanielGibson.github.io/blob/source/themes/lithium/layouts/_default/single.html#L21-L39)
+Of special interest may be [this](https://github.com/DanielGibson/DanielGibson.github.io/blob/source/themes/lithium/layouts/_default/single.html#L27-L45)
 and [this](https://github.com/DanielGibson/DanielGibson.github.io/blob/source/themes/lithium/static/js/github-comments.js)
 for Github based comments (based on [Don Williamson's code](http://donw.io/post/github-comments/#using-github-for-comments)
 but adapted to use plain JS instead of JQuery) and

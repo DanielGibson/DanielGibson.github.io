@@ -19,12 +19,19 @@ A screenshot from <a href="https://github.com/yquake2/zaero">Quake2: Zaero</a> i
 a screenshot from <a href="https://github.com/RobertBeckebans/RBDOOM-3-BFG/">RBDoom3BFG</a> in 1392x920,
 the classic "<a href="https://en.wikipedia.org/wiki/Lenna">Lenna</a>" test image in 512x512
 and a <a href="http://wallpapercave.com/w/a5QVpjx">colorful wallpaper with several parrots</a> in 2560x1600.  
-Update: I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a>
+*Update:* I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a>
 
 # Results:
 
 I tested libpng with highest compression (`png_set_compression_level(png_ptr, 9);`) and default compression.  
 libpng with highest compression is used as 100%, as it almost always yields the smallest image.
+
+**_UPDATE:_** `stb_image_write.h` now lets you set your own deflate-implementation for compressing PNG,
+via `#define STBIW_ZLIB_COMPRESS my_stbiw_zlib_compress`,
+see [stb_image_write.h](https://github.com/nothings/stb/blob/master/stb_image_write.h) for details.  
+If you make it use the deflate implementations of zlib (`compress2()`) or miniz (`mz_compress2()`);
+the resulting file sizes will be much closer to libpng, as you can see the results of
+stb_image_write.h with miniz's `mz_compress2()` (compression level 9) in the "stb+miniz" rows.
 
 ## Doom3BFG Screenshot:
 
@@ -35,7 +42,7 @@ libpng default | 1167675 | 103%
 LodePNG        | 1198051 | 106%
 miniz          | 1569473 | 138%
 stb            | 1608577 | 142%
-
+stb+miniz      | 1163202 | 103%
 
 ## Quake2 Screenshot:
 
@@ -46,6 +53,7 @@ libpng default | 2125051 | 102%
 LodePNG        | 2243547 | 108%
 miniz          | 2683565 | 129%
 stb            | 3146951 | 151%
+stb+miniz      | 2166861 | 104%
 
 ## Parrots:
 
@@ -56,6 +64,7 @@ libpng default | 5195689 | 103%
 LodePNG        | 5328474 | 105%
 miniz          | 9000478 | 178%
 stb            | 7439122 | 147%
+stb+miniz      | 5233623 | 103%
 
 ## Lenna:
 
@@ -66,6 +75,7 @@ libpng default | 476196 | 100%
 LodePNG        | 499061 | 105%
 miniz          | 729880 | 153%
 stb            | 723394 | 152%
+stb+miniz      | 514857 | 108%
 
 ## Snakebird:
 
@@ -76,6 +86,7 @@ libpng default | 265571 | 102%
 LodePNG        | 291126 | 112%
 miniz          | 226136 | 87%
 stb            | 315422 | 122%
+stb+miniz      | 263418 | 102%
 
 # Conclusion
 
@@ -87,7 +98,7 @@ is better and sometimes `stbi_write_png()` is better - so it doesn't matter
 which one you use, if you wanna use one of them.
 
 However, compared to libpng and LodePNG both don't compress very well - 
-the resulting images are 29%-78% bigger.  
+the resulting images are 29%-78% bigger *(When combining them it gets a lot better, see below)*.  
 LodePNG on the other hand produces almost as good results as libpng (only 5%-8% bigger)
 and is significantly easier to use - integrating it in your project is easy
 (just drop the source and the header file to your project) and using it 
@@ -103,6 +114,40 @@ will yield different results, because
 And he was right: In that case the `stbi_write_png()` output was only 22% bigger
 than the libpng output - but for some reason miniz, which does not seem to
 do PNG filtering, compressed even better than libpng (the resulting file was 13% smaller).
+
+**UPDATE:** When making stb_image_write use the deflate implementation of miniz
+(instead of its own), it produces PNGs that are usually only about 2-4% bigger than
+what libpng produces (see the "stb+miniz" rows above).
+Especially if you're using zlib or miniz in your project anyway, doing this should
+be a nobrainer as it's super simple, as this example for miniz shows:
+
+```c
+static unsigned char*
+my_stbi_zlib_compress(unsigned char *data, int data_len, int *out_len, int quality)
+{
+        mz_ulong buflen = mz_compressBound(data_len);
+        // Note that the returned buffer will be free'd by stbi_write_png*()
+        // with STBIW_FREE(), so if you have overridden that (and STBIW_MALLOC())
+        // to use a different allocator, adjust the next malloc() call accordingly:
+        unsigned char* buf = malloc(buflen);
+        if(buf == NULL || mz_compress2(buf, &buflen, data, data_len, quality) != 0)
+        {
+                free(buf); // .. yes, this would have to be adjusted as well.
+                return NULL;
+        }
+        *out_len = buflen;
+        return buf;
+}
+
+#define STBIW_ZLIB_COMPRESS  my_stbi_zlib_compress
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+// use the stbiw_* functions as usual; by setting stbi_write_png_compression_level = 9;
+// you can change the deflate compression level (named "quality" above)
+```
+
+(For zlib it's basically the same, only the functions don't have the `mz_` prefix.)
 
 ## The Code:
 
@@ -123,9 +168,9 @@ Needs:
 
 [![Quake 2: Zaero](/images/q2_libpng-small.png)](/images/q2_libpng.png)
 
-[![Lenna](/images/lenna.png)](/images/lenna.png)
-
 [![Snakebird](/images/snakebird2_libpng-small.png)](/images/snakebird2_libpng.png)
+
+[https://en.wikipedia.org/wiki/Lenna](Lenna)
 
 And a wallpaper of parrots, available at:
 http://wallpapercave.com/w/a5QVpjx or
