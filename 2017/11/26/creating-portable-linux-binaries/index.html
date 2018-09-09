@@ -160,7 +160,7 @@ This is useful for several reasons:
 different sound systems, if the lib of one is missing that shouldn&rsquo;t make your application fail)</li>
 <li>You avoid versioned symbols<sup class="footnote-ref" id="fnref:fn-versym"><a rel="footnote" href="#fn:fn-versym">2</a></sup> - as long as a function with a given name is available at all,
 you can use it - even if it has a different version than on the system you compiled on</li>
-<li>If you use SDL2 yourself, it will do this for most system libs (esp. the graphics and sound related ones).
+<li>If you build SDL2 yourself, it will by default do this for most system libs (esp. the graphics and sound related ones).
 So if you choose to bundle SDL2, that will not cause many hard dependencies.
 
 <ul>
@@ -171,8 +171,8 @@ so indeed build SDL2 yourself; make sure to have the relevant development header
 <li>Unfortunately, for C++ APIs <code>dlopen()</code> + <code>dlsym()</code> is not an option - another reason to prefer plain C libs :-)
 
 <ul>
-<li>If you end up using libs with a C++ API, bundle them, maybe even link them statically.
-If that&rsquo;s not feasible, don&rsquo;t use them.<br />
+<li>If you end up using libs with a C++ API and they&rsquo;re not header-only anyway, bundle them,
+maybe even link them statically. If that&rsquo;s not feasible, don&rsquo;t use them.<br />
 GCC (g++) broke ABI compatibility of C++ libs (except for libstdc++ apparently) with GCC 5.1
 by introducing <a href="https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html">&ldquo;ABI tags&rdquo;</a>.
 This can also affect libraries built with some g++ vs clang++ versions;
@@ -207,8 +207,8 @@ and bundle it with your game anyway, so just do that and link against that.</p>
 
 <h1 id="but-what-if-i-need-a-more-recent-compiler">But what if I need a (more) recent compiler?</h1>
 
-<p>If you need a more recent compiler than GCC/G++ 4.7, because you
-need proper support for C++11 (or even newer), this is not enough..</p>
+<p>If you need a more recent compiler than GCC/G++ 4.7, for example because you
+need C++11 (or even newer) features not supported by GCC 4.7, this is not enough..</p>
 
 <p>And this is where the trouble starts. Building a newer GCC version (I used 5.4.0)
 yourself (on that old system/chroot) is easy enough - but that newer GCC version will
@@ -301,7 +301,7 @@ and use that to get the full path to the bundled libs to check their versions,
 then check the system libs versions and set <code>LD_LIBRARY_PATH</code> accordingly.<br />
 Assuming your libstdc++ and libSDL2 are newer than the ones on the system, but
 the systems libgcc is new enough, it&rsquo;d look like like:<br />
-<code>setenv(&quot;LD_LIBRARY_PATH&quot;, &quot;/path/to/game/libs/stdcpp:/path/to/game/sdl2&quot;, 1);</code><br />
+<code>setenv(&quot;LD_LIBRARY_PATH&quot;, &quot;/path/to/game/libs/stdcpp:/path/to/game/libs/sdl2&quot;, 1);</code><br />
 (libgcc&rsquo;s API hasn&rsquo;t had any additions since GCC 4.8.0, so this is even likely).<br />
 Afterwards it&rsquo;d launch the actual application, like:<br />
 <code>execv(/path/to/game/YourGame.real, argv);</code><br />

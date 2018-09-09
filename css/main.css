@@ -192,6 +192,18 @@ code {
   margin: 15px 0 0px;
 }
 
+.footnotes ol::before {
+ /* because apparently hugo doesn't let me set a heading or similar for the
+  * footnotes, add this hack as workaround */
+  content: "Footnotes:";
+
+  font-family: 'Lato', sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  color: #222;
+  margin-left:-1em;
+}
+
 .article-content a {
   text-decoration: none;
   color: inherit;
@@ -220,7 +232,7 @@ code {
 
 
 .article-content hr {
-  width: 150px;
+  width: 400px;
   margin: 50px auto;
   height: 1px;
   overflow: hidden;

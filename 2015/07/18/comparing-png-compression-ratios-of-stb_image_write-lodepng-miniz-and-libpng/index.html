@@ -80,12 +80,19 @@ A screenshot from <a href="https://github.com/yquake2/zaero">Quake2: Zaero</a> i
 a screenshot from <a href="https://github.com/RobertBeckebans/RBDOOM-3-BFG/">RBDoom3BFG</a> in 1392x920,
 the classic &ldquo;<a href="https://en.wikipedia.org/wiki/Lenna">Lenna</a>&rdquo; test image in 512x512
 and a <a href="http://wallpapercave.com/w/a5QVpjx">colorful wallpaper with several parrots</a> in 2560x1600.<br />
-Update: I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a></p>
+<em>Update:</em> I also tested a screenshot of <a href="http://snakebird.noumenongames.com/">Snakebird</a></p>
 
 <h1 id="results">Results:</h1>
 
 <p>I tested libpng with highest compression (<code>png_set_compression_level(png_ptr, 9);</code>) and default compression.<br />
 libpng with highest compression is used as 100%, as it almost always yields the smallest image.</p>
+
+<p><strong><em>UPDATE:</em></strong> <code>stb_image_write.h</code> now lets you set your own deflate-implementation for compressing PNG,
+via <code>#define STBIW_ZLIB_COMPRESS my_stbiw_zlib_compress</code>,
+see <a href="https://github.com/nothings/stb/blob/master/stb_image_write.h">stb_image_write.h</a> for details.<br />
+If you make it use the deflate implementations of zlib (<code>compress2()</code>) or miniz (<code>mz_compress2()</code>);
+the resulting file sizes will be much closer to libpng, as you can see the results of
+stb_image_write.h with miniz&rsquo;s <code>mz_compress2()</code> (compression level 9) in the &ldquo;stb+miniz&rdquo; rows.</p>
 
 <h2 id="doom3bfg-screenshot">Doom3BFG Screenshot:</h2>
 
@@ -127,6 +134,12 @@ libpng with highest compression is used as 100%, as it almost always yields the 
 <td>stb</td>
 <td>1608577</td>
 <td>142%</td>
+</tr>
+
+<tr>
+<td>stb+miniz</td>
+<td>1163202</td>
+<td>103%</td>
 </tr>
 </tbody>
 </table>
@@ -172,6 +185,12 @@ libpng with highest compression is used as 100%, as it almost always yields the 
 <td>3146951</td>
 <td>151%</td>
 </tr>
+
+<tr>
+<td>stb+miniz</td>
+<td>2166861</td>
+<td>104%</td>
+</tr>
 </tbody>
 </table>
 
@@ -215,6 +234,12 @@ libpng with highest compression is used as 100%, as it almost always yields the 
 <td>stb</td>
 <td>7439122</td>
 <td>147%</td>
+</tr>
+
+<tr>
+<td>stb+miniz</td>
+<td>5233623</td>
+<td>103%</td>
 </tr>
 </tbody>
 </table>
@@ -260,6 +285,12 @@ libpng with highest compression is used as 100%, as it almost always yields the 
 <td>723394</td>
 <td>152%</td>
 </tr>
+
+<tr>
+<td>stb+miniz</td>
+<td>514857</td>
+<td>108%</td>
+</tr>
 </tbody>
 </table>
 
@@ -304,6 +335,12 @@ libpng with highest compression is used as 100%, as it almost always yields the 
 <td>315422</td>
 <td>122%</td>
 </tr>
+
+<tr>
+<td>stb+miniz</td>
+<td>263418</td>
+<td>102%</td>
+</tr>
 </tbody>
 </table>
 
@@ -317,7 +354,7 @@ is better and sometimes <code>stbi_write_png()</code> is better - so it doesn&rs
 which one you use, if you wanna use one of them.</p>
 
 <p>However, compared to libpng and LodePNG both don&rsquo;t compress very well -
-the resulting images are 29%-78% bigger.<br />
+the resulting images are 29%-78% bigger <em>(When combining them it gets a lot better, see below)</em>.<br />
 LodePNG on the other hand produces almost as good results as libpng (only 5%-8% bigger)
 and is significantly easier to use - integrating it in your project is easy
 (just drop the source and the header file to your project) and using it
@@ -333,6 +370,38 @@ will yield different results, because
 And he was right: In that case the <code>stbi_write_png()</code> output was only 22% bigger
 than the libpng output - but for some reason miniz, which does not seem to
 do PNG filtering, compressed even better than libpng (the resulting file was 13% smaller).</p>
+
+<p><strong>UPDATE:</strong> When making stb_image_write use the deflate implementation of miniz
+(instead of its own), it produces PNGs that are usually only about 2-4% bigger than
+what libpng produces (see the &ldquo;stb+miniz&rdquo; rows above).
+Especially if you&rsquo;re using zlib or miniz in your project anyway, doing this should
+be a nobrainer as it&rsquo;s super simple, as this example for miniz shows:</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span>
+<span class="nf">my_stbi_zlib_compress</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">int</span> <span class="n">data_len</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">out_len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">quality</span><span class="p">)</span>
+<span class="p">{</span>
+        <span class="n">mz_ulong</span> <span class="n">buflen</span> <span class="o">=</span> <span class="n">mz_compressBound</span><span class="p">(</span><span class="n">data_len</span><span class="p">);</span>
+        <span class="c1">// Note that the returned buffer will be free&#39;d by stbi_write_png*()</span>
+        <span class="c1">// with STBIW_FREE(), so if you have overridden that (and STBIW_MALLOC())</span>
+        <span class="c1">// to use a different allocator, adjust the next malloc() call accordingly:</span>
+        <span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="n">buflen</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">buf</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">mz_compress2</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buflen</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_len</span><span class="p">,</span> <span class="n">quality</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span> <span class="c1">// .. yes, this would have to be adjusted as well.</span>
+                <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="o">*</span><span class="n">out_len</span> <span class="o">=</span> <span class="n">buflen</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">buf</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cp">#define STBIW_ZLIB_COMPRESS  my_stbi_zlib_compress</span>
+<span class="cp">#define STB_IMAGE_WRITE_IMPLEMENTATION</span>
+<span class="cp">#include</span> <span class="cpf">&quot;stb_image_write.h&quot;</span><span class="cp"></span>
+
+<span class="c1">// use the stbiw_* functions as usual; by setting stbi_write_png_compression_level = 9;</span>
+<span class="c1">// you can change the deflate compression level (named &quot;quality&quot; above)</span>
+</code></pre></div>
+
+<p>(For zlib it&rsquo;s basically the same, only the functions don&rsquo;t have the <code>mz_</code> prefix.)</p>
 
 <h2 id="the-code">The Code:</h2>
 
@@ -355,9 +424,9 @@ do PNG filtering, compressed even better than libpng (the resulting file was 13%
 
 <p><a href="../../../../images/q2_libpng.png"><img src="../../../../images/q2_libpng-small.png" alt="Quake 2: Zaero" /></a></p>
 
-<p><a href="../../../../images/lenna.png"><img src="../../../../images/lenna.png" alt="Lenna" /></a></p>
-
 <p><a href="../../../../images/snakebird2_libpng.png"><img src="../../../../images/snakebird2_libpng-small.png" alt="Snakebird" /></a></p>
+
+<p><a href="Lenna">https://en.wikipedia.org/wiki/Lenna</a></p>
 
 <p>And a wallpaper of parrots, available at:
 <a href="http://wallpapercave.com/w/a5QVpjx">http://wallpapercave.com/w/a5QVpjx</a> or
