@@ -173,8 +173,8 @@ Needs:
 
 [![Snakebird](/images/snakebird2_libpng-small.png)](/images/snakebird2_libpng.png)
 
-[https://en.wikipedia.org/wiki/Lenna](Lenna)
+[Lenna](https://en.wikipedia.org/wiki/Lenna)
 
 And a wallpaper of parrots, available at:
-http://wallpapercave.com/w/a5QVpjx or
-http://www.kanhangadvartha.com/HQW-946107.html  
+http://wallpapercave.com/w/a5QVpjx 
+

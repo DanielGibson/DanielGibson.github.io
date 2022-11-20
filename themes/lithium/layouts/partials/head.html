@@ -17,6 +17,8 @@
 {{ if .Site.Params.twitterhandle }}<meta name="twitter:creator" content="{{ .Site.Params.twitterhandle }}" />{{ end }}
 <meta property="og:image" content="{{ .Site.BaseURL }}/images/logo-160.png" />
 
+<link rel="me" href="https://mastodon.gamedev.place/@Doomed_Daniel" />
+
 {{ if .Keywords }}<meta property="keywords" content ="{{ delimit .Keywords ", " }}">{{ end }}
 
 {{ if .RSSLink }}<link href="{{ .RSSLink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" />{{ end }}

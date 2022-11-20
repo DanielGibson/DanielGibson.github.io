@@ -306,7 +306,7 @@ There are basically two ways to use a library (and its exported functions):
    (aka "dynamic linker" - [`ld.so`](http://man7.org/linux/man-pages/man8/ld.so.8.html) on Linux)
    looks for  the libs is was linked against (in this case `libyourlib.so` or maybe
    `libyourlib.so.0` or similar[^fn:soname]), makes sure the lib exports all the
-   functions of that lib that you're using and makes sure you calls to those
+   functions of that lib that you're using and makes sure your calls to those
    functions actually call the ones in the lib.  
    If any of the required libraries or functions in the libraries can't be found,
    it produces an error and your application won't start.

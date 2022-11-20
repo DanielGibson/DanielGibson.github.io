@@ -31,6 +31,10 @@ relativeURLs = true
     url = "https://github.com/DanielGibson/"
 
 [[menu.main]]
+    name = "Mastodon"
+    url = "https://mastodon.gamedev.place/@Doomed_Daniel"
+
+[[menu.main]]
     name = "Twitter"
     url = "https://twitter.com/Doomed_Daniel"
 
