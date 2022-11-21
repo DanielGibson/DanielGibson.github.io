@@ -15,6 +15,18 @@ disableKinds = ["taxonomy", "taxonomyTerm", "section", "404"]
     style = 'tango'
     tabWidth = 4
 
+  [markup.tableOfContents]
+    endLevel = 5
+    ordered = false
+    startLevel = 1
+
+  [markup.goldmark.parser]
+    autoHeadingID = true
+    # defaults to github, but blackfriday is what old hugo used and I want to keep anchor-links compatible
+    autoHeadingIDType = 'blackfriday'
+
+
+
 [params]
   mainSections = ["post"]
   twitterhandle = "@Doomed_Daniel"
