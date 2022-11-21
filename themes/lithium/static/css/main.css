@@ -427,11 +427,15 @@ code {
 }
 
 /* the first column in a line number code table is the line numbers, we don't want padding on the left there,
-   but we *do* want a thin dotted line on the right to separate line numbers and code */
-.highlight .lntable td:first-child .chroma {
-	border-right: 1px dotted black;
+   but we *do* want a darker background to separate linenumbers and code */
+.highlight .lntable td:first-child .chroma,
+.highlight .lntable td:first-child .chroma code {
 	padding-left: 0;
+	background-color: #e8e8e8;
+	/* only round the left corners (the outer ones), the right ones are direct neighbours of the code column */
+	border-radius: 6px 0 0 6px;
 }
+
 
 /* generated with: hugo gen chromastyles --style=tango */
 /* Background */ .chroma {
