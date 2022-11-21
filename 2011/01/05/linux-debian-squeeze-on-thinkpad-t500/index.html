@@ -113,9 +113,9 @@ The hdaps daemon is also available via apt, the package is called <!-- raw HTML 
 blacklist pcspkr
 blacklist snd_pcsp
 </code></pre></div><p>Note that this doesn&rsquo;t deactivate all beeps: The Thinkpad seems to beep independently of the OS e.g. on resume (after hibernate/standby) or when the power chord is plugged in or removed.</p>
-<h3 id="xorgdesktop-specific-stuff">X.org/Desktop specific stuff</h3>
+<h3 id="x-org-desktop-specific-stuff">X.org/Desktop specific stuff</h3>
 <p>The following stuff concerns X.org. It&rsquo;s independent from a specific desktop environment (like XFCE, GNOME, KDE, &hellip;) - but it may well be that some of this can also be done with tools from the desktop environment.</p>
-<h4 id="make-the-ultranav-touchpadtrackpoint-behave-the-way-i-want">Make the &ldquo;UltraNav&rdquo; (Touchpad/Trackpoint) behave the way I want</h4>
+<h4 id="make-the-ultranav-touchpad-trackpoint-behave-the-way-i-want">Make the &ldquo;UltraNav&rdquo; (Touchpad/Trackpoint) behave the way I want</h4>
 <p>Both the Touchpad and the Trackpoint work out of the box. They can be further configured with a tool like <!-- raw HTML omitted -->gpointing-device-settings<!-- raw HTML omitted --> or similar tools from your desktop environment.
 However, two things could not be configured with gpointing-device-settings:</p>
 <!-- raw HTML omitted -->
@@ -155,7 +155,7 @@ Now either use <!-- raw HTML omitted -->xbindkeys-config<!-- raw HTML omitted --
 &#34;brightness.sh&#34;
     m:0x0 + c:232
     XF86MonBrightnessDown 
-</code></pre></div><h5 id="switch-touchpad-onoff">Switch Touchpad on/off</h5>
+</code></pre></div><h5 id="switch-touchpad-on-off">Switch Touchpad on/off</h5>
 <p>Fn-F8 is meant to toggle between touchpad, Trackpoint and both.. I see no point in disabling the Trackpoint so I just use it to disable/enable the touchpad.
 So by pressing Fn-F8 you&rsquo;ll get a nice OSD info saying &ldquo;Touchpad OFF&rdquo; or &ldquo;Touchpad ON&rdquo; and the touchpad will be switched off/on.<br>
 Save the following code as <!-- raw HTML omitted -->toggletouchpad.sh<!-- raw HTML omitted --> somewhere in your $PATH and make it executable:</p>
@@ -400,7 +400,7 @@ The following script (save it as <!-- raw HTML omitted -->batteryinfo.sh<!-- raw
 <span class="c1"># End of xbindkeys configuration</span>
 </code></pre></div><h3 id="what-also-works-tested">What also works (tested)</h3>
 <!-- raw HTML omitted -->
-<h3 id="what-doesnt-work">What doesn&rsquo;t work</h3>
+<h3 id="what-doesn-t-work">What doesn&rsquo;t work</h3>
 <!-- raw HTML omitted -->
 <h3 id="untested">Untested</h3>
 <!-- raw HTML omitted -->

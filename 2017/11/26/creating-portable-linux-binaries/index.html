@@ -79,7 +79,7 @@ symbol versioning on Linux (last section of the article)." />
   </ul>
 
   <ul>
-    <li><a href="#building-mbed-tls-tested-with-260">Building mbed TLS (tested with 2.6.0)</a></li>
+    <li><a href="#building-mbed-tls-tested-with-2-6-0">Building mbed TLS (tested with 2.6.0)</a></li>
     <li><a href="#building-libcurl-itself">Building libcurl itself</a></li>
   </ul>
 
@@ -87,7 +87,7 @@ symbol versioning on Linux (last section of the article)." />
     <li><a href="#dynamic-libraries-on-unix-like-systems">Dynamic Libraries on Unix-like systems</a></li>
     <li><a href="#versioned-symbols">Versioned Symbols</a>
       <ul>
-        <li><a href="#example-glibcs-memcpy">Example: glibc&rsquo;s memcpy()</a></li>
+        <li><a href="#example-glibc-s-memcpy">Example: glibc&rsquo;s memcpy()</a></li>
         <li><a href="#how-and-why-libcurl-uses-symbol-versioning">How and why libcurl uses symbol versioning</a></li>
         <li><a href="#more-information-on-symbol-versioning">More information on Symbol Versioning</a></li>
       </ul>
@@ -312,7 +312,7 @@ and thus is favorable to your version that may have freshly discovered security
 holes in a few months. You have to make sure to link against a libcurl.so.4
 <em>without</em> versioned symbols<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> though (or use it via <code>dlopen()</code> + <code>dlsym()</code>
 and don&rsquo;t link it at all).</p>
-<h1 id="building-a-portable-libcurlso4-without-versioned-symbols">Building a portable libcurl.so.4 without versioned symbols</h1>
+<h1 id="building-a-portable-libcurl-so-4-without-versioned-symbols">Building a portable libcurl.so.4 without versioned symbols</h1>
 <p>Often you&rsquo;d like to use HTTP or HTTPS and the most common cross-platform
 library to do that is libcurl. It also supports a plethora of other protocols,
 but I usually deactivate everything but http(s).
@@ -325,7 +325,7 @@ supports several other SSL/TLS libraries, including <a href="https://tls.mbed.or
 which is easy to build, has a friendly license
 (<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>)
 and can be statically linked.</p>
-<h2 id="building-mbed-tls-tested-with-260">Building mbed TLS (tested with 2.6.0)</h2>
+<h2 id="building-mbed-tls-tested-with-2-6-0">Building mbed TLS (tested with 2.6.0)</h2>
 <ul>
 <li>Download and extract the source</li>
 <li>Edit Makefile, change <code>DESTDIR</code> to something else, I&rsquo;ll use <code>/opt/mbedtls/</code></li>
@@ -445,7 +445,7 @@ that additionally takes the version name as an argument, like<br>
 As you&rsquo;d expect, it returns the function for <code>function_name</code> with version <code>VERSION_NAME</code>
 and if that combination couldn&rsquo;t be found it returns NULL; even if a function called
 <code>function_name</code> with another version (or none at all) exists.</p>
-<h3 id="example-glibcs-memcpy">Example: glibc&rsquo;s memcpy()</h3>
+<h3 id="example-glibc-s-memcpy">Example: glibc&rsquo;s memcpy()</h3>
 <p>Being a C standard lib, glibc of course always had a
 <a href="http://man7.org/linux/man-pages/man3/memcpy.3.html"><strong>memcpy()</strong></a> implementation.
 Historically, it used to behave like <a href="http://man7.org/linux/man-pages/man3/memmove.3.html"><strong>memmove</strong></a>,

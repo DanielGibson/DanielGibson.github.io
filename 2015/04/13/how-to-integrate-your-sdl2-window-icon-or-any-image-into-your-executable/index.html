@@ -80,8 +80,8 @@ Furthermore it&rsquo;d be great if it didn&rsquo;t require additional dependenci
 containing a struct that holds the image data + necessary metadata (width,
 height, color depth) and how to load that struct into a <code>SDL_Surface*</code>
 and to set that surface as a window icon.</p>
-<h1 id="creating-the-source-file-">Creating the source file &hellip;</h1>
-<h2 id="-using-gimp">.. using GIMP</h2>
+<h1 id="creating-the-source-file">Creating the source file &hellip;</h1>
+<h2 id="using-gimp">.. using GIMP</h2>
 <p>An easy way to create that source file is using <a href="http://www.gimp.org/">GIMP</a>,
 an open source image manipulation program.</p>
 <ul>
@@ -113,7 +113,7 @@ into the same directory your source code (that creates the SDL2 window) lives in
 </code></pre></div><p>The (uncompressed) RGBA image data is encoded as an
 <a href="http://en.wikipedia.org/wiki/Escape_sequences_in_C">escaped C string</a>
 with chars that encode the values of the image&rsquo;s bytes.</p>
-<h2 id="-without-using-gimp">.. without using GIMP</h2>
+<h2 id="without-using-gimp">.. without using GIMP</h2>
 <p>If you don&rsquo;t want to use GIMP, I wrote a little commandline tool that converts
 images into source files in the same format as GIMP&rsquo;s C export:<br>
 <a href="https://github.com/DanielGibson/Snippets/blob/master/ImgToC.c">https://github.com/DanielGibson/Snippets/blob/master/ImgToC.c</a></p>

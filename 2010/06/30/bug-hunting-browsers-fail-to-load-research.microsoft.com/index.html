@@ -85,7 +85,7 @@ should be fixed anyway but there doesn&rsquo;t seem to be much interest in doing
 <h3 id="how-to-reproduce">How to reproduce</h3>
 <p>Try to open <!-- raw HTML omitted --><a href="http://research.microsoft.com">http://research.microsoft.com</a><!-- raw HTML omitted -->. If your browser doesn&rsquo;t have cookies for the page yet (or you&rsquo;re not affected by this strange bug), the page should be displayed by your browser.
 Now try to open a sub page of <a href="http://research.microsoft.com">http://research.microsoft.com</a> (to make sure it&rsquo;s not loaded from the browser cache), you might just click on &ldquo;Our Research&rdquo; or something. If you&rsquo;re affected by the bug, the page won&rsquo;t load at all.</p>
-<h3 id="what-ive-found-out-so-far-mostly-from-original-bugreport">What I&rsquo;ve found out so far (mostly from original bugreport)</h3>
+<h3 id="what-i-ve-found-out-so-far-mostly-from-original-bugreport">What I&rsquo;ve found out so far (mostly from original bugreport)</h3>
 <!-- raw HTML omitted -->
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">## the format: number, system time, source, destination, protocol, info, time
 11	01:03:08.075023	192.168.0.155	192.168.0.1	DNS	Standard query A research.microsoft.com	4.574382
@@ -164,7 +164,7 @@ Why does this happen? Does Microsoft&rsquo;s server not accept packets that are 
 I don&rsquo;t know if a TCP stack is supposed to do this - I guess this is just a workaround for broken servers. As far as I know, normally the server should send a &ldquo;ICMP Fragmentation Needed&rdquo; packet with its MTU and the client sending the request should split up the packet in smaller packets of that size and resend. But it seems like no such ICMP packet is sent, at least none was captured. I also captured the traffic on my router on ppp0 and no such packet arrived there either. So this looks like a misconfiguration of Microsoft&rsquo;s server.</p>
 <p>However, this still does not explain why the HTTP GET packet is split up right from the beginning when MTU clamping is disabled. And why the page works for most people.
 I captured several dumps with wireshark of different configurations etc.. if you want a copy to look at them yourself drop me a line.</p>
-<h3 id="2-update-also-2010-06-01---explanation">2. Update (also 2010-06-01) - Explanation</h3>
+<h3 id="2-update-also-2010-06-01-explanation">2. Update (also 2010-06-01) - Explanation</h3>
 <p>A friend of mine found the explanation of this weird behaviour.</p>
 <p>See also <!-- raw HTML omitted -->his analysis of the problem<!-- raw HTML omitted -->.
 The following kind of summarizes his analysis.</p>

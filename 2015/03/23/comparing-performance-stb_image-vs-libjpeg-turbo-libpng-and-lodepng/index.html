@@ -100,7 +100,7 @@ And it supports lots of common image file types including JPEG, PNG, TGA, BMP, G
 <h2 id="libjpeg-libjpeg-turbo">libjpeg, libjpeg-turbo</h2>
 <p>I used libjpeg binaries from distributions, so compilers and optimization flags on my end didn&rsquo;t make a difference.</p>
 <!-- raw HTML omitted -->
-<h2 id="stb_image-202-using-sse-intrinsics"><strong>stb_image</strong> 2.02, using SSE intrinsics</h2>
+<h2 id="stb-image-2-02-using-sse-intrinsics"><strong>stb_image</strong> 2.02, using SSE intrinsics</h2>
 <!-- raw HTML omitted -->
 <h2 id="results-for-jpeg-decoding">Results for JPEG decoding</h2>
 <p>For JPEG, if you use clang stb_image is a bit slower than libjpeg (and a lot slower than libjpeg-turbo). If you use GCC (and at least -O1), the performance is between libjpeg and libjpeg-turbo.<br>
@@ -114,10 +114,10 @@ Using optimization (at -O1 or more) yields significantly faster decoders than un
 <h1 id="png">PNG</h1>
 <p>I converted the 4000x3000pixel JPEG used above to PNG with compressionlevel 9, using Gimp.
 The PNG is pretty big, about 16MB.</p>
-<h2 id="libpng-12">libpng 1.2</h2>
+<h2 id="libpng-1-2">libpng 1.2</h2>
 <p>I used Ubuntu 14.04&rsquo;s <!-- raw HTML omitted -->libpng12<!-- raw HTML omitted --> (1.2.50-1ubuntu2), so again the compiler and optimization flags didn&rsquo;t matter.</p>
 <!-- raw HTML omitted -->
-<h2 id="stb_image-202"><strong>stb_image</strong> 2.02</h2>
+<h2 id="stb-image-2-02"><strong>stb_image</strong> 2.02</h2>
 <!-- raw HTML omitted -->
 <h2 id="lodepng-version-20150321"><strong>lodepng</strong> version 20150321</h2>
 <!-- raw HTML omitted -->
