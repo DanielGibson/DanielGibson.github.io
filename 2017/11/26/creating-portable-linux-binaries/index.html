@@ -75,21 +75,30 @@ symbol versioning on Linux (last section of the article)." />
       <b>Table of Contents:</b>
       <nav id="TableOfContents">
   <ul>
-    <li><a href="#some-implementation-details-of-the-wrapper">Some implementation details of the wrapper</a></li>
-  </ul>
-
-  <ul>
-    <li><a href="#building-mbed-tls-tested-with-2-6-0">Building mbed TLS (tested with 2.6.0)</a></li>
-    <li><a href="#building-libcurl-itself">Building libcurl itself</a></li>
-  </ul>
-
-  <ul>
-    <li><a href="#dynamic-libraries-on-unix-like-systems">Dynamic Libraries on Unix-like systems</a></li>
-    <li><a href="#versioned-symbols">Versioned Symbols</a>
+    <li><a href="#some-general-suggestions">Some general suggestions</a></li>
+    <li><a href="#basic-system-libraries">Basic system libraries</a></li>
+    <li><a href="#but-what-if-i-need-a-more-recent-compiler">But what if I need a (more) recent compiler?</a></li>
+    <li><a href="#a-wrapper-that-selectively-overrides-system-libs">A wrapper that selectively overrides system libs</a>
       <ul>
-        <li><a href="#example-glibc-s-memcpy">Example: glibc&rsquo;s memcpy()</a></li>
-        <li><a href="#how-and-why-libcurl-uses-symbol-versioning">How and why libcurl uses symbol versioning</a></li>
-        <li><a href="#more-information-on-symbol-versioning">More information on Symbol Versioning</a></li>
+        <li><a href="#some-implementation-details-of-the-wrapper">Some implementation details of the wrapper</a></li>
+      </ul>
+    </li>
+    <li><a href="#building-a-portable-libcurl-so-4-without-versioned-symbols">Building a portable libcurl.so.4 without versioned symbols</a>
+      <ul>
+        <li><a href="#building-mbed-tls-tested-with-2-6-0">Building mbed TLS (tested with 2.6.0)</a></li>
+        <li><a href="#building-libcurl-itself">Building libcurl itself</a></li>
+      </ul>
+    </li>
+    <li><a href="#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning">Bonus: Dynamic Libs on Linux and what is symbol versioning?</a>
+      <ul>
+        <li><a href="#dynamic-libraries-on-unix-like-systems">Dynamic Libraries on Unix-like systems</a></li>
+        <li><a href="#versioned-symbols">Versioned Symbols</a>
+          <ul>
+            <li><a href="#example-glibc-s-memcpy">Example: glibc&rsquo;s memcpy()</a></li>
+            <li><a href="#how-and-why-libcurl-uses-symbol-versioning">How and why libcurl uses symbol versioning</a></li>
+            <li><a href="#more-information-on-symbol-versioning">More information on Symbol Versioning</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
   </ul>
