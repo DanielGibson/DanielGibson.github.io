@@ -11,8 +11,10 @@ PygmentsCodeFences = true
 # from from code blocks with line numbers harder
 pygmentsUseClassic = true
 relativeURLs = true
+disableKinds = ["taxonomy", "taxonomyTerm", "section", "404"]
 
 [params]
+  mainSections = ["post"]
   twitterhandle = "@Doomed_Daniel"
   description = "Daniel Gibson's Blog"
   [params.logo]
