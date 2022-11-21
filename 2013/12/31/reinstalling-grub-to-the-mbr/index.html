@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.29" />
+<meta name="generator" content="Hugo 0.92.2" />
 
 
 <title>(Re)installing GRUB to the MBR - ./gibson.sh --blog</title>
@@ -11,7 +11,6 @@
 <meta property="og:type" content="summary" />
 <meta property="og:description" content="This is just a very short roundup of the relevant commands needed to reinstall grub,
 e.g. when migrating a Linux installation to a new hard drive.
-
 
 boot live Linux system (from CD/DVD or USB key, I use
 grml, any other live Linux should do)
@@ -27,14 +26,12 @@ If names of partitions changed, don&rsquo;t forget to adjust /etc/fstab
 reboot, remove live linux
 configure your BIOS/UEFI to boot from that harddisk
 
-
-That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
-" />
+That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations" />
 
 <meta name="twitter:creator" content="@Doomed_Daniel" />
 <meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
-
+<link rel="me" href="https://mastodon.gamedev.place/@Doomed_Daniel" />
 
 
 
@@ -59,7 +56,7 @@ That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot 
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
-    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    <li><a href="https://mastodon.gamedev.place/@Doomed_Daniel">Mastodon</a></li>
     
   </ul>
 </nav>
@@ -81,7 +78,6 @@ That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot 
     <div class="article-content">
       <p>This is just a very short roundup of the relevant commands needed to reinstall grub,
 e.g. when migrating a Linux installation to a new hard drive.</p>
-
 <ul>
 <li>boot live Linux system (from CD/DVD or USB key, I use
 <a href="http://grml.org">grml</a>, any other live Linux should do)</li>
@@ -97,9 +93,7 @@ for older versions of grub?), grub will need those</li>
 <li>reboot, remove live linux</li>
 <li>configure your BIOS/UEFI to boot from that harddisk</li>
 </ul>
-
-<p>That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
-</p>
+<p>That&rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations</p>
     </div>
   </article>
 
@@ -127,9 +121,7 @@ for older versions of grub?), grub will need those</li>
 
       <footer class="footer">
         <ul class="footer-links">
-          <li>
-            <a href="http://blog.gibson.sh/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
-          </li>
+          
           <li>
             <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
           </li>

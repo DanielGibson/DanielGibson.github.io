@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.29" />
+<meta name="generator" content="Hugo 0.92.2" />
 
 
 <title>How to integrate your SDL2 window icon (or any image) into your executable - ./gibson.sh --blog</title>
@@ -13,21 +13,18 @@
 cross-platform application that uses libSDL2.
 A suitable window icon is 64x64pixels big (other sizes should work as well, though)
 and has 32bit RGBA colors, which means it contains an alpha-channel.
-
 Now it would be handy if the icon could just be part of the executable
 and if this could be achieved in a platform-independent way.
 Furthermore it&rsquo;d be great if it didn&rsquo;t require additional dependencies (e.g. to decode image files).
-
 In this tutorial I&rsquo;ll show how to translate the image into C source file
 containing a struct that holds the image data &#43; necessary metadata (width,
 height, color depth) and how to load that struct into a SDL_Surface*
-and to set that surface as a window icon.
-" />
+and to set that surface as a window icon." />
 
 <meta name="twitter:creator" content="@Doomed_Daniel" />
 <meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
 
-
+<link rel="me" href="https://mastodon.gamedev.place/@Doomed_Daniel" />
 
 
 
@@ -52,7 +49,7 @@ and to set that surface as a window icon.
     
     <li><a href="https://github.com/DanielGibson/">Github</a></li>
     
-    <li><a href="https://twitter.com/Doomed_Daniel">Twitter</a></li>
+    <li><a href="https://mastodon.gamedev.place/@Doomed_Daniel">Mastodon</a></li>
     
   </ul>
 </nav>
@@ -73,44 +70,34 @@ and to set that surface as a window icon.
 
     <div class="article-content">
       <p>Let&rsquo;s assume you have an image that you want to use as a window icon in your
-cross-platform application that uses <a href="http://www.libsdl.org/">libSDL2</a>.<br />
+cross-platform application that uses <a href="http://www.libsdl.org/">libSDL2</a>.<br>
 A suitable window icon is 64x64pixels big (other sizes should work as well, though)
 and has 32bit RGBA colors, which means it contains an alpha-channel.</p>
-
 <p>Now it would be handy if the icon could just be part of the executable
-and if this could be achieved in a platform-independent way.<br />
+and if this could be achieved in a platform-independent way.<br>
 Furthermore it&rsquo;d be great if it didn&rsquo;t require additional dependencies (e.g. to decode image files).</p>
-
 <p>In this tutorial I&rsquo;ll show how to translate the image into C source file
 containing a struct that holds the image data + necessary metadata (width,
 height, color depth) and how to load that struct into a <code>SDL_Surface*</code>
-and to set that surface as a window icon.
-</p>
-
-<h1 id="creating-the-source-file">Creating the source file &hellip;</h1>
-
-<h2 id="using-gimp">.. using GIMP</h2>
-
+and to set that surface as a window icon.</p>
+<h1 id="creating-the-source-file-">Creating the source file &hellip;</h1>
+<h2 id="-using-gimp">.. using GIMP</h2>
 <p>An easy way to create that source file is using <a href="http://www.gimp.org/">GIMP</a>,
 an open source image manipulation program.</p>
-
 <ul>
 <li>Open your icon in GIMP</li>
-<li>Click <em>&ldquo;File&rdquo;</em> -&gt; <em>&ldquo;Export As&hellip;&rdquo;</em></li>
+<li>Click <em>&ldquo;File&rdquo;</em> -&gt; <em>&ldquo;Export As&hellip;&quot;</em></li>
 <li>Select <em>&ldquo;C Source Code&rdquo;</em> as filetype (<strong>not</strong> &ldquo;C Source Code Header&rdquo;,
 that uses a different format!)</li>
 <li>Save it as <em>&ldquo;my_icon.c&rdquo;</em> (or some other name, it&rsquo;s really up to you&hellip;)
 into the same directory your source code (that creates the SDL2 window) lives in.</li>
 </ul>
-
-<p>Make sure to choose the export settings like this:<br />
-<img src="../../../../images/gimp-exporticon1.png" alt="GIMPs export as C Source Code dialog" /></p>
-
-<p>So you <strong>do</strong> want an alpha-channel and you <strong>don&rsquo;t</strong> want any of the other options.<br />
+<p>Make sure to choose the export settings like this:<br>
+<img src="../../../../images/gimp-exporticon1.png" alt="GIMPs export as C Source Code dialog"></p>
+<p>So you <strong>do</strong> want an alpha-channel and you <strong>don&rsquo;t</strong> want any of the other options.<br>
 <em>&ldquo;Prefixed name&rdquo;</em> is the name the C struct will have.</p>
-
 <p>So this part is done, you can open <em>my_icon.c</em> in a text editor, it will look similar to this:</p>
-<div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="cm">/* GIMP RGBA C-Source image dump (my_icon.c) */</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cm">/* GIMP RGBA C-Source image dump (my_icon.c) */</span>
 
 <span class="k">static</span> <span class="k">const</span> <span class="k">struct</span> <span class="p">{</span>
   <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">width</span><span class="p">;</span>
@@ -119,136 +106,134 @@ into the same directory your source code (that creates the SDL2 window) lives in
   <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">pixel_data</span><span class="p">[</span><span class="mi">64</span> <span class="o">*</span> <span class="mi">64</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
 <span class="p">}</span> <span class="n">my_icon</span> <span class="o">=</span> <span class="p">{</span>
   <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span>
-  <span class="s">&quot;</span><span class="se">\236\234\232\377\222\220\216\377\210\206\205\377</span><span class="s">|{y</span><span class="se">\377</span><span class="s">sqp</span><span class="se">\377</span><span class="s">rsr</span><span class="se">\377</span><span class="s">sqp&quot;</span>
-  <span class="s">&quot; ... and lots of other lines of more-or-less text, containing the ... &quot;</span>
-  <span class="s">&quot; ... encoded image ... &quot;</span>
+  <span class="s">&#34;</span><span class="se">\236\234\232\377\222\220\216\377\210\206\205\377</span><span class="s">|{y</span><span class="se">\377</span><span class="s">sqp</span><span class="se">\377</span><span class="s">rsr</span><span class="se">\377</span><span class="s">sqp&#34;</span>
+  <span class="s">&#34; ... and lots of other lines of more-or-less text, containing the ... &#34;</span>
+  <span class="s">&#34; ... encoded image ... &#34;</span>
 <span class="p">};</span>
-</code></pre></div>
-
-<p>The (uncompressed) RGBA image data is encoded as an
+</code></pre></div><p>The (uncompressed) RGBA image data is encoded as an
 <a href="http://en.wikipedia.org/wiki/Escape_sequences_in_C">escaped C string</a>
 with chars that encode the values of the image&rsquo;s bytes.</p>
-
-<h2 id="without-using-gimp">.. without using GIMP</h2>
-
+<h2 id="-without-using-gimp">.. without using GIMP</h2>
 <p>If you don&rsquo;t want to use GIMP, I wrote a little commandline tool that converts
-images into source files in the same format as GIMP&rsquo;s C export:<br />
+images into source files in the same format as GIMP&rsquo;s C export:<br>
 <a href="https://github.com/DanielGibson/Snippets/blob/master/ImgToC.c">https://github.com/DanielGibson/Snippets/blob/master/ImgToC.c</a></p>
-
 <p>It needs <a href="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image.h</a>
 and thus can convert from any image type that is supported by stb_image,
-including TGA, PNG, BMP and JPG. It should compile with any halfway-recent C compiler.<br />
+including TGA, PNG, BMP and JPG. It should compile with any halfway-recent C compiler.<br>
 See the big comment block at the beginning of the file on how to use it.</p>
-
 <h1 id="setting-the-sdl2-window-icon-from-our-generated-source-file">Setting the SDL2 window icon from our generated source file</h1>
-
-<p><a href="https://wiki.libsdl.org/SDL_SetWindowIcon">SDL_SetWindowIcon()</a> is used to set the window icon.<br />
+<p><a href="https://wiki.libsdl.org/SDL_SetWindowIcon">SDL_SetWindowIcon()</a> is used to set the window icon.<br>
 I&rsquo;ll show you how to write a function <code>static void SetSDLIcon(SDL_Window* window)</code>
 that sets an icon from the exported C source code for the given <code>SDL_Window*</code> -
 you can just call it from wherever your code creates the <code>SDL_Window*</code>
 (after the window has been created).</p>
-
 <p>First you&rsquo;ll need to convert that image struct into a <code>SDL_Surface*</code>,
 using <a href="https://wiki.libsdl.org/SDL_CreateRGBSurfaceFrom">SDL_CreateRGBSurfaceFrom()</a></p>
-
 <p>As you can see, <code>SDL_CreateRGBSurfaceFrom()</code> expects some masks for the
-colors + alpha, so it&rsquo;ll know how to interpret the data it&rsquo;ll be fed.<br />
+colors + alpha, so it&rsquo;ll know how to interpret the data it&rsquo;ll be fed.<br>
 These masks should extract the red/green/blue/alpha byte from an endian-specific
 32bit integer value of your data. You can read about the details on the
 <a href="https://wiki.libsdl.org/SDL_CreateRGBSurfaceFrom">SDL_CreateRGBSurfaceFrom() wiki page</a>.</p>
-
 <p>Anyway, the very first thing you do in the <code>SetSDLIcon()</code> function is
 <code>#include &quot;my_icon.c&quot;</code>, so the my_icon struct is part of the function and
 can be used there.</p>
-
 <p><em>Note:</em> Because <code>include &quot;my_icon.c&quot;</code> looks so strange, I usually rename those
 generated files to <code>my_icon.h</code>. This could also prevent trouble with your
 build system which is not supposed to compile &ldquo;my_icon.c&rdquo; - it&rsquo;s compiled
 as part of the source file that includes it.</p>
-
 <p>Afterwards you calculate the masks like shown below (this code actually
 supports both 24bit RGB and 32bit RGBA data). Note how <code>my_icon.bytes_per_pixel</code>
 is used to decide whether it&rsquo;s RGB or RGBA.</p>
-
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-c" data-lang="c"> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21</code></pre></div></td><td class="code"><div class="highlight"><pre><code class="language-c" data-lang="c"><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">SetSDLIcon</span><span class="p">(</span><span class="n">SDL_Window</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">SetSDLIcon</span><span class="p">(</span><span class="n">SDL_Window</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span>
 <span class="p">{</span>
-  <span class="c1">// this will &quot;paste&quot; the struct my_icon into this function</span>
-  <span class="cp">#include</span> <span class="cpf">&quot;my_icon.c&quot;</span><span class="cp"></span>
-
-  <span class="c1">// these masks are needed to tell SDL_CreateRGBSurface(From)</span>
-  <span class="c1">// to assume the data it gets is byte-wise RGB(A) data</span>
-  <span class="n">Uint32</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">;</span>
-<span class="cp">#if SDL_BYTEORDER == SDL_BIG_ENDIAN</span>
-  <span class="kt">int</span> <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">8</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="c1">// this will &#34;paste&#34; the struct my_icon into this function
+</span><span class="c1"></span>  <span class="cp">#include</span> <span class="cpf">&#34;my_icon.c&#34;</span><span class="cp">
+</span><span class="cp"></span>
+  <span class="c1">// these masks are needed to tell SDL_CreateRGBSurface(From)
+</span><span class="c1"></span>  <span class="c1">// to assume the data it gets is byte-wise RGB(A) data
+</span><span class="c1"></span>  <span class="n">Uint32</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">;</span>
+<span class="cp">#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+</span><span class="cp"></span>  <span class="kt">int</span> <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">8</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
   <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0xff000000</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
   <span class="n">gmask</span> <span class="o">=</span> <span class="mh">0x00ff0000</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
   <span class="n">bmask</span> <span class="o">=</span> <span class="mh">0x0000ff00</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
   <span class="n">amask</span> <span class="o">=</span> <span class="mh">0x000000ff</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
-<span class="cp">#else </span><span class="c1">// little endian, like x86</span>
-  <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0x000000ff</span><span class="p">;</span>
+<span class="cp">#else </span><span class="c1">// little endian, like x86
+</span><span class="c1"></span>  <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0x000000ff</span><span class="p">;</span>
   <span class="n">gmask</span> <span class="o">=</span> <span class="mh">0x0000ff00</span><span class="p">;</span>
   <span class="n">bmask</span> <span class="o">=</span> <span class="mh">0x00ff0000</span><span class="p">;</span>
   <span class="n">amask</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="mh">0xff000000</span><span class="p">;</span>
-<span class="cp">#endif</span>
-  
-</code></pre></div>
-</td></tr></table>
-
-<p>Now create the <code>SDL_Surface*</code> using <code>SDL_CreateRGBSurfaceFrom()</code>.<br />
+<span class="cp">#endif
+</span><span class="cp"></span>  
+</code></pre></td></tr></table>
+</div>
+</div>
+<p>Now create the <code>SDL_Surface*</code> using <code>SDL_CreateRGBSurfaceFrom()</code>.<br>
 You can get the <code>width</code> and <code>height</code> parameters directly from the corresponding
 <code>my_icon</code> fields. <code>depth</code> is expected in <strong>bits</strong> per pixel, while <code>my_icon</code>
-offers <code>bytes_per_pixel</code>, so that value is multiplied with 8.<br />
+offers <code>bytes_per_pixel</code>, so that value is multiplied with 8.<br>
 <code>pitch</code> is <em>&ldquo;the length of a row of pixels in bytes&rdquo;</em> and can theoretically
 be used to copy just a rectangle out of the source image. While we use the
 whole image, it must be <code>my_icon.bytes_per_pixel * my_icon.width</code> either way.</p>
-
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-c" data-lang="c">22
-23
-24
-25</code></pre></div></td><td class="code"><div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>  <span class="n">SDL_Surface</span><span class="o">*</span> <span class="n">icon</span> <span class="o">=</span> <span class="n">SDL_CreateRGBSurfaceFrom</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">my_icon</span><span class="p">.</span><span class="n">pixel_data</span><span class="p">,</span>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c">  <span class="n">SDL_Surface</span><span class="o">*</span> <span class="n">icon</span> <span class="o">=</span> <span class="n">SDL_CreateRGBSurfaceFrom</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">my_icon</span><span class="p">.</span><span class="n">pixel_data</span><span class="p">,</span>
       <span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">height</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span>
       <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">);</span>
   
-</code></pre></div>
-</td></tr></table>
-
+</code></pre></td></tr></table>
+</div>
+</div>
 <p>Finally, set the surface as window icon and free it (<code>SDL_SetWindowIcon()</code>
 will duplicate the contained data anyway):</p>
-
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-c" data-lang="c">26
-27
-28
-29</code></pre></div></td><td class="code"><div class="highlight"><pre><code class="language-c" data-lang="c"><span></span>  <span class="n">SDL_SetWindowIcon</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">icon</span><span class="p">);</span>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c">  <span class="n">SDL_SetWindowIcon</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">icon</span><span class="p">);</span>
 
   <span class="n">SDL_FreeSurface</span><span class="p">(</span><span class="n">icon</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-</td></tr></table>
-
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>Done!</p>
-
 <p>This method can be used to integrate any image into your executable, of course,
-but it&rsquo;s added uncompressed so the executable can get pretty big.<br />
+but it&rsquo;s added uncompressed so the executable can get pretty big.<br>
 It&rsquo;s ok for a window icon (and maybe a handful of other icons or cursors),
 but if you need more data, you probably shouldn&rsquo;t integrate it into your
 executable, especially not uncompressed. Maybe use a zip file or something.</p>
@@ -279,9 +264,7 @@ executable, especially not uncompressed. Maybe use a zip file or something.</p>
 
       <footer class="footer">
         <ul class="footer-links">
-          <li>
-            <a href="http://blog.gibson.sh/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
-          </li>
+          
           <li>
             <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
           </li>
