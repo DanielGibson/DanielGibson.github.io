@@ -4,14 +4,16 @@ languageCode = "en-us"
 title = "./gibson.sh --blog"
 paginate = 10
 theme = "lithium"
-pygmentsuseclasses = true
-pygmentsstyle = "tango"
-PygmentsCodeFences = true
-# don't use the chroma highlighting stuff, it makes copying
-# from from code blocks with line numbers harder
-pygmentsUseClassic = true
 relativeURLs = true
 disableKinds = ["taxonomy", "taxonomyTerm", "section", "404"]
+
+[markup]
+  [markup.highlight]
+    #anchorLineNos = false
+    lineNumbersInTable = true
+    noClasses = false
+    style = 'tango'
+    tabWidth = 4
 
 [params]
   mainSections = ["post"]
