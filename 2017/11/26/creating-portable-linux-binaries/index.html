@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>How to create portable Linux binaries (even if you need a recent compiler) - ./gibson.sh --blog</title>
@@ -302,7 +302,7 @@ to get a list of symbols libstdc++ exports for that version and pick one
 <li>check if the chosen symbol is available with<br>
 <code>dlvsym(handle, &quot;_ZNSt13runtime_errorC1EPKc&quot;, &quot;GLIBCXX_3.4.21&quot;)</code><sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup></li>
 </ul>
-<!-- raw HTML omitted -->
+<!-- ***TODO: how to get libopenal version?*** -->
 <p><em>Note</em> that the symbol names are so ugly because they are C++ name mangled
 and that the name mangling (and function signature) is different for different
 architectures, so even for x86_64 and x86 the names are sometimes different,
@@ -319,7 +319,7 @@ if it&rsquo;s available on the system at all: Even if the systems version is old
 yours, it hopefully has recent security patches applied by the Linux distributor
 and thus is favorable to your version that may have freshly discovered security
 holes in a few months. You have to make sure to link against a libcurl.so.4
-<em>without</em> versioned symbols<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> though (or use it via <code>dlopen()</code> + <code>dlsym()</code>
+<em>without</em> versioned symbols<sup id="fnref1:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> though (or use it via <code>dlopen()</code> + <code>dlsym()</code>
 and don&rsquo;t link it at all).</p>
 <h1 id="building-a-portable-libcurl-so-4-without-versioned-symbols">Building a portable libcurl.so.4 without versioned symbols</h1>
 <p>Often you&rsquo;d like to use HTTP or HTTPS and the most common cross-platform
@@ -364,13 +364,13 @@ compile it in. Download that bundle from <a href="https://curl.haxx.se/ca/cacert
 (If you need a custom CA certificate for self-signed certificates, you can add
 it to that file).</p>
 <p>Then you execute the <code>./configure</code> script with all the options..</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">./configure --prefix=/opt/curl/ --enable-http --disable-ftp --disable-ldap \
-  --disable-file --disable-ldaps --disable-telnet --disable-rtsp \
-  --disable-dict --disable-tftp --disable-pop3 --disable-imap \
-  --disable-smb --disable-smtp --disable-gopher --without-libssh2 \
-  --without-librtmp --disable-versioned-symbols --without-ssl \
-  --with-mbedtls=/opt/mbedtls --with-ca-bundle=/path/to/cacert.pem
-</code></pre></div><p><code>--prefix=/opt/curl/</code> sets the installation directory, then there&rsquo;s tons of
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">./configure --prefix=/opt/curl/ --enable-http --disable-ftp --disable-ldap \
+</span></span><span class="line"><span class="cl">  --disable-file --disable-ldaps --disable-telnet --disable-rtsp \
+</span></span><span class="line"><span class="cl">  --disable-dict --disable-tftp --disable-pop3 --disable-imap \
+</span></span><span class="line"><span class="cl">  --disable-smb --disable-smtp --disable-gopher --without-libssh2 \
+</span></span><span class="line"><span class="cl">  --without-librtmp --disable-versioned-symbols --without-ssl \
+</span></span><span class="line"><span class="cl">  --with-mbedtls=/opt/mbedtls --with-ca-bundle=/path/to/cacert.pem
+</span></span></code></pre></div><p><code>--prefix=/opt/curl/</code> sets the installation directory, then there&rsquo;s tons of
 options to disable protocols I don&rsquo;t care about (if you want any of them just
 leave out the corresponding <code>--disable-*</code>), <code>--disable-versioned-symbols</code>
 makes sure the libcurl symbols are not versionsed with the used SSL library name
@@ -464,16 +464,16 @@ For glibc version 2.14, the developers introduced optimizations for
 Thankfully, they decided to use a symbol version so this change doesn&rsquo;t break
 old binaries that (incorrectly) rely on <code>memcpy()</code> working with overlapping ranges,
 but only breaks code that&rsquo;s recompiled and linked against glibc 2.14 (or newer).<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">$ readelf -s /lib/x86_64-linux-gnu/libc.so.6 | grep memcpy
-...
-1132: 00000000000943f0 106 IFUNC GLOBAL DEFAULT 13 memcpy@@GLIBC_2.14
-1134: 000000000008f14b  87 IFUNC GLOBAL DEFAULT 13 memcpy@GLIBC_2.2.5
-...
-</code></pre></div><p>As expected, <code>memcpy</code> indeed turns up twice in the symbols of <code>libc.so.6</code> - once
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">$ readelf -s /lib/x86_64-linux-gnu/libc.so.6 | grep memcpy
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">1132: 00000000000943f0 106 IFUNC GLOBAL DEFAULT 13 memcpy@@GLIBC_2.14
+</span></span><span class="line"><span class="cl">1134: 000000000008f14b  87 IFUNC GLOBAL DEFAULT 13 memcpy@GLIBC_2.2.5
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></div><p>As expected, <code>memcpy</code> indeed turns up twice in the symbols of <code>libc.so.6</code> - once
 in version <code>GLIBC_2.2.5</code><sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup> and once in version <code>GLIBC_2.14</code>.<br>
 You&rsquo;ll also note that before <code>GLIBC_2.2.5</code> is one <code>@</code> and before <code>GLIBC_2.14</code>
 there are two <code>@@</code> - the two <code>@@</code> indicate that this is the default version
-of that function that the compile-time linker (and apparently <code>dlsym()</code><sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>) will use.</p>
+of that function that the compile-time linker (and apparently <code>dlsym()</code><sup id="fnref1:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>) will use.</p>
 <h3 id="how-and-why-libcurl-uses-symbol-versioning">How and why libcurl uses symbol versioning</h3>
 <p><strong>libcurl</strong> uses symbol versioning in a different way: There all symbols get the same
 version and only exist in one version (if it was built with symbol versioning enabled).
@@ -507,11 +507,11 @@ More low-level details</li>
 <li><a href="https://people.freebsd.org/~deischen/symver/library_versioning.txt">Symbol Versioning on FreeBSD</a></li>
 <li><a href="https://docs.oracle.com/cd/E19683-01/816-5042/solarisabi-8/index.htm">Symbol Versioning on Solaris</a></li>
 </ul>
-<!-- raw HTML omitted -->
-<section class="footnotes" role="doc-endnotes">
+<!-- Below: Footnotes -->
+<div class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn:1" role="doc-endnote">
+<li id="fn:1">
 <p>Ideally the bundled version will only be used as a fallback in case
 the lib is missing on the system. <em>You&rsquo;re lucky, this post will show you how to do
 that at least for SDL.</em> For OpenAL it&rsquo;s not as easy, as up to now there has been no
@@ -526,11 +526,11 @@ called <code>alsoft_get_version()</code>, see <a href="https://github.com/kcat/o
 implementation is relevant on Linux.)</li>
 </ul>
 &#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:2" role="doc-endnote">
+<li id="fn:2">
 <p><a href="#bonus-dynamic-libs-on-linux-and-what-is-symbol-versioning">See the bonus section</a>
-for an explanation of/introduction into versioned symbols/symbol versioning.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+for an explanation of/introduction into versioned symbols/symbol versioning.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:3" role="doc-endnote">
+<li id="fn:3">
 <p>Apparently it is on <strong>Red Hat Enterprise Linux (RHEL)</strong> and
 derivates like <strong>CentOS</strong> though, because they <em>statically</em> link <code>libstdc++</code>,
 see <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1417663">this bugreport</a>.
@@ -542,31 +542,31 @@ runs a very old version of Fedora), the system version will be at least
 as new as yours and the yet to be introduced wrapper will choose
 the system version instead.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:4" role="doc-endnote">
+<li id="fn:4">
 <p>You could change <code>argv[0]</code> to modify the name that will show up in <code>ps</code>,
 <code>top</code> etc, but that&rsquo;s purely cosmetical.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:5" role="doc-endnote">
+<li id="fn:5">
 <p>my table with function- and version-names for libstdc++ looks like
 <a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L176-L210">this</a>
 and for libgcc it looks like
-<a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L242-L263">this</a>.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L242-L263">this</a>.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:6" role="doc-endnote">
-<p>the tables mentioned in<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup> are used like
+<li id="fn:6">
+<p>the tables mentioned in<sup id="fnref1:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup> are used like
 <a href="https://github.com/DanielGibson/Linux-app-wrapper/blob/6971a1a2a8b3d9f57e9e93c32c25c8c861750027/wrapper.c#L97-L126">this</a>&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:7" role="doc-endnote">
+<li id="fn:7">
 <p>The names could also be different for different Operating Systems,
 as they might use different calling- and naming conventions.<br>
 So while this general concept should work on other Unix-like systems
 like *BSD, Solaris or maybe even OSX, the names might be different - and
 they might not even use libstdc++ but e.g. clang&rsquo;s libc++.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:8" role="doc-endnote">
+<li id="fn:8">
 <p><a href="https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries">Wikipedia has some more information about libraries and shared libraries</a>&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:9" role="doc-endnote">
+<li id="fn:9">
 <p>Not only libraries, but also executables can export symbols - that way
 libraries loaded by the executable can use symbols of the executable.<br>
 The relevant concept for selecting which symbols are exported is called
@@ -576,12 +576,12 @@ unless you compile with <code>-fvisibility=hidden</code>, then only functions/gl
 marked (see linked article) are exported (on Windows it&rsquo;s the other way around, there
 symbols are not exported by default).&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:10" role="doc-endnote">
+<li id="fn:10">
 <p>You always link against libfoo.so, but sometimes the lib the runtime linker
 is actually looking for has a slightly different name, like libfoo.so.1
 The relevant thing is called <a href="https://en.wikipedia.org/wiki/Soname"><strong>soname</strong></a>&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:11" role="doc-endnote">
+<li id="fn:11">
 <p>While apparently <code>dlsym(RTLD_DEFAULT, &quot;fun&quot;)</code> and <code>dlsym(libhandle, &quot;fun&quot;)</code>
 return the default version of <code>fun()</code>, it seems like <code>dlsym(RTLD_NEXT, &quot;fun&quot;)</code>
 returns the <em>oldest</em> version&hellip;<br>
@@ -605,17 +605,17 @@ to return the default version of the function (as it appears to be the case)</li
 at least the function signature stayed the same, but is also used for
 functions that changed their signature, i.e. <code>VERSION1</code> takes arguments of
 different type than <code>VERSION2</code>. In that case it&rsquo;s of course important to
-get the right version and using <code>dlvsym()</code> is a good idea..&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+get the right version and using <code>dlvsym()</code> is a good idea..&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:12" role="doc-endnote">
+<li id="fn:12">
 <p><a href="http://www.win.tue.nl/~aeb/linux/misc/gcc-semibug.html">People were not very happy with this change anyway</a>&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:13" role="doc-endnote">
+<li id="fn:13">
 <p>This is the oldest/lowest symbol version in <code>libc.so.6</code>,
 so I guess they started symbol versioning in glibc 2.2.5.&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
-</section>
+</div>
     </div>
   </article>
 

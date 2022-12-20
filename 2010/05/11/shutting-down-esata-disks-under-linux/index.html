@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>Shutting down (e)SATA disks under Linux - ./gibson.sh --blog</title>
@@ -61,72 +61,72 @@ I googled that and stumbled upon http://www.sakana.fr/blog/2009/05/04/linux-sata
 
     <div class="article-content">
       <p>I&rsquo;m using a eSATA external harddrive and want to be able to safely unplug it without shutting down my PC. While just removing the drive after unmounting worked so far, I&rsquo;m not sure if it&rsquo;s really safe - I&rsquo;d really prefer to cleanly disconnect it and spinning it down before pulling the plug.
-I googled that and stumbled upon <!-- raw HTML omitted --><a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/">http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/</a><!-- raw HTML omitted --> which seems to be a clean and safe way to do it, so I just wrote a script to do that.</p>
-<p>It also checks if any partition of that drive is still mounted (that check might result in false positives however or might just fail when the disk is mounted by UUID or via some mapper like dmcrypt) and tells you to unmount before disconnecting the drive - however you can bypass that test with the <!-- raw HTML omitted -->-f<!-- raw HTML omitted --> option.</p>
+I googled that and stumbled upon <a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/"><a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/">http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/</a></a> which seems to be a clean and safe way to do it, so I just wrote a script to do that.</p>
+<p>It also checks if any partition of that drive is still mounted (that check might result in false positives however or might just fail when the disk is mounted by UUID or via some mapper like dmcrypt) and tells you to unmount before disconnecting the drive - however you can bypass that test with the <code>-f</code> option.</p>
 <p>You can copy the script by moving the mouse over the code, clicking that &ldquo;view source&rdquo; icon on the top right corner of the code listing and then just copy and paste the code from the popup-window.
-Save the code to <!-- raw HTML omitted -->/usr/local/sbin/disc_disk<!-- raw HTML omitted --> (or some other directory in $PATH, but note that this script can only be successfully executed by the root-user - or via sudo - anyway) and make it executable (<!-- raw HTML omitted -->chmod 755 /usr/local/sbin/disc_disk<!-- raw HTML omitted -->).
-Usage is quite easy: If you want to disconnect the disk represented by /dev/sdX just execute (as root or prefixed by <!-- raw HTML omitted -->sudo<!-- raw HTML omitted -->) <!-- raw HTML omitted --><!-- raw HTML omitted -->$ disc_disk sdX<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+Save the code to <code>/usr/local/sbin/disc_disk</code> (or some other directory in $PATH, but note that this script can only be successfully executed by the root-user - or via sudo - anyway) and make it executable (<code>chmod 755 /usr/local/sbin/disc_disk</code>).
+Usage is quite easy: If you want to disconnect the disk represented by /dev/sdX just execute (as root or prefixed by <code>sudo</code>) <pre><code>$ disc_disk sdX</pre></code></p>
 <p>This should probably work with any hot-pluggable device managed by the Linux SCSI subsystem like USB memory sticks (tried that, worked for me) or real SCSI discs.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/sh
-</span><span class="cp"></span><span class="c1"># simple script to shutdown and disconnect SATA-discs</span>
-<span class="c1"># (and probably other devices using Linux&#39;s SCSI-subsystem </span>
-<span class="c1"># like USB mass-storage devices)</span>
-<span class="c1"># (C) 2010 caedes</span>
-<span class="c1"># You may use and distribute this freely.</span>
-
-<span class="nv">USG</span><span class="o">=</span><span class="s2">&#34;Usage: disc_disk [-f] &lt;device&gt;\n
-</span><span class="s2">	-f forces disconnect even if device is mounted\n
-</span><span class="s2">	Example: disc_disk sda&#34;</span>
-
-<span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;-h&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-	<span class="nb">echo</span> <span class="s2">&#34;Disconnects and shuts down disk.&#34;</span>
-	<span class="nb">echo</span> -e <span class="nv">$USG</span>
-	<span class="nb">exit</span> <span class="m">0</span>
-<span class="k">fi</span>
-
-<span class="nv">FORCE</span><span class="o">=</span><span class="m">0</span>
-
-<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&#34;</span><span class="nv">$2</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-	<span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;-f&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-		<span class="nv">FORCE</span><span class="o">=</span><span class="m">1</span>
-	<span class="k">else</span>
-		<span class="nb">echo</span> <span class="s2">&#34;Unknown Option </span><span class="nv">$1</span><span class="s2">&#34;</span>
-		<span class="nb">echo</span> -e <span class="nv">$USG</span>
-		<span class="nb">exit</span> <span class="m">1</span>
-	<span class="k">fi</span>
-	<span class="nv">DEV</span><span class="o">=</span><span class="nv">$2</span>
-<span class="k">else</span>
-	<span class="nv">DEV</span><span class="o">=</span><span class="nv">$1</span>
-<span class="k">fi</span>
-
-<span class="k">if</span> <span class="o">[</span> -z <span class="nv">$DEV</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-	<span class="nb">echo</span> <span class="s2">&#34;Disconnects and shuts down disk.&#34;</span>
-	<span class="nb">echo</span> -e <span class="nv">$USG</span>
-	<span class="nb">exit</span> <span class="m">1</span>
-<span class="k">fi</span>
-
-<span class="nv">DPATH</span><span class="o">=</span><span class="s2">&#34;/sys/block/</span><span class="nv">$DEV</span><span class="s2">/device/delete&#34;</span>
-
-<span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$DPATH</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-	<span class="nb">echo</span> <span class="s2">&#34;Invalid device!&#34;</span>
-	<span class="nb">echo</span> -e <span class="nv">$USG</span>
-	<span class="nb">exit</span> <span class="m">1</span>
-<span class="k">fi</span>
-
-<span class="c1"># really simple check, might fail (may be skipped  with -f)</span>
-<span class="c1"># (e.g. on mount /dev/sdb /mnt/sda and disc_disk sda)</span>
-<span class="k">if</span> <span class="o">[</span> <span class="nv">$FORCE</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-	<span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DEV</span> <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-		<span class="nb">echo</span> <span class="s2">&#34;Device still mounted! Unmount it before disconnecting or use -f option to enforce disconnect (dangerous!).&#34;</span>
-		<span class="nb">echo</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DEV</span><span class="k">)</span>
-		<span class="nb">exit</span> <span class="m">1</span>
-	<span class="k">fi</span>
-<span class="k">fi</span>
-
-<span class="nb">echo</span> <span class="s2">&#34;Shutting down and disconnecting </span><span class="nv">$DEV</span><span class="s2">..&#34;</span>
-<span class="nb">echo</span> <span class="m">1</span> &gt; <span class="nv">$DPATH</span>
-<span class="nb">echo</span> <span class="s2">&#34;Done.&#34;</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="c1"># simple script to shutdown and disconnect SATA-discs</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># (and probably other devices using Linux&#39;s SCSI-subsystem </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># like USB mass-storage devices)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># (C) 2010 caedes</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># You may use and distribute this freely.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">USG</span><span class="o">=</span><span class="s2">&#34;Usage: disc_disk [-f] &lt;device&gt;\n
+</span></span></span><span class="line"><span class="cl"><span class="s2">	-f forces disconnect even if device is mounted\n
+</span></span></span><span class="line"><span class="cl"><span class="s2">	Example: disc_disk sda&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;-h&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">echo</span> <span class="s2">&#34;Disconnects and shuts down disk.&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">echo</span> -e <span class="nv">$USG</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">exit</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">FORCE</span><span class="o">=</span><span class="m">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> -n <span class="s2">&#34;</span><span class="nv">$2</span><span class="s2">&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="o">=</span> <span class="s2">&#34;-f&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">		<span class="nv">FORCE</span><span class="o">=</span><span class="m">1</span>
+</span></span><span class="line"><span class="cl">	<span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">echo</span> <span class="s2">&#34;Unknown Option </span><span class="nv">$1</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">echo</span> -e <span class="nv">$USG</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">	<span class="k">fi</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">DEV</span><span class="o">=</span><span class="nv">$2</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span>
+</span></span><span class="line"><span class="cl">	<span class="nv">DEV</span><span class="o">=</span><span class="nv">$1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> -z <span class="nv">$DEV</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">echo</span> <span class="s2">&#34;Disconnects and shuts down disk.&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">echo</span> -e <span class="nv">$USG</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">DPATH</span><span class="o">=</span><span class="s2">&#34;/sys/block/</span><span class="nv">$DEV</span><span class="s2">/device/delete&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$DPATH</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">echo</span> <span class="s2">&#34;Invalid device!&#34;</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">echo</span> -e <span class="nv">$USG</span>
+</span></span><span class="line"><span class="cl">	<span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># really simple check, might fail (may be skipped  with -f)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># (e.g. on mount /dev/sdb /mnt/sda and disc_disk sda)</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> <span class="nv">$FORCE</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="o">[</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DEV</span> <span class="p">|</span> wc -l<span class="k">)</span> -gt <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">echo</span> <span class="s2">&#34;Device still mounted! Unmount it before disconnecting or use -f option to enforce disconnect (dangerous!).&#34;</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">echo</span> <span class="k">$(</span>mount <span class="p">|</span> grep <span class="nv">$DEV</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">		<span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">	<span class="k">fi</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;Shutting down and disconnecting </span><span class="nv">$DEV</span><span class="s2">..&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="m">1</span> &gt; <span class="nv">$DPATH</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;Done.&#34;</span>
+</span></span></code></pre></div>
     </div>
   </article>
 

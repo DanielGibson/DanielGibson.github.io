@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>./gibson.sh --blog</title>
@@ -139,19 +139,19 @@ and to set that surface as a window icon.</p>
                 <p>I recently tried out Sean Barrett&rsquo;s <a href="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image.h</a>
 and was blown away by how fucking easy it is to use.<br>
 Integrating it into your project is trivial: Just add the header and somewhere do:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define STB_IMAGE_IMPLEMENTATION
-</span><span class="cp">#include</span> <span class="cpf">&#34;stb_image.h&#34;</span><span class="cp">
-</span></code></pre></div><p>That&rsquo;s all. (If you wanna use it in multiple files you just <code>#include &quot;stb_image.h&quot;</code> there without the <code>#define</code>.)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define STB_IMAGE_IMPLEMENTATION
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;stb_image.h&#34;</span><span class="cp">
+</span></span></span></code></pre></div><p>That&rsquo;s all. (If you wanna use it in multiple files you just <code>#include &quot;stb_image.h&quot;</code> there without the <code>#define</code>.)</p>
 <p>And the API is trivial too:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
-<span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pixeldata</span><span class="p">,</span> <span class="o">*</span><span class="n">pixeldata2</span><span class="p">;</span>
-<span class="n">pixeldata</span> <span class="o">=</span> <span class="n">stbi_load</span><span class="p">(</span><span class="s">&#34;bla.jpg&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="c1">// if you have already read the image file data into a buffer:
-</span><span class="c1"></span><span class="n">pixeldata2</span> <span class="o">=</span> <span class="n">stbi_load_from_memory</span><span class="p">(</span><span class="n">bufferWithImageData</span><span class="p">,</span> <span class="n">bufferLength</span><span class="p">,</span>
-                                   <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="k">if</span><span class="p">(</span><span class="n">pixeldata2</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Some error happened: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">stbi_failure_reason</span><span class="p">());</span>
-</code></pre></div><p>There&rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pixeldata</span><span class="p">,</span> <span class="o">*</span><span class="n">pixeldata2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">pixeldata</span> <span class="o">=</span> <span class="nf">stbi_load</span><span class="p">(</span><span class="s">&#34;bla.jpg&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// if you have already read the image file data into a buffer:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">pixeldata2</span> <span class="o">=</span> <span class="nf">stbi_load_from_memory</span><span class="p">(</span><span class="n">bufferWithImageData</span><span class="p">,</span> <span class="n">bufferLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                   <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">pixeldata2</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Some error happened: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="nf">stbi_failure_reason</span><span class="p">());</span>
+</span></span></code></pre></div><p>There&rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
 And it supports lots of common image file types including JPEG, PNG, TGA, BMP, GIF and PSD.</p>
 <p>So I wondered if there are any downsides regarding speed.</p>
                 <a href="./2015/03/23/comparing-performance-stb_image-vs-libjpeg-turbo-libpng-and-lodepng/"><i>Read More…</i></a>
@@ -241,7 +241,7 @@ for older versions of grub?), grub will need those</li>
           <div class="article-content">
             <div class="summary">
               
-                <p>I recently got myself a Lenovo <!-- raw HTML omitted -->Thinkpad T500<!-- raw HTML omitted --> (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.</p>
+                <p>I recently got myself a Lenovo <a href="http://www.thinkwiki.org/wiki/Category:T500">Thinkpad T500</a> (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.</p>
 <p>However, I shrunk the Windows 7 partition (I didn&rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &hellip;) anyway.</p>
                 <a href="./2011/01/05/linux-debian-squeeze-on-thinkpad-t500/"><i>Read More…</i></a>
               
@@ -260,15 +260,15 @@ for older versions of grub?), grub will need those</li>
           <div class="article-content">
             <div class="summary">
               
-                <p>This is a follow-up to <!-- raw HTML omitted -->debian bug #541658 for Iceweasel: &ldquo;cannot open research.microsoft.com&rdquo;<!-- raw HTML omitted -->.
+                <p>This is a follow-up to <a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541658">debian bug #541658 for Iceweasel: &ldquo;cannot open research.microsoft.com&rdquo;</a>.
 It turned out that this bug applies to all (tested) browsers with cookie-support (Iceweasel, Opera, Chrome, Arora, Kazehakase),
 but only very few people are experiencing it.<br>
 First I&rsquo;ll tell how to reproduce the bug, then I&rsquo;ll sum up the facts I already
 collected in that bugreport and then I&rsquo;ll document my further attempts to narrow down the problem.</p>
 <p><strong>UPDATE:</strong> The reason for that strange behaviour was found and I filed a new bugreport:
-<!-- raw HTML omitted --><!-- raw HTML omitted -->No. #587789<!-- raw HTML omitted --><!-- raw HTML omitted --><br>
+<del datetime="2010-07-02T23:57:20+00:00"><a href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=587789">No. #587789</a></del><br>
 <strong>UPDATE 2:</strong> Debians Kernel maintainer considers this expected behavior and told me
-to file a bugreport upstream and I did: <!-- raw HTML omitted -->Netfilter bug #622<!-- raw HTML omitted -->.<br>
+to file a bugreport upstream and I did: <a href="http://bugzilla.netfilter.org/show_bug.cgi?id=662">Netfilter bug #622</a>.<br>
 <strong>UPDATE 3:</strong> I think Microsoft has fixed their server. Of course the Linux kernel
 should be fixed anyway but there doesn&rsquo;t seem to be much interest in doing so :-/<br>
 <strong>UPDATE 4:</strong> <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/net/netfilter/xt_TCPMSS.c?h=v4.12&amp;id=409b545ac10d9548929557a75ad86540f59a2c83">Three years later it had been fixed in the Linux kernel.</a></p>
@@ -287,7 +287,7 @@ should be fixed anyway but there doesn&rsquo;t seem to be much interest in doing
             <div class="summary">
               
                 <p>I&rsquo;m using a eSATA external harddrive and want to be able to safely unplug it without shutting down my PC. While just removing the drive after unmounting worked so far, I&rsquo;m not sure if it&rsquo;s really safe - I&rsquo;d really prefer to cleanly disconnect it and spinning it down before pulling the plug.
-I googled that and stumbled upon <!-- raw HTML omitted --><a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/">http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/</a><!-- raw HTML omitted --> which seems to be a clean and safe way to do it, so I just wrote a script to do that.</p>
+I googled that and stumbled upon <a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/"><a href="http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/">http://www.sakana.fr/blog/2009/05/04/linux-sata-hot-plug-unplug/</a></a> which seems to be a clean and safe way to do it, so I just wrote a script to do that.</p>
                 <a href="./2010/05/11/shutting-down-esata-disks-under-linux/"><i>Read More…</i></a>
               
             </div>
@@ -302,10 +302,10 @@ I googled that and stumbled upon <!-- raw HTML omitted --><a href="http://www.sa
           <div class="article-content">
             <div class="summary">
               
-                <p>My favorite desktop environment is <!-- raw HTML omitted -->XFCE<!-- raw HTML omitted -->, because it&rsquo;s fast, doesn&rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).
+                <p>My favorite desktop environment is <a href="http://www.xfce.org/">XFCE</a>, because it&rsquo;s fast, doesn&rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).
 I also use <a href="https://github.com/iwamatsu/slim">SLiM</a> as a display manager because it is slim and looks much better than xdm.</p>
-<p>On my Laptop I also use GNOME&rsquo;s <!-- raw HTML omitted -->NetworkManager<!-- raw HTML omitted --> because I haven&rsquo;t yet found a better and less bloated alternative for handling wireless networks and VPNs.
-NetworkManager is able to store your passwords (WPA-keys etc) in the <!-- raw HTML omitted -->GNOME Keyring<!-- raw HTML omitted --> so you don&rsquo;t need to enter them each time your laptop connects to a wireless network. But you still have to enter the password to unlock the keyring.. <!-- raw HTML omitted --><!-- raw HTML omitted -->unless<!-- raw HTML omitted --><!-- raw HTML omitted --> you let <!-- raw HTML omitted -->PAM<!-- raw HTML omitted --> handle that on login.</p>
+<p>On my Laptop I also use GNOME&rsquo;s <a href="http://projects.gnome.org/NetworkManager/">NetworkManager</a> because I haven&rsquo;t yet found a better and less bloated alternative for handling wireless networks and VPNs.
+NetworkManager is able to store your passwords (WPA-keys etc) in the <a href="http://live.gnome.org/GnomeKeyring">GNOME Keyring</a> so you don&rsquo;t need to enter them each time your laptop connects to a wireless network. But you still have to enter the password to unlock the keyring.. <em><strong>unless</strong></em> you let <a href="http://en.wikipedia.org/wiki/Pluggable_Authentication_Modules">PAM</a> handle that on login.</p>
                 <a href="./2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/"><i>Read More…</i></a>
               
             </div>
@@ -320,8 +320,8 @@ NetworkManager is able to store your passwords (WPA-keys etc) in the <!-- raw HT
           <div class="article-content">
             <div class="summary">
               
-                <p>Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, <!-- raw HTML omitted -->VNC<!-- raw HTML omitted --> is my weapon of choice, if SSH isn&rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &hellip;).</p>
-<p>I&rsquo;ll describe how to set up a normal and reverse VNC-connections using <!-- raw HTML omitted -->x11vnc<!-- raw HTML omitted --> and <!-- raw HTML omitted -->TightVNC<!-- raw HTML omitted -->.</p>
+                <p>Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, <a title="Virtual Network Computing" href="http://en.wikipedia.org/wiki/VNC">VNC</a> is my weapon of choice, if SSH isn&rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &hellip;).</p>
+<p>I&rsquo;ll describe how to set up a normal and reverse VNC-connections using <a title="home of x11vnc" href="http://www.karlrunge.com/x11vnc/">x11vnc</a> and <a title="TightVNC homepage" href="http://www.tightvnc.com/">TightVNC</a>.</p>
                 <a href="./2010/01/08/remote-administrationtech-support-with-reverse-vnc/"><i>Read More…</i></a>
               
             </div>
@@ -339,8 +339,8 @@ NetworkManager is able to store your passwords (WPA-keys etc) in the <!-- raw HT
           <div class="article-content">
             <div class="summary">
               
-                <p>After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a <!-- raw HTML omitted -->screen<!-- raw HTML omitted --> is so much nicer.</p>
-<p>So I tried <!-- raw HTML omitted -->MCabber<!-- raw HTML omitted -->, that turned out to be really great once you&rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&rsquo;ll want to configure it to your needs.</p>
+                <p>After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a <a href="http://www.gnu.org/software/screen/screen.html">screen</a> is so much nicer.</p>
+<p>So I tried <a href="http://www.mcabber.com">MCabber</a>, that turned out to be really great once you&rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&rsquo;ll want to configure it to your needs.</p>
                 <a href="./2009/10/01/mcabber-settings-rebinding-pageup-down/"><i>Read More…</i></a>
               
             </div>

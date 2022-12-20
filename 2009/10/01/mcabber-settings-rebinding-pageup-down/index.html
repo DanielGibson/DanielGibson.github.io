@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>MCabber - Settings and rebinding of PageUp/PageDown - ./gibson.sh --blog</title>
@@ -60,34 +60,41 @@ So I tried MCabber, that turned out to be really great once you&rsquo;ve configu
     
 
     <div class="article-content">
-      <p>After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a <!-- raw HTML omitted -->screen<!-- raw HTML omitted --> is so much nicer.</p>
-<p>So I tried <!-- raw HTML omitted -->MCabber<!-- raw HTML omitted -->, that turned out to be really great once you&rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&rsquo;ll want to configure it to your needs.</p>
-<p>Create a <!-- raw HTML omitted -->.mcabber/<!-- raw HTML omitted --> directory in your home-dir, with subdirs <!-- raw HTML omitted -->histo/<!-- raw HTML omitted --> and <!-- raw HTML omitted -->otr/<!-- raw HTML omitted -->. Those directories should be only accessible by yourself (chmod 700) or MCabber will print out a warning at startup.</p>
-<p>You&rsquo;ll also need to put a <!-- raw HTML omitted -->mcabberrc<!-- raw HTML omitted --> file into <!-- raw HTML omitted -->~/.mcabber/<!-- raw HTML omitted -->, <!-- raw HTML omitted -->the one that comes with mcabber<!-- raw HTML omitted --> (debian users will find it at /usr/share/doc/mcabber/examples/) is a good start and documented.</p>
-<p><!-- raw HTML omitted -->mcabberrc<!-- raw HTML omitted --> should have chmod 600.</p>
+      <p>After years of using centericq for ICQ and Jabber I switched to gajim (ICQ via transport), because centericq didn&rsquo;t have any useable UTF8 support. I was never really satisfied with gajim though, because I happen to switch between my PC and my Notebook multiple times a day, resulting in inconsistent chat-histories etc - a console based solution in a <a href="http://www.gnu.org/software/screen/screen.html">screen</a> is so much nicer.</p>
+<p>So I tried <a href="http://www.mcabber.com">MCabber</a>, that turned out to be really great once you&rsquo;ve configured it to your needs. After installing MCabber (most Linux/BSD distributions should have a package or port) you&rsquo;ll want to configure it to your needs.</p>
+<p>Create a <code>.mcabber/</code> directory in your home-dir, with subdirs <code>histo/</code> and <code>otr/</code>. Those directories should be only accessible by yourself (chmod 700) or MCabber will print out a warning at startup.</p>
+<p>You&rsquo;ll also need to put a <code>mcabberrc</code> file into <code>~/.mcabber/</code>, <a href="http://mcabber.com/files/mcabberrc.example">the one that comes with mcabber</a> (debian users will find it at /usr/share/doc/mcabber/examples/) is a good start and documented.</p>
+<p><code>mcabberrc</code> should have chmod 600.</p>
 <p>I enhanced it a bit to suit my needs:</p>
-<!-- raw HTML omitted -->
+<ul>
+	<li>If you have a lot of contacts, a quick search function may come in handy. Usually its "/roster search somename". I prefer just "/rs somename" so add <code>alias rs = roster search</code> to your mcabberrc.</li>
+	<li>Sometimes I want to scroll up the history - and don't want it to scroll down if my buddy sends me a message. You can use "/buffer scroll_lock" and "/buffer scroll_unlock" or just "/buffer scroll_toggle" to achieve that. Just bind the toggling to F6, so you can enable and disable scroll lock with F6: Put <code>bind 270 = buffer scroll_toggle</code> in your mcabberrc.</li>
+</ul>
+<strong>Note:</strong> Why "270"? 270 is the curses-keycode of F6. At least on my box. On other systems or with other versions of the curses library (which mcabber uses) the keycode may be different.  Fortunately MCabber helps you to find out the keycode: just press an (unbound) key in MCabber and something like <code>[21:26:16] Unknown key=270</code> will appear in mcabbers log window.
 <p>MCabbers way of sending multi line messages is a bit unusual: First you have to start multiline mode (&quot;/msay begin&quot; or &ldquo;/msay toggle&rdquo;), then you write your message (just hit return once you&rsquo;ve finished one line) and, when you&rsquo;re done you send the message (&quot;/msay send&quot; or Ctrl-d).</p>
-<!-- raw HTML omitted -->
+<ul>
+	<li>I want to start multiline-mode with Alt-Enter (keycode M13 on my system), so I add the following binding: <code>bind M13 = msay toggle</code></li>
+</ul>
+Now you should have a fairly useable config.
 <p>But there was one thing still that annoyed me: Going through the roster (contact list) is bound to PageUp/PageDown - and this is done in MCabbers code, not in the mcabberrc. My problem was, that the PageUp/Down-keys are next to the Enter-key on my Notebook. If I missed the enter key and pressed both PageUp/Down and Enter, the message would be sent to the next/previous contact in my roaster.. that sucks.</p>
 <p>I decided to make PageUp/Down scroll the chat history and use Ctrl-PageUp/Down to move within the roster. To do that I need the keycodes of Ctrl-PageUp/Down (easy, because there is no hardcoded binding on them: MK3 and MK4 on my system) and of PageUp/Down - not easy, because MCabber doesn&rsquo;t show the keycodes of bound keys.</p>
-<p><!-- raw HTML omitted -->The Solution:<!-- raw HTML omitted --> The curses keycodes are defined in <!-- raw HTML omitted -->/usr/include/curses.h<!-- raw HTML omitted --> - look for KEY_NPAGE and KEY_PPAGE. If you can&rsquo;t find curses.h, you probably haven&rsquo;t installed the curses development package (on debian it&rsquo;s called libncurses5-dev).</p>
+<p><em>The Solution:</em> The curses keycodes are defined in <code>/usr/include/curses.h</code> - look for KEY_NPAGE and KEY_PPAGE. If you can&rsquo;t find curses.h, you probably haven&rsquo;t installed the curses development package (on debian it&rsquo;s called libncurses5-dev).</p>
 <p>You&rsquo;ll get octal values (like 0522 and 0523 in my case) that need to be translated to decimal values to get a keycode for MCabber:</p>
-<p>PageDown: <!-- raw HTML omitted -->#define KEY_NPAGE  0522<!-- raw HTML omitted --> 0522 is an octal value, convert to decimal (right to left): <!-- raw HTML omitted -->2<!-- raw HTML omitted --><em>8^0+<!-- raw HTML omitted -->2<!-- raw HTML omitted --><em>8^1+<!-- raw HTML omitted -->5<!-- raw HTML omitted --><em>8^2 = 2</em>1+2</em>8+5</em>64 = 338</p>
+<p>PageDown: <code>#define KEY_NPAGE  0522</code> 0522 is an octal value, convert to decimal (right to left): <strong>2</strong><em>8^0+<strong>2</strong><em>8^1+<strong>5</strong><em>8^2 = 2</em>1+2</em>8+5</em>64 = 338</p>
 <p>PageUp is KEY_PPAGE, defined as 0523 (on my system), which translates to 339. Add the following to your mcabberrc to change the semantics of PageUp/Down and Ctrl-PageUp/Down:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"># Ctrl-PGUP/DN -&gt; move in contact list
-bind MK3 = roster up
-bind MK4 = roster down
-# PGUP/DN -&gt; scroll in message history
-bind 339 = buffer up
-bind 338 = buffer down
-</code></pre></div><p>Last but not least: I find it convenient to have a sensible window-title in the terminal running MCabber (in screen). Most common terminal emulators (xterm, urxvt, Gnome Terminal, xfce terminal, &hellip;) can handle the xterm escape sequence to set the title (see <!-- raw HTML omitted -->this page<!-- raw HTML omitted --> for more information).</p>
-<p>So I created a simple shellscript <!-- raw HTML omitted -->settitle.sh<!-- raw HTML omitted --> to execute before starting mcabber, like this:</p>
-<p><!-- raw HTML omitted -->$ settitle.sh &ldquo;MCabber&rdquo; &amp;&amp; mcabber<!-- raw HTML omitted --></p>
-<p><!-- raw HTML omitted -->settitle.sh<!-- raw HTML omitted --> looks like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/sh
-</span><span class="cp"></span><span class="nb">printf</span> <span class="s1">&#39;33]2;%s07&#39;</span> <span class="nv">$1</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># Ctrl-PGUP/DN -&gt; move in contact list
+</span></span><span class="line"><span class="cl">bind MK3 = roster up
+</span></span><span class="line"><span class="cl">bind MK4 = roster down
+</span></span><span class="line"><span class="cl"># PGUP/DN -&gt; scroll in message history
+</span></span><span class="line"><span class="cl">bind 339 = buffer up
+</span></span><span class="line"><span class="cl">bind 338 = buffer down
+</span></span></code></pre></div><p>Last but not least: I find it convenient to have a sensible window-title in the terminal running MCabber (in screen). Most common terminal emulators (xterm, urxvt, Gnome Terminal, xfce terminal, &hellip;) can handle the xterm escape sequence to set the title (see <a href="http://tldp.org/HOWTO/Xterm-Title.html">this page</a> for more information).</p>
+<p>So I created a simple shellscript <code>settitle.sh</code> to execute before starting mcabber, like this:</p>
+<p><code>$ settitle.sh &ldquo;MCabber&rdquo; &amp;&amp; mcabber</code></p>
+<p><strong>settitle.sh</strong> looks like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="nb">printf</span> <span class="s1">&#39;33]2;%s07&#39;</span> <span class="nv">$1</span>
+</span></span></code></pre></div>
     </div>
   </article>
 

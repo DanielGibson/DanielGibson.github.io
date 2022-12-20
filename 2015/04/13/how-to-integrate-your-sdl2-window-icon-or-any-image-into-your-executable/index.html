@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>How to integrate your SDL2 window icon (or any image) into your executable - ./gibson.sh --blog</title>
@@ -86,7 +86,7 @@ and to set that surface as a window icon.</p>
 an open source image manipulation program.</p>
 <ul>
 <li>Open your icon in GIMP</li>
-<li>Click <em>&ldquo;File&rdquo;</em> -&gt; <em>&ldquo;Export As&hellip;&quot;</em></li>
+<li>Click <em>&ldquo;File&rdquo;</em> -&gt; <em>&ldquo;Export As&hellip;&rdquo;</em></li>
 <li>Select <em>&ldquo;C Source Code&rdquo;</em> as filetype (<strong>not</strong> &ldquo;C Source Code Header&rdquo;,
 that uses a different format!)</li>
 <li>Save it as <em>&ldquo;my_icon.c&rdquo;</em> (or some other name, it&rsquo;s really up to you&hellip;)
@@ -97,20 +97,20 @@ into the same directory your source code (that creates the SDL2 window) lives in
 <p>So you <strong>do</strong> want an alpha-channel and you <strong>don&rsquo;t</strong> want any of the other options.<br>
 <em>&ldquo;Prefixed name&rdquo;</em> is the name the C struct will have.</p>
 <p>So this part is done, you can open <em>my_icon.c</em> in a text editor, it will look similar to this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cm">/* GIMP RGBA C-Source image dump (my_icon.c) */</span>
-
-<span class="k">static</span> <span class="k">const</span> <span class="k">struct</span> <span class="p">{</span>
-  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">width</span><span class="p">;</span>
-  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">height</span><span class="p">;</span>
-  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">bytes_per_pixel</span><span class="p">;</span> <span class="cm">/* 2:RGB16, 3:RGB, 4:RGBA */</span>
-  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">pixel_data</span><span class="p">[</span><span class="mi">64</span> <span class="o">*</span> <span class="mi">64</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
-<span class="p">}</span> <span class="n">my_icon</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span>
-  <span class="s">&#34;</span><span class="se">\236\234\232\377\222\220\216\377\210\206\205\377</span><span class="s">|{y</span><span class="se">\377</span><span class="s">sqp</span><span class="se">\377</span><span class="s">rsr</span><span class="se">\377</span><span class="s">sqp&#34;</span>
-  <span class="s">&#34; ... and lots of other lines of more-or-less text, containing the ... &#34;</span>
-  <span class="s">&#34; ... encoded image ... &#34;</span>
-<span class="p">};</span>
-</code></pre></div><p>The (uncompressed) RGBA image data is encoded as an
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cm">/* GIMP RGBA C-Source image dump (my_icon.c) */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">width</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">height</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">bytes_per_pixel</span><span class="p">;</span> <span class="cm">/* 2:RGB16, 3:RGB, 4:RGBA */</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">pixel_data</span><span class="p">[</span><span class="mi">64</span> <span class="o">*</span> <span class="mi">64</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">my_icon</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34;</span><span class="se">\236\234\232\377\222\220\216\377\210\206\205\377</span><span class="s">|{y</span><span class="se">\377</span><span class="s">sqp</span><span class="se">\377</span><span class="s">rsr</span><span class="se">\377</span><span class="s">sqp&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34; ... and lots of other lines of more-or-less text, containing the ... &#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="s">&#34; ... encoded image ... &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>The (uncompressed) RGBA image data is encoded as an
 <a href="http://en.wikipedia.org/wiki/Escape_sequences_in_C">escaped C string</a>
 with chars that encode the values of the image&rsquo;s bytes.</p>
 <h2 id="without-using-gimp">.. without using GIMP</h2>
@@ -169,28 +169,28 @@ is used to decide whether it&rsquo;s RGB or RGBA.</p>
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">void</span> <span class="nf">SetSDLIcon</span><span class="p">(</span><span class="n">SDL_Window</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">// this will &#34;paste&#34; the struct my_icon into this function
-</span><span class="c1"></span>  <span class="cp">#include</span> <span class="cpf">&#34;my_icon.c&#34;</span><span class="cp">
-</span><span class="cp"></span>
-  <span class="c1">// these masks are needed to tell SDL_CreateRGBSurface(From)
-</span><span class="c1"></span>  <span class="c1">// to assume the data it gets is byte-wise RGB(A) data
-</span><span class="c1"></span>  <span class="n">Uint32</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">;</span>
-<span class="cp">#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-</span><span class="cp"></span>  <span class="kt">int</span> <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">8</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0xff000000</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
-  <span class="n">gmask</span> <span class="o">=</span> <span class="mh">0x00ff0000</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
-  <span class="n">bmask</span> <span class="o">=</span> <span class="mh">0x0000ff00</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
-  <span class="n">amask</span> <span class="o">=</span> <span class="mh">0x000000ff</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
-<span class="cp">#else </span><span class="c1">// little endian, like x86
-</span><span class="c1"></span>  <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0x000000ff</span><span class="p">;</span>
-  <span class="n">gmask</span> <span class="o">=</span> <span class="mh">0x0000ff00</span><span class="p">;</span>
-  <span class="n">bmask</span> <span class="o">=</span> <span class="mh">0x00ff0000</span><span class="p">;</span>
-  <span class="n">amask</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="mh">0xff000000</span><span class="p">;</span>
-<span class="cp">#endif
-</span><span class="cp"></span>  
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">SetSDLIcon</span><span class="p">(</span><span class="n">SDL_Window</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// this will &#34;paste&#34; the struct my_icon into this function
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="cp">#include</span> <span class="cpf">&#34;my_icon.c&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// these masks are needed to tell SDL_CreateRGBSurface(From)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// to assume the data it gets is byte-wise RGB(A) data
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">Uint32</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="kt">int</span> <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">8</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0xff000000</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">gmask</span> <span class="o">=</span> <span class="mh">0x00ff0000</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">bmask</span> <span class="o">=</span> <span class="mh">0x0000ff00</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">amask</span> <span class="o">=</span> <span class="mh">0x000000ff</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else </span><span class="c1">// little endian, like x86
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">rmask</span> <span class="o">=</span> <span class="mh">0x000000ff</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">gmask</span> <span class="o">=</span> <span class="mh">0x0000ff00</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">bmask</span> <span class="o">=</span> <span class="mh">0x00ff0000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">amask</span> <span class="o">=</span> <span class="p">(</span><span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="mh">0xff000000</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  
+</span></span></code></pre></td></tr></table>
 </div>
 </div>
 <p>Now create the <code>SDL_Surface*</code> using <code>SDL_CreateRGBSurfaceFrom()</code>.<br>
@@ -208,11 +208,11 @@ whole image, it must be <code>my_icon.bytes_per_pixel * my_icon.width</code> eit
 </span><span class="lnt">25
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c">  <span class="n">SDL_Surface</span><span class="o">*</span> <span class="n">icon</span> <span class="o">=</span> <span class="n">SDL_CreateRGBSurfaceFrom</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">my_icon</span><span class="p">.</span><span class="n">pixel_data</span><span class="p">,</span>
-      <span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">height</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span>
-      <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">);</span>
-  
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">  <span class="n">SDL_Surface</span><span class="o">*</span> <span class="n">icon</span> <span class="o">=</span> <span class="nf">SDL_CreateRGBSurfaceFrom</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">my_icon</span><span class="p">.</span><span class="n">pixel_data</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">height</span><span class="p">,</span> <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">my_icon</span><span class="p">.</span><span class="n">bytes_per_pixel</span><span class="o">*</span><span class="n">my_icon</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rmask</span><span class="p">,</span> <span class="n">gmask</span><span class="p">,</span> <span class="n">bmask</span><span class="p">,</span> <span class="n">amask</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  
+</span></span></code></pre></td></tr></table>
 </div>
 </div>
 <p>Finally, set the surface as window icon and free it (<code>SDL_SetWindowIcon()</code>
@@ -225,10 +225,10 @@ will duplicate the contained data anyway):</p>
 </span><span class="lnt">29
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c">  <span class="n">SDL_SetWindowIcon</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">icon</span><span class="p">);</span>
-
-  <span class="n">SDL_FreeSurface</span><span class="p">(</span><span class="n">icon</span><span class="p">);</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">  <span class="nf">SDL_SetWindowIcon</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">icon</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nf">SDL_FreeSurface</span><span class="p">(</span><span class="n">icon</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
 </div>
 </div>
 <p>Done!</p>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>Comparing Performance: stb_image vs libjpeg(-turbo), libpng and lodepng - ./gibson.sh --blog</title>
@@ -79,29 +79,42 @@ So I wondered if there are any downsides regarding speed." />
       <p>I recently tried out Sean Barrett&rsquo;s <a href="https://github.com/nothings/stb/blob/master/stb_image.h">stb_image.h</a>
 and was blown away by how fucking easy it is to use.<br>
 Integrating it into your project is trivial: Just add the header and somewhere do:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define STB_IMAGE_IMPLEMENTATION
-</span><span class="cp">#include</span> <span class="cpf">&#34;stb_image.h&#34;</span><span class="cp">
-</span></code></pre></div><p>That&rsquo;s all. (If you wanna use it in multiple files you just <code>#include &quot;stb_image.h&quot;</code> there without the <code>#define</code>.)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define STB_IMAGE_IMPLEMENTATION
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;stb_image.h&#34;</span><span class="cp">
+</span></span></span></code></pre></div><p>That&rsquo;s all. (If you wanna use it in multiple files you just <code>#include &quot;stb_image.h&quot;</code> there without the <code>#define</code>.)</p>
 <p>And the API is trivial too:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
-<span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pixeldata</span><span class="p">,</span> <span class="o">*</span><span class="n">pixeldata2</span><span class="p">;</span>
-<span class="n">pixeldata</span> <span class="o">=</span> <span class="n">stbi_load</span><span class="p">(</span><span class="s">&#34;bla.jpg&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="c1">// if you have already read the image file data into a buffer:
-</span><span class="c1"></span><span class="n">pixeldata2</span> <span class="o">=</span> <span class="n">stbi_load_from_memory</span><span class="p">(</span><span class="n">bufferWithImageData</span><span class="p">,</span> <span class="n">bufferLength</span><span class="p">,</span>
-                                   <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="k">if</span><span class="p">(</span><span class="n">pixeldata2</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Some error happened: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">stbi_failure_reason</span><span class="p">());</span>
-</code></pre></div><p>There&rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bytesPerPixel</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">pixeldata</span><span class="p">,</span> <span class="o">*</span><span class="n">pixeldata2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">pixeldata</span> <span class="o">=</span> <span class="nf">stbi_load</span><span class="p">(</span><span class="s">&#34;bla.jpg&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// if you have already read the image file data into a buffer:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">pixeldata2</span> <span class="o">=</span> <span class="nf">stbi_load_from_memory</span><span class="p">(</span><span class="n">bufferWithImageData</span><span class="p">,</span> <span class="n">bufferLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                   <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesPerPixel</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">pixeldata2</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Some error happened: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="nf">stbi_failure_reason</span><span class="p">());</span>
+</span></span></code></pre></div><p>There&rsquo;s also a simple callback-API which allows you to define some callbacks that stb_image will call to get the data, handy if you&rsquo;re using some kind of virtual filesystem or want to load the data from .zip files or something.
 And it supports lots of common image file types including JPEG, PNG, TGA, BMP, GIF and PSD.</p>
 <p>So I wondered if there are any downsides regarding speed.</p>
-<p>In short: (On my machine) it&rsquo;s faster than libjpeg, a bit slower than libjpeg-turbo, twice as fast as lodepng (another one-file-png decoder which also has a nice API) and a bit slower than libpng. For smaller images stb_image&rsquo;s performance is even closer to libpng/libjpeg-turbo. GCC produces faster code than Clang. All in all I find the performance acceptable and will use stb_image more in the future (my first &ldquo;victim&rdquo; was <!-- raw HTML omitted -->Yamagi Quake II<!-- raw HTML omitted -->).</p>
+<p>In short: (On my machine) it&rsquo;s faster than libjpeg, a bit slower than libjpeg-turbo, twice as fast as lodepng (another one-file-png decoder which also has a nice API) and a bit slower than libpng. For smaller images stb_image&rsquo;s performance is even closer to libpng/libjpeg-turbo. GCC produces faster code than Clang. All in all I find the performance acceptable and will use stb_image more in the future (my first &ldquo;victim&rdquo; was <a href="https://github.com/yquake2/yquake2/commit/47cde06e27d7a81f4cc70cd287cdf47364cf69fb">Yamagi Quake II</a>).</p>
 <p>The average times decoding a 4000x3000pixel image in milliseconds for GCC and clang with different optimization levels:</p>
 <h1 id="jpeg">JPEG</h1>
 <h2 id="libjpeg-libjpeg-turbo">libjpeg, libjpeg-turbo</h2>
 <p>I used libjpeg binaries from distributions, so compilers and optimization flags on my end didn&rsquo;t make a difference.</p>
-<!-- raw HTML omitted -->
+<ul>
+<li>Debian Wheezy's <strong>libjpeg8</strong> 8d1-deb7u1, no turbo: 130ms</li>
+<li>Ubuntu 14.04's <strong>libjpeg-turbo8</strong> 1.3.0-0ubuntu2: 69ms</li>
+</ul>
 <h2 id="stb-image-2-02-using-sse-intrinsics"><strong>stb_image</strong> 2.02, using SSE intrinsics</h2>
-<!-- raw HTML omitted -->
+<ul>
+<li>clang -O0: 436ms</li>
+<li>gcc -O0: 402ms</li>
+<li>clang -O1: 179ms</li>
+<li>gcc -O1: 97ms</li>
+<li>clang -O2: 151ms</li>
+<li>gcc -O2: 93ms</li>
+<li>clang -O3: 150ms</li>
+<li>gcc -O3: 85ms</li>
+<li>gcc -O4: 85ms</li>
+</ul>
 <h2 id="results-for-jpeg-decoding">Results for JPEG decoding</h2>
 <p>For JPEG, if you use clang stb_image is a bit slower than libjpeg (and a lot slower than libjpeg-turbo). If you use GCC (and at least -O1), the performance is between libjpeg and libjpeg-turbo.<br>
 Using optimization (at -O1 or more) yields significantly faster decoders than unoptimized (-O0) code (&gt;4x as fast for GCC, almost 3x as fast for clang).</p>
@@ -109,20 +122,55 @@ Using optimization (at -O1 or more) yields significantly faster decoders than un
 <p>So stb_image has competitive performance for loading jpegs.</p>
 <h2 id="update-test-with-a-smaller-image"><em>Update:</em> Test with a smaller image</h2>
 <p>I also did some tests with a 512x512pixel jpg image:</p>
-<!-- raw HTML omitted -->
+<ul>
+<li>libjpeg-turbo: 3.21ms</li>
+<li>stb clang -O0: 14.92ms</li>
+<li>stb gcc -O0: 14.24ms</li>
+<li>stb clang -O2: 5.19ms</li>
+<li>stb gcc -O2: 3.72ms</li>
+<li>stb gcc -O4: 3.33ms</li>
+</ul>
 <p>libjpeg-turbo is still faster, but stb_image only takes about 16% (-O2) or 3% (-O4) longer - so it&rsquo;s much closer than with the big image.</p>
 <h1 id="png">PNG</h1>
 <p>I converted the 4000x3000pixel JPEG used above to PNG with compressionlevel 9, using Gimp.
 The PNG is pretty big, about 16MB.</p>
 <h2 id="libpng-1-2">libpng 1.2</h2>
-<p>I used Ubuntu 14.04&rsquo;s <!-- raw HTML omitted -->libpng12<!-- raw HTML omitted --> (1.2.50-1ubuntu2), so again the compiler and optimization flags didn&rsquo;t matter.</p>
-<!-- raw HTML omitted -->
+<p>I used Ubuntu 14.04&rsquo;s <strong>libpng12</strong> (1.2.50-1ubuntu2), so again the compiler and optimization flags didn&rsquo;t matter.</p>
+<ul>
+<li>libpng12: 293ms</li>
+</ul>
 <h2 id="stb-image-2-02"><strong>stb_image</strong> 2.02</h2>
-<!-- raw HTML omitted -->
+<ul>
+<li>clang -O0: 905ms</li>
+<li>gcc -O0: 923ms</li>
+<li>clang -O1: 455ms</li>
+<li>gcc -O1: 457ms</li>
+<li>clang -O2: 432ms</li>
+<li>gcc -O2: 408ms</li>
+<li>clang -O3: 424ms</li>
+<li>gcc -O3: 394ms</li>
+<li>gcc -O4: 393ms</li>
+</ul>
 <h2 id="lodepng-version-20150321"><strong>lodepng</strong> version 20150321</h2>
-<!-- raw HTML omitted -->
+<ul>
+<li>clang -O0: 1902ms</li>
+<li>gcc -O0: 1862ms</li>
+<li>clang -O1: 862ms</li>
+<li>gcc -O1: 814ms</li>
+<li>clang -O2: 698ms</li>
+<li>gcc -O2: 680ms</li>
+<li>clang -O3: 676ms</li>
+<li>gcc -O3: 587ms</li>
+<li>gcc -O4: 581ms</li>
+</ul>
 <h2 id="results-for-png-decoding">Results for PNG decoding:</h2>
-<!-- raw HTML omitted -->
+<ul>
+<li>stb_image is a lot faster than lodepng, with and without compiler optimization.</li>
+<li>gcc produces faster code than clang, but the difference is smaller than in the JPEG case</li>
+<li>stb_image/lodepng decoders built with with <em>-O1</em> are more than twice as fast as ones built without optimization (<em>-O0</em>)</li>
+<li>libpng is fastest, optimized stb_image takes about 33-40% longer, optimized lodepng takes about 100-130% longer</li>
+<li><em>See below:</em> For smaller images stb_image's performance is much closer to libpng.</li>
+</ul>
 <p>So, I think stb_image&rsquo;s png decoding speed is still acceptable.. however png in general is kinda slow and should probably not be used for games if you have lots of (big) textures.<br>
 If you have the same picture as JPG and PNG (as I had in my tests), decoding from JPG (with stb_image) is more than 4x as fast as decoding from PNG (also stb_image; similar for libjpeg-turbo vs libpng).</p>
 <p>If loading performance is important to you (you load that many textures that it really slows you down),
@@ -151,26 +199,39 @@ which might even be better than the one used by PNG (deflate, same as zip uses)<
 <h2 id="update-test-with-smaller-images"><em>Update:</em> Test with smaller images</h2>
 <p>I did some additional tests with a 512x512pixel png that has an alpha-channel, which is probably closer to game development requirements. Because it&rsquo;s much faster to decode this, I ran 300 decode iterations instead of 100.<br>
 Furthermore, I only tested this with -O0 and -O2, which should be most relevant in practice (for debug and release builds).</p>
-<!-- raw HTML omitted -->
-<p>So while for the huge 24bit RGB png stb_image took about 33-40% longer to decode than libpng, for the small 32bit RGBA png it was <!-- raw HTML omitted -->less than 10% longer<!-- raw HTML omitted --> (in the optimized cases).</p>
-<p>And some more for a 512x512 RGB picture <!-- raw HTML omitted -->without<!-- raw HTML omitted --> alpha-channel:</p>
-<!-- raw HTML omitted -->
+<ul>
+<li>libpng: 6.07ms</li>
+<li>stb gcc -O0: 19.17ms</li>
+<li>stb clang -O0: 19.96ms</li>
+<li>stb gcc -O2: 6.53ms</li>
+<li>stb clang -O2: 7.00ms</li>
+<li>stb gcc -O4: 6.22ms</li>
+<li>lodepng gcc -O0: 31.25ms</li>
+<li>lodepng gcc -O2: 10.81ms</li>
+</ul>
+<p>So while for the huge 24bit RGB png stb_image took about 33-40% longer to decode than libpng, for the small 32bit RGBA png it was <em>less than 10% longer</em> (in the optimized cases).</p>
+<p>And some more for a 512x512 RGB picture <em>without</em> alpha-channel:</p>
+<ul>
+<li>libpng: 5.00ms</li>
+<li>stb gcc -O2: 4.99ms</li>
+<li>stb gcc -O4: 4.69ms</li>
+</ul>
 <p>In this case stb_image even is a bit faster than libpng!</p>
 <h1 id="how-i-tested">How I tested:</h1>
-<p>I wrote a hacky test-program that loads an image file into a buffer and then measures how long it takes to decode that buffer 100 times with the tested codec and divided the result by 100, see <!-- raw HTML omitted -->imgLoadBench.c<!-- raw HTML omitted --><br>
+<p>I wrote a hacky test-program that loads an image file into a buffer and then measures how long it takes to decode that buffer 100 times with the tested codec and divided the result by 100, see <a href="https://gist.github.com/DanielGibson/e0828acfc90f619198cb">imgLoadBench.c</a><br>
 I ran that 3 times in a row and used the best result.</p>
 <p>I used a random 4000x3000pixel JPG (about 2.6MB) image taken with a digital camera.<br>
 For the png tests I converted it to png (about 16MB) with Gimp, using highest compression level (9).<br>
 (I also tried compression level 1 - encoding with that is faster and the resulting file is slightly bigger, but decoding actually takes longer.)</p>
-<p>I used <!-- raw HTML omitted -->clang 3.6<!-- raw HTML omitted --> 1:3.6.1~svn232753-1~exp1 from <a href="http://llvm.org/apt/trusty/">http://llvm.org/apt/trusty/</a> llvm-toolchain-trusty-3.6/main and Ubuntu 14.04&rsquo;s <!-- raw HTML omitted -->gcc 4.8<!-- raw HTML omitted --> 4.8.2-19ubuntu1.<br>
+<p>I used <strong>clang 3.6</strong> 1:3.6.1~svn232753-1~exp1 from <a href="http://llvm.org/apt/trusty/">http://llvm.org/apt/trusty/</a> llvm-toolchain-trusty-3.6/main and Ubuntu 14.04&rsquo;s <strong>gcc 4.8</strong> 4.8.2-19ubuntu1.<br>
 Tests were executed on a Intel Haswell i7-4771 system running Linux Mint 17.1 x86_64 with Kernel 3.16.0-29-lowlatency #39-Ubuntu SMP PREEMPT.</p>
 <p>Yeah, all this is not highly scientific, but should give a rough idea of the performance of stb_image and lodepng compared to the &ldquo;normal&rdquo; libjpeg, libjpeg-turbo and libpng.</p>
-<p>stb_image: <!-- raw HTML omitted -->Sean Barrett&rsquo;s stb_ libs on Github<!-- raw HTML omitted --><br>
-lodepng: <!-- raw HTML omitted -->Lode Vandevenne&rsquo;s LodePNG<!-- raw HTML omitted --><br>
-libjpeg-turbo: <!-- raw HTML omitted -->Project Homepage<!-- raw HTML omitted --><br>
-libpng: <!-- raw HTML omitted -->Project Homepage<!-- raw HTML omitted --><br>
-RBDoom3BFG: <!-- raw HTML omitted -->I stole the code to use libpng and libjpeg for comparison there<!-- raw HTML omitted --></p>
-<p>imgLoadBench.c: <!-- raw HTML omitted -->My crappy test program<!-- raw HTML omitted --></p>
+<p>stb_image: <a href="//github.com/nothings/stb">Sean Barrett&rsquo;s stb_ libs on Github</a><br>
+lodepng: <a href="http://lodev.org/lodepng/">Lode Vandevenne&rsquo;s LodePNG</a><br>
+libjpeg-turbo: <a href="http://www.libjpeg-turbo.org/">Project Homepage</a><br>
+libpng: <a href="http://www.libpng.org/pub/png/libpng.html">Project Homepage</a><br>
+RBDoom3BFG: <a href="https://github.com/RobertBeckebans/RBDOOM-3-BFG/">I stole the code to use libpng and libjpeg for comparison there</a></p>
+<p>imgLoadBench.c: <a href="https://gist.github.com/DanielGibson/e0828acfc90f619198cb">My crappy test program</a></p>
     </div>
   </article>
 

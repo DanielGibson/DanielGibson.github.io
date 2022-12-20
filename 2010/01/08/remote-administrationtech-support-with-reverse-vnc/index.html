@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Hugo 0.92.2" />
+<meta name="generator" content="Hugo 0.108.0">
 
 
 <title>Remote administration/tech-support with (reverse) VNC - ./gibson.sh --blog</title>
@@ -60,40 +60,40 @@ I&rsquo;ll describe how to set up a normal and reverse VNC-connections using x11
     
 
     <div class="article-content">
-      <p>Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, <!-- raw HTML omitted -->VNC<!-- raw HTML omitted --> is my weapon of choice, if SSH isn&rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &hellip;).</p>
-<p>I&rsquo;ll describe how to set up a normal and reverse VNC-connections using <!-- raw HTML omitted -->x11vnc<!-- raw HTML omitted --> and <!-- raw HTML omitted -->TightVNC<!-- raw HTML omitted -->.</p>
+      <p>Like most computer-savvy people I am frequently asked to give tech support to my family etc. Because telling them on the telephone what to do is a major pain in the ass, <a title="Virtual Network Computing" href="http://en.wikipedia.org/wiki/VNC">VNC</a> is my weapon of choice, if SSH isn&rsquo;t sufficiant (got to show how something is done, SSH impossible/hard because the other side uses Windows or is behind a NAT, &hellip;).</p>
+<p>I&rsquo;ll describe how to set up a normal and reverse VNC-connections using <a title="home of x11vnc" href="http://www.karlrunge.com/x11vnc/">x11vnc</a> and <a title="TightVNC homepage" href="http://www.tightvnc.com/">TightVNC</a>.</p>
 <p>We have 2 computers: Your (the helpers) system - let&rsquo;s call it &ldquo;the client&rdquo; from now on- using a VNC Client, and the helpee&rsquo;s (does this word even exist?) system, running a VNC server - we&rsquo;ll call it &ldquo;the server&rdquo;.</p>
-<p>If the server runs Linux, i&rsquo;d recommend installing <!-- raw HTML omitted -->x11vnc<!-- raw HTML omitted -->, if it runs Windows, tell the helpee to install <!-- raw HTML omitted -->TightVNC<!-- raw HTML omitted -->.</p>
+<p>If the server runs Linux, i&rsquo;d recommend installing <a title="home of x11vnc" href="http://www.karlrunge.com/x11vnc/">x11vnc</a>, if it runs Windows, tell the helpee to install <a title="TightVNC homepage" href="http://www.tightvnc.com/">TightVNC</a>.</p>
 <p>You need to install a VNC-client on the client system, for example the TightVNC viewer (package &ldquo;xtightvncviewer&rdquo; on debian/Ubuntu).</p>
-<p><!-- raw HTML omitted -->Please note:<!-- raw HTML omitted --> This HOWTO describes simple <!-- raw HTML omitted -->unencrypted<!-- raw HTML omitted --> VNC sessions. If you want to encrypt the session you should use SSH tunneling or SSL - see your VNC softwares documentation on how to do this.</p>
+<p><em>Please note:</em> This HOWTO describes simple <strong>unencrypted</strong> VNC sessions. If you want to encrypt the session you should use SSH tunneling or SSL - see your VNC softwares documentation on how to do this.</p>
 <h1 id="first-case-normal-vnc">First Case: Normal VNC</h1>
 <p>For normal VNC operation the server needs to be accessible via a public IP (or it needs to be in the same private subnet (LAN) as the client). This is normally the case, if the VNC server dials directly into the internet (-&gt; doesn&rsquo;t use a &ldquo;router&rdquo;) or if the according port is forwarded by the router to the VNC server. You also sometimes get public IPs in university (W)LANs.</p>
 <p>If the server doesn&rsquo;t have a public IP, configure the router that connects the LAN with the server to the internet to forward port 5900 TCP to the servers IP. Consult your routers manual on how to do this.</p>
 <p>If you can&rsquo;t or don&rsquo;t want to configure the helpee&rsquo;s router, use reverse VNC (see below).</p>
 <p>Tell the helpee to start the VNC server software. For x11vnc the appropriate command is</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<pre><code>x11vnc -display :0 -passwd s0mep4ssword
+</code></pre>
 <p>This will start x11vnc on display :0 (standard display) and on connection you&rsquo;ll be asked to enter a password, which is &ldquo;s0mep4ssword&rdquo; in this case. This not super secure, but should prevent basic automated attacks, especially if x11vnc only runs if needed.
 Just tell the helpee to enter this into the terminal or create a clickable shortcut (on the desktop or in some menu&hellip;) that executes this command.</p>
-<p>The TightVNC server on windows is started by clicking <!-- raw HTML omitted -->Start-&gt;Programs-&gt;TightVNC-&gt;Launch TightVNC Server<!-- raw HTML omitted -->. The helpee will be asked to set a password on the first TightVNC start. For further information see <!-- raw HTML omitted -->the official documentation<!-- raw HTML omitted -->.</p>
-<p>The helper (you) needs the helpee&rsquo;s public IP (or a <!-- raw HTML omitted -->dyndns<!-- raw HTML omitted -->-address or something similar) to connect. Tell him to visit <!-- raw HTML omitted -->this<!-- raw HTML omitted --> or <!-- raw HTML omitted -->this<!-- raw HTML omitted --> page and tell you the fat numbers ;-)</p>
+<p>The TightVNC server on windows is started by clicking <strong>Start-&gt;Programs-&gt;TightVNC-&gt;Launch TightVNC Server</strong>. The helpee will be asked to set a password on the first TightVNC start. For further information see <a href="http://www.tightvnc.com/winst.php#start_serv">the official documentation</a>.</p>
+<p>The helper (you) needs the helpee&rsquo;s public IP (or a <a title="DynDNS homepage" href="http://www.dyndns.org">dyndns</a>-address or something similar) to connect. Tell him to visit <a title="What's my IP" href="http://www.whatsmyip.org/">this</a> or <a title="heise My-IP service" href="http://www.heise.de/netze/tools/ip/">this</a> page and tell you the fat numbers ;-)</p>
 <p>Connect with<br>
 <code>vncviewer -compresslevel 9 123.45.67.89</code><br>
 (replace 123.45.67.89 with the correct IP). Enter the password (&ldquo;s0mep4ssword&rdquo; in my example) in the terminal when asked for it.
 &ldquo;-compresslevel 9&rdquo; sets maximal compression for faster screen updates. It will look a bit crappy, but in my experience everything is still readable and usable.
-If you&rsquo;re using Windows (boo!), click &ldquo;<!-- raw HTML omitted -->Start-&gt;Programs-&gt;TightVNC-&gt;TightVNC     Viewer<!-- raw HTML omitted -->&quot;; consult the <!-- raw HTML omitted -->TightVNC documentation<!-- raw HTML omitted --> for further information.</p>
+If you&rsquo;re using Windows (boo!), click &ldquo;<strong>Start-&gt;Programs-&gt;TightVNC-&gt;TightVNC     Viewer</strong>&rdquo;; consult the <a href="http://www.tightvnc.com/winst.php#start_view">TightVNC documentation</a> for further information.</p>
 <p>Now the helper should be able to see the helpee&rsquo;s desktop and do stuff. If the helper closes the vncviewer window, the connection is closed and the server (at least x11vnc) shuts down and needs to be restarted if the helper wants to connect again.</p>
 <h1 id="second-case-reverse-vnc">Second Case: Reverse VNC</h1>
 <p>Technically,  in this case the helper is the server and the helpee is the client. So you got to make sure the helpee can connect to your Machine. If your PC doesn&rsquo;t have a public IP (and is not in the same LAN as the helpees PC), i.e. is not directly connected to the internet, configure the router that connects the LAN with your PC to the internet to forward port 5500 TCP to your IP. As you&rsquo;re probably tech-savvy, you&rsquo;ll know how to do this. If you don&rsquo;t, consult your routers documentation.
 If you&rsquo;re in a LAN, but have no rights to change the routers configuration (for example in a university&rsquo;s (W)LAN), and you can&rsquo;t use normal VNC either, you&rsquo;re probably screwed. You could try some weird tunneling over a third PC/server with a public IP.. (ssh -L and ssh -R might be useful) but I&rsquo;m not going to discuss this (hopefully rare) case now.</p>
 <p>After making sure that your (the helpers) PC&rsquo;s port 5500 TCP is reachable from the internet, you have to start the vncviewer in listen mode:</p>
-<p><!-- raw HTML omitted -->vncviewer -compresslevel 9 -listen<!-- raw HTML omitted --></p>
-<p>If you&rsquo;re using Windows,  just start the TightVNC viewer (<!-- raw HTML omitted -->Start-&gt;Programs-&gt;TightVNC-&gt;TightVNC     Viewer)<!-- raw HTML omitted --> and click &ldquo;<!-- raw HTML omitted -->Listening Mode<!-- raw HTML omitted -->&rdquo;.
+<p><code>vncviewer -compresslevel 9 -listen</code></p>
+<p>If you&rsquo;re using Windows,  just start the TightVNC viewer (<strong>Start-&gt;Programs-&gt;TightVNC-&gt;TightVNC     Viewer)</strong> and click &ldquo;<strong>Listening Mode</strong>&rdquo;.
 Now the VNC viewer on your PC ist listening for incoming connections from a VNC-server (yes that sounds weird, but that&rsquo;s why it&rsquo;s called &ldquo;reverse VNC&rdquo;).
 The helpee now has to make his VNC server connect to your VNC viewer. If he&rsquo;s using x11vnc, it&rsquo;s as simple as:</p>
-<p><!-- raw HTML omitted -->x11vnc -display :0 -connect foobar.dyndns.org<!-- raw HTML omitted --></p>
-<p>foobar.dyndns.org should be your <!-- raw HTML omitted -->dyndns<!-- raw HTML omitted --> adress, pointing to your public IP. If you don&rsquo;t (want to) use dyndns, just replace &ldquo;foobar.dyndns.org&rdquo; with your public IP (&ldquo;12.34.56.78&rdquo; or whatever, you may look it up at <!-- raw HTML omitted -->this<!-- raw HTML omitted --> or <!-- raw HTML omitted -->this<!-- raw HTML omitted --> page). If you&rsquo;re using dyndns (or something similar) you can also create a handy shortcut executing this line on potential helpees' desktops.</p>
-<p>If the helpee is using Windows, tell him to start the TightVNC server, maybe set a password when asked to, right-click the TightVNC icon next to the clock, click &ldquo;Add New Client&rdquo; and enter your dyndns-adress or public IP. Consult the <!-- raw HTML omitted -->TightVNC documentation<!-- raw HTML omitted --> for further information.</p>
+<p><code>x11vnc -display :0 -connect foobar.dyndns.org</code></p>
+<p>foobar.dyndns.org should be your <a title="DynDNS homepage" href="http://www.dyndns.org/">dyndns</a> adress, pointing to your public IP. If you don&rsquo;t (want to) use dyndns, just replace &ldquo;foobar.dyndns.org&rdquo; with your public IP (&ldquo;12.34.56.78&rdquo; or whatever, you may look it up at <a title="What's my IP" href="http://www.whatsmyip.org/">this</a> or <a title="heise My-IP service" href="http://www.heise.de/netze/tools/ip/">this</a> page). If you&rsquo;re using dyndns (or something similar) you can also create a handy shortcut executing this line on potential helpees&rsquo; desktops.</p>
+<p>If the helpee is using Windows, tell him to start the TightVNC server, maybe set a password when asked to, right-click the TightVNC icon next to the clock, click &ldquo;Add New Client&rdquo; and enter your dyndns-adress or public IP. Consult the <a href="http://www.tightvnc.com/winst.php#start_view">TightVNC documentation</a> for further information.</p>
 <p>Right after the helpee has sucessfully made his VNC server connect to your listening VNC viewer, you should get the familiar VNC window with his desktop on your screen.</p>
 <p>Good luck.</p>
     </div>
