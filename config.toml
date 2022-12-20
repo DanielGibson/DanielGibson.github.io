@@ -24,8 +24,9 @@ disableKinds = ["taxonomy", "taxonomyTerm", "section", "404"]
     autoHeadingID = true
     # defaults to github, but blackfriday is what old hugo used and I want to keep anchor-links compatible
     autoHeadingIDType = 'blackfriday'
-
-
+  [markup.goldmark.renderer]
+    # allow inline HTML
+    unsafe = true
 
 [params]
   mainSections = ["post"]
