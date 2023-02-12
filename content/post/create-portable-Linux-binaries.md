@@ -65,6 +65,18 @@ symbol versioning on Linux (last section of the article).
     This can also affect libraries built with some g++ vs clang++ versions;
     clang introduced support for ABI tags in [version 3.9](http://releases.llvm.org/3.9.0/tools/clang/docs/ReleaseNotes.html#id4).
 
+## *Update 2023-03-12:* Why not musl?
+
+A common suggestion for this kind of problem is "just link the [musl libc](https://www.musl-libc.org/) (and all other libs) statically!".
+
+That doesn't work, at least for graphical programs that need to use libraries from the system, like libGL or libX11.  
+The reason is that a program that uses musl (instead of glibc) *can't use libraries that use glibc* - and mainstream distributions *do* use glibc, and thus so do their versions of libGL, libX11 etc.
+*(No, you can't link libGL statically, it's part of the graphics driver and thus system-specific. Or it's a dispatcher that uses another dynamic lib that's part of the graphics driver, which in the end is the same..)*
+
+So musl is a great solution for standalone commandline tools (and maybe server processes running in the background), as long as you don't need *any* kind of system libs that can't be linked statically as well, but it's not for portable binaries of games or any other kind of graphical applications.
+
+See the previous section for why linking libstdc++ (or SDL, OpenAL or cURL) statically is not a great idea either. Though it *might* be possible to compile with clang++ and explicitly statically link its libc++, instead of libstdc++, to avoid collisions with system libs that use (a potentially different version of) libstdc++. I haven't tried that, though.
+
 # Basic system libraries
 
 The most basic system libs you can hardly avoid are:
@@ -80,7 +92,7 @@ The most basic system libs you can hardly avoid are:
 To work with all (or at least most) Linux distributions released in the last years,
 you need to link against reasonably old versions of those libs.  
 The easiest way to do that is by building on an old distribution (in a chroot or VM).
-Now (in 2017) using **Debian 7 "Wheezy"** (old-oldstable from 2013) should
+Now (**in 2017**) using **Debian 7 "Wheezy"** (old-oldstable from 2013) should
 do the trick, it comes with glibc 2.13 and GCC 4.7.2 with corresponding libgcc 4.7.2
 and libstdc++ 4.7.2 (GLIBCXX_3.4.17, CXXABI_1.3.6).  
 Wheezy is lacking **SDL2**, but it's a good idea to build the latest version yourself
