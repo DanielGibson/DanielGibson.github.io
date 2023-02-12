@@ -75,7 +75,11 @@ symbol versioning on Linux (last section of the article)." />
       <b>Table of Contents:</b>
       <nav id="TableOfContents">
   <ul>
-    <li><a href="#some-general-suggestions">Some general suggestions</a></li>
+    <li><a href="#some-general-suggestions">Some general suggestions</a>
+      <ul>
+        <li><a href="#update-2023-03-12-why-not-musl"><em>Update 2023-03-12:</em> Why not musl?</a></li>
+      </ul>
+    </li>
     <li><a href="#basic-system-libraries">Basic system libraries</a></li>
     <li><a href="#but-what-if-i-need-a-more-recent-compiler">But what if I need a (more) recent compiler?</a></li>
     <li><a href="#a-wrapper-that-selectively-overrides-system-libs">A wrapper that selectively overrides system libs</a>
@@ -173,6 +177,13 @@ clang introduced support for ABI tags in <a href="http://releases.llvm.org/3.9.0
 </ul>
 </li>
 </ul>
+<h2 id="update-2023-03-12-why-not-musl"><em>Update 2023-03-12:</em> Why not musl?</h2>
+<p>A common suggestion for this kind of problem is &ldquo;just link the <a href="https://www.musl-libc.org/">musl libc</a> (and all other libs) statically!&rdquo;.</p>
+<p>That doesn&rsquo;t work, at least for graphical programs that need to use libraries from the system, like libGL or libX11.<br>
+The reason is that a program that uses musl (instead of glibc) <em>can&rsquo;t use libraries that use glibc</em> - and mainstream distributions <em>do</em> use glibc, and thus so do their versions of libGL, libX11 etc.
+<em>(No, you can&rsquo;t link libGL statically, it&rsquo;s part of the graphics driver and thus system-specific. Or it&rsquo;s a dispatcher that uses another dynamic lib that&rsquo;s part of the graphics driver, which in the end is the same..)</em></p>
+<p>So musl is a great solution for standalone commandline tools (and maybe server processes running in the background), as long as you don&rsquo;t need <em>any</em> kind of system libs that can&rsquo;t be linked statically as well, but it&rsquo;s not for portable binaries of games or any other kind of graphical applications.</p>
+<p>See the previous section for why linking libstdc++ (or SDL, OpenAL or cURL) statically is not a great idea either. Though it <em>might</em> be possible to compile with clang++ and explicitly statically link its libc++, instead of libstdc++, to avoid collisions with system libs that use (a potentially different version of) libstdc++. I haven&rsquo;t tried that, though.</p>
 <h1 id="basic-system-libraries">Basic system libraries</h1>
 <p>The most basic system libs you can hardly avoid are:</p>
 <ul>
@@ -187,7 +198,7 @@ link against it.</li>
 <p>To work with all (or at least most) Linux distributions released in the last years,
 you need to link against reasonably old versions of those libs.<br>
 The easiest way to do that is by building on an old distribution (in a chroot or VM).
-Now (in 2017) using <strong>Debian 7 &ldquo;Wheezy&rdquo;</strong> (old-oldstable from 2013) should
+Now (<strong>in 2017</strong>) using <strong>Debian 7 &ldquo;Wheezy&rdquo;</strong> (old-oldstable from 2013) should
 do the trick, it comes with glibc 2.13 and GCC 4.7.2 with corresponding libgcc 4.7.2
 and libstdc++ 4.7.2 (GLIBCXX_3.4.17, CXXABI_1.3.6).<br>
 Wheezy is lacking <strong>SDL2</strong>, but it&rsquo;s a good idea to build the latest version yourself
