@@ -33,10 +33,13 @@ a {
 }
 
 code {
-  background: #f8f8f8;
+  background: #f0f0f0;
+  color: #222;
   font-family: 'Source Code Pro', monospace;
   font-size: 16px;
   hyphens: none; /* breaking inline-code sections with hyphens looks bad */
+  padding: 2px 3px 2px 3px;
+  border-radius: 3px;
   /*font-size: 100%;*/
 }
 
@@ -108,7 +111,7 @@ code {
   font-size: 16px;
   /*font-size: 100%;*/
   line-height: 1.7;
-  color: #555;
+  color: #444;
 }
 
 .article-title {
@@ -442,6 +445,9 @@ code {
  background-color: #f8f8f8 ;
  border-radius: 6px; /* DG: added this */
 }
+/* DG: must specify background-color for .chrome code, otherwise the default code style
+       for normal text overwrites the chroma background color */
+.chroma code { background-color: #f8f8f8 }
 /* Other */ .chroma .x { color: #000000 }
 /* Error */ .chroma .err { color: #a40000 }
 /* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
