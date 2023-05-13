@@ -1,6 +1,6 @@
 +++
-date = "2023-05-11T20:20:20+02:00"
-title = "How to set up a Linux server to host Forgejo (gitea-fork) behind a WireGuard VPN"
+date = "2023-05-16T20:20:20+02:00"
+title = "How to set up a Linux server to host git with LFS behind a VPN"
 slug = "vps-with-wireguard-and-forgejo"
 tags = [ "linux", "wireguard", "VPN", "git", "LFS", "gamedev", "server", "VPS" ]
 draft = true
@@ -8,11 +8,13 @@ toc = true
 # ghcommentid = 13
 +++
 
-# How to set up a Linux server to host Forgejo (gitea-fork) behind a WireGuard VPN
+# How to set up a Linux server to host git with LFS behind a VPN
 
-This HowTo explains how to set up a Linux server that runs SSH, WireGuard, Forgejo (a web-based
-git forge, kinda like self-hosted Github) and a minimal DNS server so we can have an internal domain
-for pretty URLs. I'll also set up automated backups and some basic self-monitoring.  
+This Howto explains how to set up a Linux server that runs [SSH](https://www.openssh.com/),
+[WireGuard VPN](https://www.wireguard.com/), [Forgejo](https://forgejo.org/) (a fork of
+[Gitea](https://gitea.io), a web-based git forge, kinda like self-hosted Github) and a minimal
+[DNS server](https://thekelleys.org.uk/dnsmasq/doc.html) so we can have an internal domain for pretty URLs.
+We'll also set up automated backups and some basic self-monitoring.  
 To follow it **you'll need (very) basic Linux commandline knowledge**, i.e. you should be able to navigate
 the file system in a terminal, use SSH and edit textfiles with a terminal-based text editor (like nano,
 joe or vim, whatever you prefer).  
@@ -20,7 +22,7 @@ It will assume that you're using **Ubuntu Server 22.04**, but it should be the s
 (systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
 You'll also need full **root privileges** on the system.
 
-**Note:** This article often requires you to enter commands in the shell. I will the following convention:
+**Note:** You'll often need to enter commands in the shell. The following convention will be used:
 
 `$ some_command --some argument`  
 means: Enter "some_command --some argument" (without quotes) in a Linux terminal, _as **normal user**_.
@@ -32,12 +34,12 @@ for each command).
 
 ## Motivation
 
-*You can skip this section if you're already convinced that this HowTo is relevant for you ;-)*
+*You can skip this section if you're already convinced that this Howto is relevant for you ;-)*
 
-We needed a git server with a web frontend. It should be low-maintenance, because we're a small
-company that doesn't have a dedicated admin who could regularly spend time on keeping the server
-up-to-date, especially when running external software packages where updates might require more
-steps than a `sudo apt update && sudo apt upgrade`.
+[We](https://www.masterbrainbytes.com/) needed a git server with a web frontend.
+It should be low-maintenance, because we're a small company that doesn't have a dedicated admin who
+could regularly spend time on keeping the server up-to-date, especially when running external
+software packages where updates might require more steps than a `sudo apt update && sudo apt upgrade`.
 
 To be honest, we *would* probably just pay a service like Github or Gitlab or whatever, if they had
 offers that meet our requirements at a reasonable price - but we create games (and related products),
@@ -45,10 +47,10 @@ which means we don't only have code, but also *lots* of binary data (game assets
 even relatively small projects can easily have checkout sizes (*without history!*) of dozens of GB,
 bigger projects often use several hundreds of GB or more. Nowadays Git supports that reasonably well with
 [Git Large File Storage (LFS)](https://git-lfs.com/), and while several Git hosters generally support LFS,
-prices for data are a bit high: Github sells "data packs" that cost $5/month for 50GB of data and 50GB
-of traffic, so if you have a 40GB repo you can only do one full clone per month or you need a second
-data pack.. this doesn't scale that well. Gitlab's price is even more ridiculous: $60/month for packs
-of 10GB of storage and 20GB of traffic...  
+prices for data are a bit high: Gitlab's takes $60/month for packs of 10GB of storage and 20GB
+of traffic.. Githubs prices are a bit less ridiculous with "data packs" that cost $5/month
+for 50GB of data and 50GB of traffic, but if you have a 40GB repo you'll already need a second
+data pack if you do more than one full clone per month.. this doesn't scale that well.  
 So self-hosting is a lot more attractive, as you can get a VPS (Virtual Private Server,
 basically a VM running "in the cloud") with several hundreds of GB storage for < €20/month,
 and S3-style "object storage" (that can be used for Git LFS data) for about €10 per 1TB per month[^hoster].
@@ -59,7 +61,7 @@ dependencies (it needs a database, but supports [sqlite](https://sqlite.org/inde
 should be more than adequate for our needs). It can store the LFS data directly in the filesystem
 on the servers disk, but also supports storing it in S3-compatible (external) object storage.
 
-We work decentralized, most people in their own home, so the server needs to be accessible over the
+We work decentralized, most people at home, so the server needs to be accessible over the
 internet.  
 However, to keep **maintenance** low (while maintaining reasonable security), we "hide" Forgejo
 behind a [Wireguard](https://www.wireguard.com/) VPN, so:  
@@ -70,7 +72,8 @@ behind a [Wireguard](https://www.wireguard.com/) VPN, so:
     so I don't have to worry about bruteforcing attacks on the user passwords)*.
 2. => We don't have to worry that Forgejo might have a vulnerability that allows unauthenticated users
    to run code (Gitlab [had such an issue a few years back](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22205)),
-   because only our team can access it at all, so if we forget to update Forgejo for a while, we'll still be safe.
+   because only our team can access it at all, so if we forget to update Forgejo for a while,
+   we'll still be safe[^security].
 3. We can use plain HTTP (instead of HTTPS), because all connections to Forgejo go through the
    encrypted Wireguard tunnel, so we don't have to mess around with SSL certificates.
 
@@ -93,7 +96,9 @@ Here you've got two options: Using your default SSH key, or creating one specifi
 Check if you already have a default SSH public key, it's in `$HOME/.ssh/id_rsa.pub` (on Windows
 `C:\Users\YourUserName\.ssh\id_rsa.pub`, on Linux something like `/home/yourusername/.ssh/id_rsa.pub`).
 
-If not you can create it by running `ssh-keygen` in a terminal. Confirm that you want to save
+If not, you can create it by running  
+`$ ssh-keygen`  
+in a terminal. Confirm that you want to save
 it in the default place (which should be the one mentioned above) and enter a password that will
 be used to *locally* decrypt the key, for extra security.
 
@@ -160,15 +165,23 @@ to get the WireGuard kernel module (it's included in Linux 5.6 and newer).
 
 ### Basic setup of the server
 
-You will need a private and corresponding public key for WireGuard for the server (and also 
+> **NOTE:** This is a quite basic configuration of WireGuard, suitable for this particular usecase.
+> It fully supports IPv6 (but here having IPv4 addresses in the VPN is sufficient) and
+> can be configured in other ways than the classic "one VPN server with several clients" scenario
+> used here.  
+> If you've already got a wireguard connection `wg0` configured, just give it another name
+> like `wg1`, so whenever this Howto mentions `wg0`, use `wg1` instead.
+
+Wireguard requires a private and corresponding public key for the server (and also 
 for each client, we'll get to that later).  
 Create a directory that only root can access to store them in:  
 `# mkdir /root/wireguard && chmod 700 /root/wireguard`  
 `# cd /root/wireguard && umask 077`
 
-Now use WireGuards `wg` tool to generate private key (stored it in a file called `wg_privatekey.txt`):  
+Now use WireGuards `wg` tool with the `genkey` command to generate a new private key
+(stored it in a file called `wg_privatekey.txt`):  
 `# wg genkey > wg_privatekey.txt`  
-and to generate the public key (stored in `wg_publickey.txt`) from the private key:  
+and the `pubkey` command to generate the public key (`wg_publickey.txt`) from the private key:  
 `# cat wg_privatekey.txt | wg pubkey > wg_publickey.txt`
 
 The easiest way to set up a WireGuard network device (here it's called `wg0`) is creating a config
@@ -178,28 +191,36 @@ As root create a textfile at `/etc/wireguard/wg0.conf` with the following conten
 ```ini
 # configuration of this server (its IP in the VPN, what port to listen on etc)
 [Interface]
-# the IP the wireguard device will have in the VPN - you can use a different
-# one of course, but make sure it's a private IP and subnet that are unused
-# in the networks you're usually in
+# the private IP the server will have in the VPN and its subnet (e.g. /24)
 Address = 172.30.0.1/24
-# the UDP port wireguard will listen on - this is WireGuards default port
+# the UDP port wireguard will listen on - 51820 is WireGuards default port
 ListenPort = 51820
+# the servers private key
 # replace "YourPrivateKey" with the private key stored in wg_privatekey.txt
 PrivateKey = YourPrivateKey
 ```
 
-As mentioned in the comment, `Address` should have a
+> **NOTE:** In WireGuard configurations (and lots of other kinds of config files and scripts),
+> lines starting with `#` are comments. They're ignored by WireGuard and are meant to provide
+> information to humans reading those files. In this case that's you, or other people who might
+> want to modify your WireGuard configs later.
+
+Make sure it's only readable by root (it contains your private key, after all!):  
+`# chmod 600 /etc/wireguard/wg0.conf`
+
+**`Address`** should be a
 [private IPv4 address](https://en.wikipedia.org/wiki/Internet_Protocol_version_4#Private_networks)
 that doesn't conflict with your LAN/WIFI at home, in the office or wherever this is going to be used.
-`/24` at the end of the IP is the subnet mask of the network we're creating (equivalent to `255.255.255.0`),
-meaning we can have up to 254 different IPs in the VPN (in this case 172.30.0.1 to 172.30.0.254;
-172.30.0.0 and 172.30.0.255 are reserved); see [Wikipedia (Subnetwork)](https://en.wikipedia.org/wiki/Subnetwork)
-for details. Of course you could choose a different IP and subnetwork, including one that's bigger
-(like a /20), whatever suits your needs.
+`/24` at the end of the IP is the subnet mask of the network we're creating (equivalent to
+`255.255.255.0`), meaning we can have up to 254 different IPs in the VPN (in this case 172.30.0.1
+to 172.30.0.254; the first and last IPs - 172.30.0.0 and 172.30.0.255 in this example - have special
+meanings); see [Wikipedia (Subnetwork)](https://en.wikipedia.org/wiki/Subnetwork) for details.
+Of course you could choose a different IP and subnetwork, including one that's bigger (like a /20),
+whatever suits your needs.
 
 This is enough to get the wireguard network interface up:  
 `# wg-quick up wg0`  
-creates a WireGuard interface **wg0** based on the settings in /etc/wireguard/**wg0**.conf.
+creates a WireGuard interface **wg0** based on the settings in /etc/wireguard/**wg0**.conf.  
 You can verify that it worked with:  
 `# ip address show wg0`  
 the output should look like:  
@@ -214,7 +235,7 @@ the output should look like:
 That's a good start, but so far no one will be able to connect to this server, as no clients have
 been configured yet.
 
-### Configure a client, on the client
+### Configure a new client, on the client
 
 This must be done on the client machine that's supposed to connect to the server!
 
@@ -258,15 +279,14 @@ Create `/etc/wireguard/wg0.conf` on the client with the following contents:
 ```ini
 # settings for this interface 
 [Interface]
-# Replace "ThisClientsPrivateKey" with the private key you just
-# generated *on this client* (in /root/wireguard/wg_privatekey.txt)
+# this client's private key
 PrivateKey = ThisClientsPrivateKey
 # the IP address this client will use in the private network
 # must not be used by another client (or the server itself)
 Address = 172.30.0.3/24
 # configure a DNS server for a custom local domain
-# only relevant on Linux, will be explained in another chapter below
-#PostUp = resolvectl dns %i 172.30.0.1; resolvectl domain %i yourcompany.lan
+# only relevant on Linux, will be explained in a later chapter
+#PostUp = resolvectl dns %i 172.30.0.1; resolvectl domain %i example.lan
 
 # the server we're gonna connect to
 [Peer]
@@ -277,30 +297,43 @@ AllowedIPs = 172.30.0.0/24
 # public IP or domain of the server and the port it's listening on
 Endpoint = yourserver.example.net:51820
 ```
-
-* **PrivateKey** is the private key **of this client**. *(On Windows this line is generated automatically)*
-* **Address** must be an unused address in the private network you configured as "Address" on the server.
-  Note that it must have the same subnetmask, `/24` in my example.
-* **PostUp**  a command that's executed when the connection is established. Commented out for now
-  because it only makes sense after the DNS chapter below.
-* **PublicKey** (under `[Peer]`) is the public key of the server, if you followed the instructions
-  above it's saved in `/root/wireguard/wg_publickey.txt` **on the server**, so replace
-  "YourServersPublicKey" with the contents of that file.
-* **AllowedIPs** is the private network reachable through this tunnel, note that it uses `172.30.0.0`
-  as IP (the first IP of the subnet), which has the special meaning of representing that subnet.
-  Used by WireGuard to ensure that only IPs in that network are routed through the tunnel.
-* **EndPoint** configures the public address and port of the WireGuard server that the client connects to.
-  Replace "yourserver.example.net" (or "1.2.3.4") with the correct IP or domain.
+* The **`[Interface]`** section configures the WireGuard network interface of this client.
+  It has the following settings:
+    - **PrivateKey** is the private key **of this client**. On Windows this line is generated
+      automatically, on Linux use the private key you just generated (in 
+      `/root/wireguard/wg_privatekey.txt` on the client).
+    - **Address** must be an unused address in the private network you configured as "Address"
+      on the server.
+      **Note** that it must have the **same subnetmask**, `/24` in my example.
+    - **PostUp**  lets you set a command that's executed when the connection is established.
+      Not available on Windows (unless explicitly allowing it in the registry).  
+      Commented out for now because it only makes sense after the DNS chapter below.
+* The **`[Peer]`** section configures the server this client will connect to:
+    - **PublicKey** is the public key of the server, if you followed the instructions
+      above it's saved in `/root/wireguard/wg_publickey.txt` **on the server**, so replace
+      "YourServersPublicKey" with the contents of that file.
+    - **AllowedIPs** is the private network reachable through this tunnel, note that it uses
+      `172.30.0.0` as IP (the first IP of the subnet), which has the special meaning of representing
+      that subnet. Used by WireGuard to ensure that only IPs in that network are routed through
+      the tunnel.
+    - **EndPoint** configures the public address and port of the WireGuard server that the client
+      connects to. Replace "yourserver.example.net" (or "1.2.3.4") with the correct IP or domain.
 
 Now the VPN connection is configured on the client, but won't work just yet, because the server
 must be told about the new client first.
 
+> **NOTE:** As the administrator of the WireGuard server, it make sense to have a copy of a 
+> client configuration in a local text file, **without the PrivateKey**, as a template for future
+> clients - the only things that must be adjusted per client are the **PrivateKey** and the **Address**
+> (I also replace the last part of the  **Address** IP with `TODO` to make sure I don't forget to
+>  set a new IP when copy&pasting it to a new client configuration).
+
 ### Add new clients to the server configuration
 
-On the **server**, open `/etc/wireguard/wg0.conf` as root in an editor again.
+On the **server**, open `/etc/wireguard/wg0.conf` in a text editor (as root).
 
 At the end of the file, add the following (this example adds two clients, if you only created one,
-add only one `[Peers]` section):
+add only one `[Peer]` section):
 
 ```ini
 
@@ -334,11 +367,29 @@ PersistentKeepalive = 21
 
 ```
 
+**Note** that, unlike *on* the client, **AllowedIPs** must have **`/32`** as subnet mask
+(meaning all bits are masked, i.e. it only refers to this one IP), because only
+traffic for that IP should be routed to that particular client[^clientsubnet].
+
 Now you can tell WireGuard to reload the config:  
 `# wg syncconf wg0 <(wg-quick strip wg0)`
 
 .. and now the clients should be able to connect (on Windows by clicking `Activate` for the tunnel,
 on Linux with `# wg-quick up wg0`).
+
+If you're wondering what `PersistentKeepalive` is about, it makes sure that a (possibly empty)
+network packet is sent at least every 21 seconds to make sure that routers and firewalls between
+the client and the server don't assume the WireGuard connection is closed when there's no real
+traffic, see also [this more elaborate explanation](https://www.wireguard.com/quickstart/#nat-and-firewall-traversal-persistence).
+
+> **NOTE:** If you're wondering why the client and the server need to know **each others public keys**,
+> that's for security. When a WireGuard client connects to a WireGuard server, the server uses
+> its copies of the clients public keys to identify the client (make sure the client is allowed to
+> connect at all, and set client-specific options like their IP). The client on the other hand
+> uses its copy of the servers public key to make sure that the WireGuard server it's connecting to
+> really is the one it wants and not just an attacker who somehow redirected traffic meant for your
+> WireGuard server to a server controlled by the attacker. For the general concept, see also
+> [Wikipedia on Public-key cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography)
 
 ### Configure the server to automatically start the connection
 
@@ -361,9 +412,372 @@ If you modify wg0.conf, instead of calling `# wg syncconf wg0 <(wg-quick strip w
 you can now also run:  
 `# systemctl reload wg-quick@wg0.service`
 
-<br><br><br><br>
+> **NOTE:** You could do the same on Linux **clients** of course, if you want to start the `wg0` 
+> connection to the server automatically at boot.
 
-## TODO
+It might be a good idea to **reboot the server** and to make sure everything still works as expected
+after the boot.
+
+## A simple firewall with iptables and SSHGuard
+
+Before setting up any more services, let's create some simple firewall rules that block all
+connection attempts from the internet, except for ones to SSH and WireGuard.  
+Furthermore [SSHGuard](https://www.sshguard.net/) is used to block hosts that are attacking our
+SSH server.
+
+Install SSHGuard:  
+`# apt install sshguard`
+
+Edit `/etc/sshguard/sshguard.conf` (as root) and replace the `BACKEND=...` line near the top of
+the file with `BACKEND="/usr/libexec/sshguard/sshg-fw-ipset"` so SSHGuard stores the IPs that
+should be blocked in an [ipset](https://linux.die.net/man/8/ipset) that can be used in iptables rules.
+Save the file, then restart SSHGuard so it applies the changed config:  
+`# systemctl restart sshguard.service`
+
+> **NOTE:** *If your server hoster supports creating **snapshots** of the server, now would be
+> a good time to take one, so you can just restore it in case something goes wrong with the
+> firewall rules we're about to create and you lock yourself out*
+
+By default, Ubuntu ships the [UFW](https://help.ubuntu.com/community/UFW) firewall.
+This Howto uses plain [ip(6)tables](https://en.wikipedia.org/wiki/Iptables), so disable ufw[^why_iptables]:  
+`# systemctl stop ufw.service`  
+`# systemctl disable ufw.service`  
+
+I suggest putting the firewall scripts into `/root/scripts/`, so create that directory.
+
+Create one script called `firewall-flush.sh` in that directory that removes all firewall rules
+and allows all connections:
+
+```bash
+#!/bin/sh
+
+# This script resets ip(6)tables so all connections are allowed again
+
+echo "Flushing firewall (iptables) rules"
+
+# flush (remove) all existing rules
+iptables -F
+iptables -t nat -F
+iptables -t filter -F
+iptables -t mangle -F
+
+# set INPUT policy to ACCEPT again
+# (otherwise it'd remain at DROP and no connection would be possible)
+iptables -P INPUT ACCEPT
+
+echo ".. same for IPv6 (ip6tables) .."
+
+# flush all existing rules
+ip6tables -F
+ip6tables -t nat -F
+ip6tables -t filter -F
+ip6tables -t mangle -F
+
+# reset ip6tables INPUT policy to ACCEPT
+ip6tables -P INPUT ACCEPT
+```
+
+Then create a second script `firewall.sh` with the actual firewall rules
+(see the comments in the scripts for a little explanation of what it does).  
+**Note** that you might have to modify the `WAN` network device name. It's the network device
+connected to the internet - it might be called `eth0`, but names like `enp5s0` or similar
+are also common. Just adjust the `WAN="eth0"` line accordingly[^devname].  
+`firewall.sh`:
+
+```bash
+#!/bin/sh
+
+# Daniels little firewall script
+# Makes sure that we only accept SSH and wireguard connections
+# from the internet. All other services (like http for the git tool etc)
+# are only allowed via wireguard VPN (dev wg0)
+
+# the network device connected to the internet
+WAN="eth0"
+# the VPN device (for connections to services not publicly exposed)
+VPN="wg0"
+
+echo "Creating IPv4 (iptables) firewall rules.."
+
+# flush all existing rules
+iptables -F
+iptables -t nat -F
+iptables -t filter -F
+iptables -t mangle -F
+
+# by default (as policy) allow all output, but block all input
+# (further down we add exceptions that allow some kinds of connections)
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+
+# Now some rules for incoming connections are added, each with iptables -A,
+# so they'll be evaluated in this exact order
+
+# allow all connections on the loopback device lo (localhost, 127.x.x.x)
+iptables -A INPUT -i lo -j ACCEPT
+# if for some broken reason we get packets for the localhost net that are
+# are *not* from lo, drop them
+# (if they're from lo, the previous rule already accepted them)
+iptables -A INPUT -d 127.0.0.0/8 -j DROP
+
+# for now, allow all incoming connections from VPN (wireguard) peers
+# (*could* be limited to the ones actually needed: UDP 53 for dnsmasq,
+#  TCP 22 for ssh/git, TCP 80 for http)
+iptables -A INPUT -i $VPN -j ACCEPT
+
+# SSHGuard detects SSH bruteforce attacks and adds their source IPs 
+# to the sshguard4 (or sshguard6 for IPv6) ipsets. 
+# So block connections from IPs in the set:
+iptables -A INPUT -i $WAN -m set --match-set sshguard4 src -j DROP
+
+# generally allow traffic for established connections
+# (this includes replies to outgoing connections )
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# accept SSH connections on port 22 (unless sshguard has dropped them first)
+iptables -A INPUT -i $WAN -p tcp --dport 22 -j ACCEPT
+# also accept connections to the wireguard server
+iptables -A INPUT -i $WAN -p udp --dport 51820 -j ACCEPT
+
+# some useful ICMP messages that we should probably allow:
+iptables -A INPUT -p icmp --icmp-type fragmentation-needed -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT # ping
+
+echo ".. now doing (basically) the same for IPv6 (ip6tables)"
+
+# flush all existing rules
+ip6tables -F
+ip6tables -t nat -F
+ip6tables -t filter -F
+ip6tables -t mangle -F
+
+# by default (as policy) allow all output, but block all input
+# (further down we add exceptions that allow some kinds of connections)
+ip6tables -P INPUT DROP
+ip6tables -P OUTPUT ACCEPT
+
+# allow all connections on localhost (::1)
+ip6tables -A INPUT -i lo -j ACCEPT
+# .. but no connections that have a localhost address but are not on lo
+ip6tables -A INPUT -d ::1/128 -j DROP
+
+# Note: not creating any ip6tables rules for wireguard-internal traffic
+# (on wg0), as we only use IPv4 for that private internal network
+
+# drop all packets from IPv6 addresses that sshguard detected as attackers
+ip6tables -A INPUT -i $WAN -m set --match-set sshguard6 src -j DROP
+
+# generally allow traffic for established connections
+# (this includes replies to outgoing connections )
+ip6tables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# accept SSH connections on port 22 (unless sshguard has dropped them first)
+ip6tables -A INPUT -i $WAN -p tcp --dport 22 -j ACCEPT
+# also accept connections to the wireguard server
+ip6tables -A INPUT -i $WAN -p udp --dport 51820 -j ACCEPT
+
+# allow the ICMPv6 types required for IPv6
+# (and ping, it's always useful if you can ping your server)
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 1 -j ACCEPT # dest unreachable
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 2 -j ACCEPT # packet too big
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 3 -j ACCEPT # time exceeded
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 4 -j ACCEPT # parameter problem
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 128 -j ACCEPT # echo request (ping)
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 133 -j ACCEPT # router solicitation
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 134 -j ACCEPT # router advertisement
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 135 -j ACCEPT # neighbor solicitation
+ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 136 -j ACCEPT # neighbor advertisement
+```
+
+Make both scripts executable:  
+`# chmod 755 /root/scripts/firewall*`
+
+The safest way to test the firewall script is like this (executed in `/root/scripts/`):  
+`# ./firewall.sh ; sleep 60 ; ./firewall-flush.sh`  
+It will apply the firewall rules, then wait for 60 seconds, and then remove them again.
+So you have one minute to test the rules, and if something went wrong and the rules lock
+you out, you only have to wait for a minute and you can connect to the server again.
+
+You could test if you can:
+* ping the server - on your local machine run: `$ ping yourserver.example.com`  
+  (replace "yourserver.example.com" with your servers domain or IP)
+* create new SSH connections: `$ ssh -S none user@yourserver.example.com `  
+  (replace "user" with the username you're using to normally log in to that server)  
+  `-S none` makes sure that a new connection is established by disabling SSH connection sharing.
+* connect with WireGuard - if a connection is currently active disable it, then enable it again
+  (on Linux with `# wg-quick down wg0` and `# wg-quick up wg0`), then try to ping your server
+  through wireguard (`$ ping 172.30.0.1`)
+
+(make sure the rules are still active and haven't been flushed yet; you could of course sleep for
+longer than a minute, e.g. `sleep 300` for five minutes)
+
+You show display the current iptables rules for IPv4 by entering:  
+`# iptables-save`  
+and for IPv6:  
+`# ip6tables-save`
+
+(you could also use `iptables -L -v` or `ip6tables -L -v` if you find that output more readable)
+
+If this all works, create a systemd service to ensure that the firewall script is automatically
+run on boot.
+
+Create a file `/etc/systemd/system/firewall.service` with the following contents:  
+
+```systemd
+## Systemd service file for Daniels little firewall script
+## makes sure that the firewall (iptables) rules are set on boot
+[Unit]
+Description=Firewall
+Requires=network.target
+After=network.target
+ 
+[Service]
+User=root
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/root/scripts/firewall.sh
+ExecStop=/root/scripts/firewall-flush.sh
+ 
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start the firewall service:  
+`# systemctl enable firewall.service`  
+`# systemctl start firewall.service` 
+
+Check with `# iptables-save` if the iptables rules have been created, reboot, make sure you still get
+on the server (and the iptables rules are still/again there).
+
+*By the way:* If it takes a while after boot until WireGuard is started, the systemd `network-online.target`
+might be hanging (the wg-quick service waits for that). You can check this by executing  
+`# systemctl status systemd-networkd-wait-online.service`  
+If the output says something about a timeout (instead of "Finished Wait for Network to be Configured."),
+execute  
+`# networkctl`  
+If the state of a device is "configur*ing*" instead of "configur*ed*" or "unmanaged", that explains
+why `systemd-networkd-wait-online.service` didn't succeed (and then gave up after a timeout so
+services that wait for it at least start *eventually*).  
+At least on our server the problem was that for some reason systemd's *networkd* doesn't properly
+finish configuring a device if **IPv6 is disabled**, as it is the default on a Contabo VPS. 
+Contabo provides a command that can be executed to enable IPv6 *(but this is Contabo-specific, if
+other hosters also disable IPv6 by default and you run into the same problem, refer to their documentation!):*  
+`# enable_ipv6`
+
+## Setting up dnsmasq as DNS server for a local domain
+
+This step will set up [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html) for the local
+`example.lan` domain, so Forgejo will be reachable (in the VPN) under `http://git.example.lan`.
+
+This isn't *strictly* needed, at least if you only host one http service on the server (or use different
+ports for different services) - then you could access them with `http://172.30.0.1` or
+`http://172.30.0.1:3000` - but it's definitely nice to have.
+
+Of course you can use a different domain, like yourcompany.lan, but I think that using the nonexistant
+.lan top-level-domain is a good idea for this purpose[^dotlan]. Alternatively you could use a subdomain of
+a real domain you have, like vpn.yourcompany.com (and then maybe git.vpn.yourcompany.com), but to
+be honest I'm not completely sure how that would be set up properly.
+
+We'll install  and configure it to only listen
+on wg0 and to answer queries for `*.example.lan`.
+
+Install the dnsmasq package:  
+`# apt install dnsmasq`
+
+Stop its systemd service, as its standard configuration clashes with systemd-resolved (and is not
+what we need anyway):  
+`# systemctl stop dnsmasq.service`  
+
+> **NOTE:** If you're already using dnsmasq on your server, or want to use it for something else
+> as well, you can create alternative instance configurations as described in the
+> [systemd howto](https://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=blob;f=debian/systemd_howto;hb=HEAD)
+> included in the dnsmasq debian/Ubuntu package (which relies on the dnsmasq systemd service as
+> defined in that package) to run multiple instances of dnsmasq at once.
+> For the sake of simplicity, this Howto assumes that's not needed and uses the standard config.
+
+As root, edit `/etc/default/dnsmasq`  
+* Add the line `DOMAIN_SUFFIX="example.lan"` (or "yourcompany.lan" or whatever you want to use);
+  make sure it's the only not commented-out line that sets DOMAIN_SUFFIX
+* Uncomment the `IGNORE_RESOLVCONF=yes` line (so it's in there **without** a `#` before it)  
+* Uncomment (or add) the `DNSMASQ_EXCEPT="lo"` line to ensure that dnsmasq will not be used as the
+  systems default resolver.
+
+Save the file and now edit `/etc/dnsmasq.conf` - in its initial states, all lines should be commented
+out (begin with `#`).
+
+The following lines should end up in dnsmasq.conf:
+
+```cfg
+# answer requests to *.example.lan from /etc/hosts
+local=/example.lan/
+# only listen on the wireguard interface
+interface=wg0
+# only provide DNS, no DHCP
+no-dhcp-interface=wg0
+# This option (only available on Linux AFAIK) will make sure that:
+# 1. like with bind-interfaces, dnsmasq only binds to wg0 (instead of
+#    binding to the wildcard address on all devices and then only
+#    replying to requests on the requested device)
+# 2. this works even with interfaces that might dynamically appear
+#    and disappear, like VPN devices
+bind-dynamic
+# this (and the next option) expands simple hosts like "horst"
+# from /etc/hosts to "horst.example.lan"
+expand-hosts
+domain=example.lan
+```
+
+*(You could also delete or rename `/etc/wireguard.conf`and create a fresh one that only contains
+the lines shown above)*
+
+Next edit `/etc/hosts`. dnsmasq uses hosts configured in that file to answer DNS requests.
+Add the lines
+
+```text 
+172.30.0.1      www.example.lan example.lan
+172.30.0.1      git.example.lan
+```
+
+(if you want to use other aliases for other services add them as well, for example   
+`172.30.0.1 openproject.example.lan`)
+
+Now start dnsmasq again:  
+`# systemctl start dnsmasq.service`
+
+### Configure clients to use the DNS server
+
+TODO: describe
+
+On **Linux**, uncomment the `#PostUp = resolvectl dns %i 172.30.0.1; resolvectl domain %i example.lan`
+line in the client's `/etc/wireguard/wg0.conf`
+
+On **Windows**, enter the following command in an **Administrator** PowerShell:  
+`Add-DnsClientNrptRule -Namespace 'example.lan','.example.lan' -NameServers '172.30.0.1'` 
+
+Now on the client you should be able to ping the new domains (if the WireGuard connection is active):  
+`$ ping example.lan`  
+`$ ping git.example.lan`
+
+## Setting up nginx as a reverse http proxy
+
+TODO: install, configure to redirect git.example.lan to localhost:3000 (for forgejo), configure
+to only listen on 172.30.0.1 (the VPN IP), remove upload file limit to make LFS work (`client_max_body_size 0;`),
+mention again that we're only using http (not https) because communication with the server is already
+encrypted with WireGuard
+
+## Setting up dma as sendmail implementation
+
+TODO: install [dma](https://github.com/corecode/dma), configure login for external SMTP server to
+use to send emails, shortly mention gmail app passwords, send a testmail with
+`sendmail foo@bar.com < textfile_with_mail.txt`
+
+## Setting up Forgejo for git hosting
+
+TODO: install basically following https://docs.gitea.io/en-us/installation/install-from-binary/
+(adapted for forgejo), adjust its config (app.ini) (higher timeouts to allow bigger uploads and migrations,
+only listen on VPN IP, tell it to use sendmail, etc)
+
+### Local storage vs. object storage for LFS
 
 migrate LFS from local storage to S3-like object-storage:  
 `$ sudo -u git forgejo migrate-storage -t lfs -c /etc/forgejo/app.ini -s minio --minio-endpoint endpoint-url.com --minio-access-key-id YOUR_ACCESS_KEY_ID --minio-secret-access-key YOUR_SECRET_ACCESS_KEY --minio-bucket gitea --minio-use-ssl -w /var/lib/forgejo/`
@@ -371,7 +785,143 @@ migrate LFS from local storage to S3-like object-storage:
 migrate from S3-like object-storage back to local:  
 `$ sudo -u git forgejo migrate-storage -t lfs -c /etc/forgejo/app.ini -s local -p /var/lib/forgejo/data/lfs -w /var/lib/forgejo/`
 
-<br><br><br>
+## Backups with restic
+
+TODO: setting up restic, link to docs for setting up rclone (for google drive),
+pg_basebackup? (maybe only if I also describe OpenProject here?)
+
+Suggested backup script (TODO: make lines fit in blog):
+
+```bash
+#!/bin/bash
+
+export RESTIC_REPOSITORY="TODO_YOUR_RESTIC_REPO"
+export RESTIC_PASSWORD_FILE=/root/backup/.restic-pw.txt
+
+# who will get an e-mail if some part of the backup has an error?
+# uses the "sendmail" command
+WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
+# NOTE: if you don't want any emails sent, use an empty list, like in the next line
+#WARN_MAIL_RECP=()
+
+NUM_ERRORS=0
+
+mytime() {
+	date +'%R:%S'
+}
+
+checklastcommand() {
+	if [ $? != 0 ]; then
+		NUM_ERRORS=$(($NUM_ERRORS+1))
+		echo "$*"
+	fi
+}
+
+backupallthethings() {
+	echo -e "Running Backup at $(date +'%F %R:%S')\n"
+	
+	echo "$(mytime) Backing up /root/ and /etc/"
+
+	# let's backup all of /etc/, it's just a few MB and may generally come in handy
+	# (also all of /root/)
+	restic backup --exclude /root/.cache/ /root/ /etc/
+	checklastcommand "ERROR: restic failed backing up /root/ and /etc"
+
+
+	##### Forgejo #####
+
+	echo "$(mytime) Backing up Forgejo"
+
+	# TODO: somehow check if someone is currently pushing before stopping the service?
+
+	# flush forgejos queues
+	su -l git -c "forgejo -c /etc/forgejo/app.ini -w /var/lib/forgejo manager flush-queues"
+	checklastcommand "ERROR: Flushing forgejo queues failed!"
+
+	# stop the service, so we backup a consistent state
+	systemctl stop forgejo
+	checklastcommand "ERROR: Stopping forgejo service failed!"
+
+	# Note: we're using forgejo with sqlite, so this also backs up the database
+	restic backup /var/lib/forgejo/
+	checklastcommand "ERROR: backing up /var/lib/forgejo failed!"
+
+	# we're done backing up forgejo, start the service again
+	systemctl start forgejo
+	checklastcommand "ERROR: Starting forgejo service failed!"
+
+
+	##### OpenProject #####
+
+	# based on: https://www.openproject.org/docs/installation-and-operations/operation/backing-up/
+	# and:      https://www.openproject.org/docs/installation-and-operations/operation/restoring/
+	# (meaning, the restore instructions should work with this data, except you'll copy the directories 
+	#  from the backup instead of extracting them from a tar.gz)
+
+	echo "$(mytime) Backing up OpenProject"
+
+	systemctl stop openproject
+	checklastcommand "ERROR: Stopping OpenProject service failed!"
+
+	[ -e /tmp/postgres-backup/ ] && rm -r /tmp/postgres-backup/
+	mkdir /tmp/postgres-backup
+	chown postgres:postgres /tmp/postgres-backup
+	
+	echo "$(mytime) .. dumping PostgreSQL database for OpenProject backup"
+	
+	# this line is like described in the openproject docs
+	su -l postgres -c "pg_dump -U postgres -d openproject -x -O > /tmp/postgres-backup/openproject.sql"
+	checklastcommand "ERROR: pg_dump for openproject.sql failed!"
+	
+	# this is just to be double-sure, so we have a backup of all postgres tables, not just openproject
+	# (mostly redundant with openproject.sql, but whatever, it's not that big..)
+	su -l postgres -c "pg_dumpall > /tmp/postgres-backup/all.sql"
+	checklastcommand "ERROR: pg_dump for all.sql failed!"
+
+	echo "$(mytime) .. backing up OpenProject files"
+
+	restic backup /var/db/openproject/files/ /tmp/postgres-backup/
+	checklastcommand "ERROR: backing up OpenProject"
+
+	# Note: we don't manage git/svn repos with openproject, so those steps are missing
+	# also: /etc/openproject/ is backed up as part of /etc/ above
+
+	service openproject start
+	checklastcommand "ERROR: Starting OpenProject service failed!"
+
+
+	# TODO: rotate backups by forgetting old ones, with restic forget --keep-within 1y ?
+	# TODO: remove unreferenced data with restic prune ?
+	# TODO: maybe only do that occasionally, on sundays?
+
+	echo -e "$(mytime) Backup done!\n"
+}
+
+[ -e /root/backup/backuplog.txt ] && mv /root/backup/backuplog.txt /root/backup/backuplog-old.txt
+backupallthethings 2>&1 | tee /root/backup/backuplog.txt
+
+if [ $NUM_ERRORS != 0 ]; then
+	echo "$NUM_ERRORS errors during backup!"
+
+	# if the list of mail recipients isn't emtpy, send them a mail about the error
+	if [ ${#WARN_MAIL_RECP[@]} != 0 ]; then
+		echo -e "Subject: WARNING: $NUM_ERRORS errors happened when trying to backup $(hostname)!\n" > /tmp/backuperrmail.txt
+		echo -e "Please see log below for details\n" >> /tmp/backuperrmail.txt
+		cat /root/backuplog.txt >> /tmp/backuperrmail.txt
+		sendmail ${WARN_MAIL_RECP[@]} < /tmp/backuperrmail.txt
+	fi
+fi
+
+```
+
+TODO: cronjob to run backup every night
+
+## Thanks
+
+Thank you for reading this, I hope you found it helpful!
+
+Thanks to [my employer](https://www.masterbrainbytes.com/) for letting me turn the documentation
+for setting up our server into a proper blog post!
 
 <!-- Below: Footnotes -->
 
@@ -389,10 +939,50 @@ migrate from S3-like object-storage back to local:
     more than 3TB storage their available VPSs stop scaling and we'll have to look more seriously at
     their Object Storage offerings..  
     Either way this is *not* an endorsement for Contabo, we haven't used them for long enough to judge
-    the overall quality of their service, and this HowTo should work with any Linux server (VPS or dedicated).
+    the overall quality of their service, and this Howto should work with any Linux server (VPS or dedicated).
     FWIW, the performance of the VPS itself has been fine so far.  
-    Some other low-cost hosters I have at least a little experience with include
+    Some other low-cost hosters I have at least a little (positive) experience with include
     [Hetzner](https://www.hetzner.com/) (they offer dedicated servers for < €50/month)
     and [vultr](https://www.vultr.com/) (they also offer cheap S3-compatible Object Storage, but 
-    I don't know if their performance is better than Contabos..).
+    I don't know if their performance is better than Contabos..).  
+    I can absolutely **not** recommend OVH, as their customers had to learn 
+    [the hard way](https://blocksandfiles.com/2023/03/23/ovh-cloud-must-pay-damages-for-lost-backup-data/)
+    that OVH data centers are built out of wood and backups are stored in the same building as the
+    backed up servers, so if a fire breaks out, it burn well and both the servers and the backups
+    get destroyed.
 
+[^security]: At least "reasonably safe". There is no total security. It's possible that OpenSSH, WireGuard
+    or the Linux kernels network stack have unknown security vulnerabilities that an attacker could
+    exploit to get onto your server. It's also possible that your hosters infrastructure gets
+    compromised and attackers get access to the servers (via hypervisor for VPS, or remote consoles
+    for dedicated servers, or even physically by breaking in).  
+    And of course it's possible (I'd even say more likely than the scenarios mentioned before) that
+    someone hacks *your* PC and gets access to the server and/or your git repos that way.  
+    Anyway, if you follow this guide (and hopefully keep at least the Linux kernel, WireGuard and
+    OpenSSH up to date), your data will be *a lot* safer than it would be if you exposed webservices
+    (instead of just WireGuard) to the internet.  
+
+[^clientsubnet]: I've never done this, but it might be possible to give a client some more
+    IPs with a different subnet mask, but that's not useful for this usecase and you'd still have to
+    make sure that there's no overlaps with IPs assigned to other clients.
+
+[^why_iptables]: If you're wondering why I'm using iptables and not UFW or
+    [nftables](https://netfilter.org/projects/nftables/), the answer is simple and boring:
+    I'm not familiar with UFW or nftables, but I'm familiar with iptables, so using iptables
+    was easiest for me `¯\_(ツ)_/¯`. If you're more familiar with an alternative, feel free to
+    use that to create equivalent rules.
+
+[^devname]: If you're not sure what the network device on your server is called, run `$ ip address`
+    in the terminal. It will list all network devices (including loopback `lo` and your WireGuard
+    device `wg0` if it's currently up). The device with the public internet IP that you're also
+    using to connect to the server via SSH/WireGuard is the one you need.
+
+[^dotlan]: Sometimes using a custom top level domain (TLD) is discouraged, because (unlike a few years back)
+    nowadays, with enough money, one can register arbitrary TLDs that don't exist yet.  
+    However, .lan is relatively widely used for this purpose, for example by OpenWRT, and
+    <https://icannwiki.org/Name_Collision> shows that ICANN is aware that letting someone register
+    .lan would be a bad idea. Furthermore, there even is an RFC that *almost* recommends using .lan,
+    so I think it should be safe ("almost" as in [*"We do not recommend use of unregistered top-level
+    at all, but should network operators decide to do this, the following top-level domains have been
+    used on private internal networks (...) for this purpose: .intranet, .internal, .private, .corp,
+    .home, **.lan**"*](https://www.rfc-editor.org/rfc/rfc6762.html#appendix-G)).
