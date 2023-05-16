@@ -114,7 +114,18 @@ To do this, just run:
 `$ ssh-keygen -f /path/to/keyfile`  
 This will create `/path/to/keyfile` (private key) and `/path/to/keyfile.pub` (public key).
 
-You'll have to tell the SSH client to use this keyfile with `ssh -i /path/to/keyfile example-host.com`
+You'll have to tell the SSH client to use this keyfile with `ssh -i /path/to/keyfile example-host.com`  
+... **or** you create an entry in `$HOME/.ssh/config` for the host:
+```sh
+# my VPS for hosting git
+Host example-host.com
+    # or whatever user you're using for logging in
+    User root
+    HostName example-host.com
+    IdentityFile /path/to/keyfile
+```
+
+then `$ ssh example-host.com` will automatically set the username and the keyfile
 
 ### Enabling your public SSH key on the server
 
@@ -147,7 +158,8 @@ As root (or with `sudo`) edit `/etc/ssh/sshd_config` and search for a line that 
 "PasswordAuthentication" and change it to `PasswordAuthentication no` - make sure to remove any `#`
 characters from the start of the line as they comment it out!  
 If there is no line with "PasswordAuthentication" yet, just add the `PasswordAuthentication no` line
-somewhere in the middle of the config, *before* any lines that start with "Match", like "Match user asfd".
+somewhere in the middle of the config, *before* any lines that start with "Match", like "Match user asfd".  
+Do the same to ensure that a `ChallengeResponseAuthentication no` line exists.
 
 Save the file and restart the SSH server to make sure the changed config is loaded:  
 `# systemctl restart sshd`
@@ -285,8 +297,8 @@ PrivateKey = ThisClientsPrivateKey
 # must not be used by another client (or the server itself)
 Address = 172.30.0.3/24
 # configure a DNS server for a custom local domain
-# only relevant on Linux, will be explained in a later chapter
-#PostUp = resolvectl dns %i 172.30.0.1; resolvectl domain %i example.lan
+# only relevant on Linux, will be set in a later chapter
+#PostUp = TODO
 
 # the server we're gonna connect to
 [Peer]
@@ -327,6 +339,14 @@ must be told about the new client first.
 > clients - the only things that must be adjusted per client are the **PrivateKey** and the **Address**
 > (I also replace the last part of the  **Address** IP with `TODO` to make sure I don't forget to
 >  set a new IP when copy&pasting it to a new client configuration).
+
+#### ... on macOS
+
+No idea, I don't have a mac :-p
+
+There seems to be a WireGuard App in the [App Store](https://apps.apple.com/de/app/wireguard/id1451685025?mt=12)
+and looking at [this tutorial](https://docs.oakhost.net/tutorials/wireguard-macos-server-vpn/#configuring-the-client)
+I found it seems to be pretty similar to the Windows one, so you should be able to get it to work :-)
 
 ### Add new clients to the server configuration
 
@@ -377,10 +397,13 @@ Now you can tell WireGuard to reload the config:
 .. and now the clients should be able to connect (on Windows by clicking `Activate` for the tunnel,
 on Linux with `# wg-quick up wg0`).
 
-If you're wondering what `PersistentKeepalive` is about, it makes sure that a (possibly empty)
-network packet is sent at least every 21 seconds to make sure that routers and firewalls between
-the client and the server don't assume the WireGuard connection is closed when there's no real
-traffic, see also [this more elaborate explanation](https://www.wireguard.com/quickstart/#nat-and-firewall-traversal-persistence).
+**Note** that clients can only communicate with the server, not with each other, at least without
+setting up ip forwarding on the server (which isn't done here).
+
+`PersistentKeepalive = 21` makes sure that a (possibly empty) network packet is sent at least every
+21 seconds to make sure that routers and firewalls between the client and the server don't assume
+the WireGuard connection is closed when there's no real traffic, see also
+[this more elaborate explanation](https://www.wireguard.com/quickstart/#nat-and-firewall-traversal-persistence).
 
 > **NOTE:** If you're wondering why the client and the server need to know **each others public keys**,
 > that's for security. When a WireGuard client connects to a WireGuard server, the server uses
@@ -708,6 +731,11 @@ out (begin with `#`).
 The following lines should end up in dnsmasq.conf:
 
 ```cfg
+# don't use resolv.conf to get upstream DNS servers
+# in our case, don't use any upstream DNS servers,
+# only handle example.lan and fail for everything else
+# (VPN clients shouldn't get resolve their normal/global domains here)
+noresolv
 # answer requests to *.example.lan from /etc/hosts
 local=/example.lan/
 # only listen on the wireguard interface
@@ -746,13 +774,93 @@ Now start dnsmasq again:
 
 ### Configure clients to use the DNS server
 
-TODO: describe
+The VPN clients must be told to use the DNS server you just set up.
 
-On **Linux**, uncomment the `#PostUp = resolvectl dns %i 172.30.0.1; resolvectl domain %i example.lan`
-line in the client's `/etc/wireguard/wg0.conf`
+#### Linux and other Unix-likes
 
-On **Windows**, enter the following command in an **Administrator** PowerShell:  
+On **Linux** distros that use **systemd-resolved** (are there other Unix-likes that use systemd?),
+replace the `#PostUp = TODO` line line in the client's `/etc/wireguard/wg0.conf` with:  
+`PostUp = resolvectl dns %i 172.30.0.1; resolvectl domain %i ~example.lan; resolvectl default-route %i false`
+(yes, that must all go in one line to work!).  
+* `resolvectl dns %i 172.30.0.1` sets 172.30.0.1 as the network-interface-specific DNS server
+  (Note that `%i` will be replaced with the interface name by `wg-quick`)
+* `resolvectl domain %i ~example.lan` sets `example.lan` as the default domain for that interface,
+  and the `~` prefix makes it a "routing (-only) domain", which means that all requests to that
+  domain (and its subdomains), in this case `*.example.lan`, should go to the DNS server(s) configured
+  for this interface.
+* `resolvectl default-route %i false` means that this interfaces DNS server should *not* be used
+  as the default DNS server for DNS requests for domains not explicitly configured as "routing domains".
+  This ensures that the dnsmasq running on `172.30.0.1` will *only* be used to resolve `example.lan`,
+  `git.example.lan`, `www.example.lan` etc, not any other domains like `blog.gibson.sh`
+  or `raspi.myhome.lan` or `xkcd.com`.
+* See [man resolvectl](https://www.freedesktop.org/software/systemd/man/resolvectl.html),
+  [man systemd.network](https://www.freedesktop.org/software/systemd/man/systemd.network.html)
+  and [this article](https://systemd.io/RESOLVED-VPNS/) for more information.
+
+For this setting to take effect, you'll have to disconnect and reconnect the wireguard connection
+on the client (`# wg-quick down wg0 && wg-quick up wg0`)
+
+On *other distributions or operating systems* (that **don't use systemd-resolved**),
+this might be a bit harder, and depend on *what* they're using *exactly*, anyway.
+Some of them use the `resolvconf` package/tool to manage `/etc/resolv.conf`, but as far as I know
+and according to [this serverfault.com answer](https://serverfault.com/questions/872109/resolv-conf-multiple-dns-servers-with-specific-domains), it only supports setting *global* DNS servers
+(that are used for all domains), and a suggested workaround is to install dnsmasq or similar on the
+client and configure dnsmasq to use `172.30.0.1` for `example.lan` (and another DNS server for 
+all other requests).  
+A simple workaround if you don't want to set up your own local caching DNS server (like dnsmasq):
+Edit `/etc/hosts` *on the client* and add the hosts you need, like  
+`172.30.0.1 git.example.lan www.example.lan whateverelse.example.lan`  
+Of course it means that if another subdomain is added on the server, you also need to add it locally,
+but depending on your usecase this might be the path of least resistance...
+
+> **NOTE:** wg-quick allows setting a `DNS = 1.2.3.4` option under `[Interface]`.  
+> Even with a default search domain, like `DNS = 172.30.0.1, example.lan`.  
+> DO NOT USE THAT!  
+> It sets the global DNS server, meaning, it will be used for *all* your DNS requests,
+> not just the ones for `example.lan` - that's most probably not what you want, and when
+> dnsmasq is configured like described here it won't even work (as it won't know how to resolve
+> other domains like `gibson.sh` or `google.com`)!  
+> Furthermore, it only works with resolvconf, not systemd-resolved or Windows (AFAIK).
+
+#### Windows
+
+On Windows, WireGuard doesn't support PostUp scripts (unless explicitly enabled in the registry),
+because apparently there are bigger security implications than on Linux.
+
+So instead of setting the DNS server when connecting and removing it when disconnecting, just
+configure it once and leave it configured, by entering the following command in an
+**Administrator** PowerShell:  
 `Add-DnsClientNrptRule -Namespace 'example.lan','.example.lan' -NameServers '172.30.0.1'` 
+
+As this explicitly sets the DNS server only for `*.example.lan`, it shouldn't hurt much 
+that the server isn't reachable when the WireGuard connection is down - it just means that the DNS
+request will timeout and fail in that case. .
+
+> **NOTE:** If you want to remove the rule again, entering  
+> `Get-DnsClientNrptRule` in an (Administrator) PowerShell will list rules
+> including their "Name" identifiers, and  
+> `Remove-DnsClientNrptRule -Name "{6E6B2697-2922-49CF-B080-6884A4E396DE}"`
+> deletes the rule with that identifier.
+
+#### macOS
+
+Again, I can't test this myself because I don't have a Mac, but I found
+[a blog post](https://stanislas.blog/2020/02/different-nameservers-domains-macos/)
+that looks relevant.
+
+The gist of it (in case it disappears in the future):
+Create a textfile `/etc/resolver/example.lan` that contains the line 
+`nameserver 172.30.0.1`
+
+Apparently this doesn't work for all tools though (not for `dig`, for example), but according to
+the blog post,
+`$ scutils --dns` can be used to check if the setting was applied, and `ping` should also work. 
+The blog posts suggests trying a reboot in case it doesn't work at all.  
+
+I hope that it works with `git`, `git-lfs` and your web browser - if you try it,
+please let me know how it went in a comment! :-)
+
+#### Testing the DNS server
 
 Now on the client you should be able to ping the new domains (if the WireGuard connection is active):  
 `$ ping example.lan`  
@@ -760,18 +868,149 @@ Now on the client you should be able to ping the new domains (if the WireGuard c
 
 ## Setting up nginx as a reverse http proxy
 
-TODO: install, configure to redirect git.example.lan to localhost:3000 (for forgejo), configure
-to only listen on 172.30.0.1 (the VPN IP), remove upload file limit to make LFS work (`client_max_body_size 0;`),
-mention again that we're only using http (not https) because communication with the server is already
-encrypted with WireGuard
+[nginx](https://nginx.org/) will be used as a webserver/reverse proxy, that makes
+`http://www.example.lan` and `http://git.example.lan` and possibly other domains available,
+redirecting them to other services based on the subdomain used (for example, the real git server, Forgejo, 
+will listen at port 3000/tcp, instead of the standard http port 80/tcp, and [OpenProject](https://www.openproject.org/), that nginx could provide at `http://openproject.example.lan`, listens on port 6000/tcp).
+
+Install it with:  
+`# apt install nginx-light`  
+(at least for the purposes documented in this tutorial, you won't need the additional features
+provided by the full nginx package)
+
+The Debian/Ubuntu configuration of nginx (maybe other distros do the same) splits up the site-specific
+nginx-configuration into one little config per site; they're configured in `/etc/nginx/sizes-available/*.conf`,
+to actually enable a site, its config is symlinked to `/etc/nginx/sites-enabled/`.  
+
+By default, only `/etc/nginx/sites-available/default` exists (and is enabled), it shows the
+static page from `/var/www/html/index.nginx-debian.html` (or index.htm or index.html in the same directory).
+I'd suggest keeping it like this; you could edit that default index.html to provide links to the pages
+with content, like `http://git.example.lan` (once they exist..).
+
+You should however make one little change to `/etc/nginx/sites-available/default`:
+Replace the `listen 80 default_server;` line with `listen 172.30.0.1:80 default_server;` to make
+sure that nginx only listens on the WireGuard IP and not on all IPs.
+
+As we'll soon install Forgejo, we can already configure the site for it in nginx by creating
+`/etc/nginx/sites-available/git` with the following content:
+
+```nginx
+server {
+    # should be reachable on port 80, only on WireGuard IP
+    listen 172.30.0.1:80;
+    # the domain that's used (=> will be available at http://git.example.lan)
+    server_name git.example.lan;
+    # nginx defaults to a 1MB size limit for uploads, which
+    # *definitely* isn't enough for Git LFS.
+    # 'client_max_body_size 300m;' would set a limit of 300MB
+    # setting it to 0 means "no limit"
+    client_max_body_size 0;
+
+    location / {
+        # Forgejo will listen on port 3000, on localhost
+        proxy_pass http://127.0.0.1:3000;
+        # http proxy header settings that are required 
+        # according to the Forgejo/Gitea documentation:
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Then create a symlink in `/etc/nginx/sites-enabled/`:  
+`# ln -s /etc/nginx/sites-available/git /etc/nginx/sites-enabled/git`
+
+and restart the nginx service:  
+`# systemctl restart nginx.service`
+
+Now if you open a browser on a desktop PC connected to the server with WireGuard (that
+has the DNS server configured as described in the previous chapter), you should be able to open
+http://example.lan and http://git.example.lan (though the latter will show an error page because
+Forgejo isn't installed yet).  
+**Note** that you might have to actually type the whole URL including `http://` in the browser,
+because nowadays browsers only open URLs without protocol (http://) for known top level domains,
+otherwise they'll open a web search using "git.example.lan" or whatever you typed in as search query...
+
+As mentioned before, this uses plain HTTP, no HTTPS encryption, because:
+1. That would be a PITA to set up for a custom/local domain (you'd have to create your own pseudo-CA
+   and import that at every client)
+2. The connection to the server is already encrypted with WireGuard, so it already is secure
+   (even if your webbrowser may claim otherwise because it doesn't know that detail)
+3. Not only is additional HTTPS encryption unnecessary, it'd also be additional overhead, both
+   on the server and client CPUs that have to encrypt/decrypt the traffic twice and on the network
+   bandwidth, as both WireGuard and SSL/TLS (used by HTTPS) add their own metadata to each packet,
+   *in addition* to the http message you actually want to send/receive.
 
 ## Setting up dma as sendmail implementation
 
-TODO: install [dma](https://github.com/corecode/dma), configure login for external SMTP server to
-use to send emails, shortly mention gmail app passwords, send a testmail with
-`sendmail foo@bar.com < textfile_with_mail.txt`
+It's useful for a server to be able to send E-Mails.  
+That can be used to tell you that an error happened, that updates are available, or it can just
+be notifications from Forgejo or other software about new (comments on) bug reports, merge requests etc.
 
-## Setting up Forgejo for git hosting
+The standard way to do this on Unix-like systems is the /usr/sbin/sendmail tool; originally part of
+a [fully fledged mailserver](https://en.wikipedia.org/wiki/Sendmail), but nowadays several different
+programs implement that functionality, including minimal ones that don't implement SMTP themselves
+but just send a mail through a configured external SMTP server.
+
+This shows how to set up such a simple sendmail replacement, specifically
+[dma](https://github.com/corecode/dma), as running a full mailserver isn't exactly straightforward
+and also is against the idea of exposing as few possibly vulnerable services on this server
+to the internet as possible.
+
+So the idea is that you already have some E-Mail account that provides SMTP access (a freemailer,
+your company mailserver, whatever), ideally with a special noreply-address just for this server.
+
+Of course the first step is to install dma:  
+`# apt install dma`
+
+On Debian and Ubuntu, after the installation, you'll automatically be asked to configure dma
+(with your mailservers login data etc), just follow the steps.  
+Users of other distros (or Debian/Ubuntu users running into problems) will probably find the
+[dma article in the ArchWiki](https://wiki.archlinux.org/title/Dma) helpful.
+
+**TODO:** hints for apt configuration steps?
+
+> **NOTE:** In case the E-Mail account you want to use is from **GMail** (or ~~Google Apps~~
+>  ~~G Suite~~ Google Workspace), setting this up is a bit more painful, as by default Google
+> doesn't support standard SMTP login anymore, but only OAuth2 based login (which is not supported
+> by dma or other similar tools that I know of). It requires setting up an "App Password", see
+> [the Google documentation for that](https://support.google.com/accounts/answer/185833?hl=en)
+> or [this tutorial from Mailreach](https://help.mailreach.co/en/article/how-to-connect-a-gmail-google-workspace-account-to-mailreach-with-an-app-password-ulwj00/)
+> (though note that Google UI has changed slightly since it was created, to get to the 
+>  screen to create an App Password you currently need to click *Manage your Google Account
+> -> Security -> How you sign in to Google -> 2-Step Verification* and select "App Passwords" there).  
+> Also potentially useful: 
+> [This article](https://pawait.africa/blog/googleworkspace/how-to-set-up-a-no-reply-email-with-a-custom-rejection-message-in-google-workspace/)
+> on turning a Google-hosted E-Mail address into a No-Reply address that rejects mails sent to it.
+> (Note that it might take 15 minutes or so until that rejection rule is in effect)
+
+### Testing the sendmail command
+
+Sending a mail on the commandline or a script with sendmail is easy:
+It the receiver addresses are commandline arguments and the mail subject and text is read from stdin.
+
+So create a textfile like this:
+```text
+Subject: This is a testmail!
+
+This is the body of the test mail.
+It's plain text.
+You can probably somehow send HTML mails, but
+1. I don't know how
+2. Those suck anyway
+
+Kind regards,
+Your Server.
+```
+
+and then send the mail with:  
+`# sendmail name@example.com othername@example.com < textfile_with_mail.txt`
+
+The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail issues.
+
+## TODO: Setting up Forgejo for git hosting
 
 TODO: install basically following https://docs.gitea.io/en-us/installation/install-from-binary/
 (adapted for forgejo), adjust its config (app.ini) (higher timeouts to allow bigger uploads and migrations,
@@ -785,7 +1024,7 @@ migrate LFS from local storage to S3-like object-storage:
 migrate from S3-like object-storage back to local:  
 `$ sudo -u git forgejo migrate-storage -t lfs -c /etc/forgejo/app.ini -s local -p /var/lib/forgejo/data/lfs -w /var/lib/forgejo/`
 
-## Backups with restic
+## TODO: Backups with restic
 
 TODO: setting up restic, link to docs for setting up rclone (for google drive),
 pg_basebackup? (maybe only if I also describe OpenProject here?)
@@ -923,6 +1162,9 @@ Thank you for reading this, I hope you found it helpful!
 Thanks to [my employer](https://www.masterbrainbytes.com/) for letting me turn the documentation
 for setting up our server into a proper blog post!
 
+Thanks to [Yamagi](https://www.yamagi.org//) for proofreading this and answering my stupid questions
+about server administration :-)
+
 <!-- Below: Footnotes -->
 
 [^hoster]: As a **server** we chose the [Contabo](https://contabo.com/) "Cloud VPS M" for €10.49/month,
@@ -948,7 +1190,7 @@ for setting up our server into a proper blog post!
     I can absolutely **not** recommend OVH, as their customers had to learn 
     [the hard way](https://blocksandfiles.com/2023/03/23/ovh-cloud-must-pay-damages-for-lost-backup-data/)
     that OVH data centers are built out of wood and backups are stored in the same building as the
-    backed up servers, so if a fire breaks out, it burn well and both the servers and the backups
+    backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
     get destroyed.
 
 [^security]: At least "reasonably safe". There is no total security. It's possible that OpenSSH, WireGuard
@@ -985,4 +1227,7 @@ for setting up our server into a proper blog post!
     so I think it should be safe ("almost" as in [*"We do not recommend use of unregistered top-level
     at all, but should network operators decide to do this, the following top-level domains have been
     used on private internal networks (...) for this purpose: .intranet, .internal, .private, .corp,
-    .home, **.lan**"*](https://www.rfc-editor.org/rfc/rfc6762.html#appendix-G)).
+    .home, **.lan**"*](https://www.rfc-editor.org/rfc/rfc6762.html#appendix-G)).  
+    Do **not** use **.local**, it's [reserved for multicast DNS / zeroconf (avahi, bonjour)](https://en.wikipedia.org/wiki/.local)
+    and using it as a TLD for normal DNS just causes headaches (will need explicit configuration on
+    many clients to work, because by default they assume that it's mDNS-only).
