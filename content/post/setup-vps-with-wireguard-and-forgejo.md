@@ -57,8 +57,8 @@ and S3-style "object storage" (that can be used for Git LFS data) for about €1
 
 To **host Git** (and get a nice Github-ish frontend) we use [Forgejo](https://forgejo.org/), a fork
 of [Gitea](https://gitea.io/). It's written in Go and is just a single executable with few external
-dependencies (it needs a database, but supports [sqlite](https://sqlite.org/index.html), which
-should be more than adequate for our needs). It can store the LFS data directly in the filesystem
+dependencies (it needs a database, but supports [sqlite](https://sqlite.org/index.html), which should
+be good enough for up to at least 10 users[^sqlite]). It can store the LFS data directly in the filesystem
 on the servers disk, but also supports storing it in S3-compatible (external) object storage.
 
 We work decentralized, most people at home, so the server needs to be accessible over the
@@ -734,7 +734,7 @@ The following lines should end up in dnsmasq.conf:
 # don't use resolv.conf to get upstream DNS servers
 # in our case, don't use any upstream DNS servers,
 # only handle example.lan and fail for everything else
-# (VPN clients shouldn't get resolve their normal/global domains here)
+# (VPN clients shouldn't resolve their normal/global domains here)
 noresolv
 # answer requests to *.example.lan from /etc/hosts
 local=/example.lan/
@@ -806,7 +806,8 @@ Some of them use the `resolvconf` package/tool to manage `/etc/resolv.conf`, but
 and according to [this serverfault.com answer](https://serverfault.com/questions/872109/resolv-conf-multiple-dns-servers-with-specific-domains), it only supports setting *global* DNS servers
 (that are used for all domains), and a suggested workaround is to install dnsmasq or similar on the
 client and configure dnsmasq to use `172.30.0.1` for `example.lan` (and another DNS server for 
-all other requests).  
+all other requests) - the required line in dnsmasq.conf *on the client* would be
+`server=/example.lan/172.30.0.1`.  
 A simple workaround if you don't want to set up your own local caching DNS server (like dnsmasq):
 Edit `/etc/hosts` *on the client* and add the hosts you need, like  
 `172.30.0.1 git.example.lan www.example.lan whateverelse.example.lan`  
@@ -925,12 +926,37 @@ Then create a symlink in `/etc/nginx/sites-enabled/`:
 and restart the nginx service:  
 `# systemctl restart nginx.service`
 
+Now you can already test it and it should work, **but** it likely won't work after **rebooting**,
+because nginx will likely start before the WireGuard device (that provides the IP nginx is supposed
+to listen on) is ready, and because of that will fail.  
+To fix this we'll have to tell the nginx systemd service to start *after* WireGuard (wg-quick@wg0).
+That's done with:  
+`# systemctl edit nginx.service`  
+which will open a text editor (with lots of stuff that's commented out) that allows you to
+specify additional rules that overwrite the ones in the system nginx.service
+(at `/usr/lib/systemd/system/nginx.service`). All that's needed here are the following lines:
+
+```text
+# tell systemd to start this service (nginx) after wg0 is up
+# (=> wg-quick@wg0 service is done)
+# so nginx can bind to the WireGuard device's IP
+[Unit]
+After=wg-quick@wg0.service
+```
+
+(ok, the first three lines are just comments and not really needed).  
+Save and exit the editor (if it's GNU nano, press Ctrl-X, then type `y` for "yes I want to save"
+and press enter to confirm the preselected filename).  
+With this change, if you reboot, nginx should (still) work.
+If you need to, you can edit this again with the same command (`# systemctl edit nginx.service`).  
+
+
 Now if you open a browser on a desktop PC connected to the server with WireGuard (that
 has the DNS server configured as described in the previous chapter), you should be able to open
 http://example.lan and http://git.example.lan (though the latter will show an error page because
 Forgejo isn't installed yet).  
 **Note** that you might have to actually type the whole URL including `http://` in the browser,
-because nowadays browsers only open URLs without protocol (http://) for known top level domains,
+because nowadays browsers only open URLs without protocol (`http://`) for known top level domains,
 otherwise they'll open a web search using "git.example.lan" or whatever you typed in as search query...
 
 As mentioned before, this uses plain HTTP, no HTTPS encryption, because:
@@ -965,12 +991,32 @@ your company mailserver, whatever), ideally with a special noreply-address just 
 Of course the first step is to install dma:  
 `# apt install dma`
 
-On Debian and Ubuntu, after the installation, you'll automatically be asked to configure dma
-(with your mailservers login data etc), just follow the steps.  
-Users of other distros (or Debian/Ubuntu users running into problems) will probably find the
-[dma article in the ArchWiki](https://wiki.archlinux.org/title/Dma) helpful.
+On Debian and Ubuntu, during the installation, you'll be asked to configure dma.
+The **"System Mail Name"** shouldn't matter much, you can leave it at its default, the **"Smarthost"**
+is the SMTP server you want to use.
+Afterwards, you'll most probably still have to do some manual changes to the configuration, so (as root)
+edit `/etc/dma/dma.conf` and:
+* set `PORT 465` (for TLS/SSL encrypted communication with the SMTP server)
+* uncomment the `#AUTHPATH /etc/dma/auth.conf` line (remove the `#` at the beginning of the line)
+  so auth.conf with the smtp server login data will be used (we'll edit that next)
+* uncomment `#SECURETRANSFER` so TLS/SSL is used
+* set `MASQUERADE noreply@yourmailer.com` (with the noreply address you want to use for this)
+  to make sure that when sending mails it always uses that address as sender; your mailserver might
+  even reject mails that set other senders
 
-**TODO:** hints for apt configuration steps?
+Now edit `/etc/dma/auth.conf` to set the login data for the smtp server by adding a line like:  
+`noreply@yourmailer.com|smtp.yourmailer.com:YourPassw0rd`  
+where `smtp.yourmailer.com` is the same domain you set as "Smarthost".
+
+For other users than root to be able to use `dma` (or `sendmail`) to send a mail, the configs must
+be readable by the `mail` group. Check with:  
+`$ ls -lh /etc/dma/`  
+If the lines don't look like `-rw-r----- 1 root mail  250 May 15 15:28 auth.conf`, but show
+another group than `mail` (maybe `root root`), change the ownership to user `root`, group `mail`, with:  
+`# chown root:mail /etc/dma/*.conf`
+
+For further information see the [dma manpage](https://manpages.debian.org/testing/dma/sendmail.8.en.html)
+and [the ArchWiki's dma page](https://wiki.archlinux.org/title/Dma).
 
 > **NOTE:** In case the E-Mail account you want to use is from **GMail** (or ~~Google Apps~~
 >  ~~G Suite~~ Google Workspace), setting this up is a bit more painful, as by default Google
@@ -984,14 +1030,17 @@ Users of other distros (or Debian/Ubuntu users running into problems) will proba
 > Also potentially useful: 
 > [This article](https://pawait.africa/blog/googleworkspace/how-to-set-up-a-no-reply-email-with-a-custom-rejection-message-in-google-workspace/)
 > on turning a Google-hosted E-Mail address into a No-Reply address that rejects mails sent to it.
-> (Note that it might take 15 minutes or so until that rejection rule is in effect)
+> (Note that it might take 15 minutes or so until that rejection rule is in effect)  
+> Also note that this is no endorsement for GMail (in fact I suggest not to use it),
+> but if you (or your company or project) are using it anyway, this information might be useful.
 
 ### Testing the sendmail command
 
-Sending a mail on the commandline or a script with sendmail is easy:
+Sending a mail on the commandline or a from script with sendmail is easy:
 It the receiver addresses are commandline arguments and the mail subject and text is read from stdin.
 
 So create a textfile like this:
+
 ```text
 Subject: This is a testmail!
 
@@ -1006,7 +1055,7 @@ Your Server.
 ```
 
 and then send the mail with:  
-`# sendmail name@example.com othername@example.com < textfile_with_mail.txt`
+`$ /usr/sbin/sendmail name@example.com name2@example.com < mailtext.txt`
 
 The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail issues.
 
@@ -1015,6 +1064,7 @@ The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail is
 TODO: install basically following https://docs.gitea.io/en-us/installation/install-from-binary/
 (adapted for forgejo), adjust its config (app.ini) (higher timeouts to allow bigger uploads and migrations,
 only listen on VPN IP, tell it to use sendmail, etc)
+
 
 ### Local storage vs. object storage for LFS
 
@@ -1192,6 +1242,10 @@ about server administration :-)
     that OVH data centers are built out of wood and backups are stored in the same building as the
     backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
     get destroyed.
+
+[^sqlite]: At least that's what one of the developers told me in the Forgejo chatroom.
+    Apparently even https://try.gitea.io/ uses sqlite, so it might be fine even with lots of repos
+    and users.
 
 [^security]: At least "reasonably safe". There is no total security. It's possible that OpenSSH, WireGuard
     or the Linux kernels network stack have unknown security vulnerabilities that an attacker could
