@@ -8,7 +8,7 @@ toc = true
 # ghcommentid = 13
 +++
 
-# How to set up a Linux server to host git with LFS behind a VPN
+<!-- # How to set up a Linux server to host git with LFS behind a VPN -->
 
 This Howto explains how to set up a Linux server that runs [SSH](https://www.openssh.com/),
 [WireGuard VPN](https://www.wireguard.com/), [Forgejo](https://forgejo.org/) (a fork of
@@ -22,6 +22,9 @@ It will assume that you're using **Ubuntu Server 22.04**, but it should be the s
 (systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
 You'll also need full **root privileges** on the system.
 
+Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
+a public Forgejo instance, or just a Wireguard server without Forgejo on it).
+
 **Note:** You'll often need to enter commands in the shell. The following convention will be used:
 
 `$ some_command --some argument`  
@@ -32,7 +35,7 @@ means: Enter "some_command --some argument" (without quotes) in a Linux terminal
 or maybe with `sudo` (you can use `$ sudo -i` to get a root-shell so you don't have to use sudo
 for each command).
 
-## Motivation
+# Motivation
 
 *You can skip this section if you're already convinced that this Howto is relevant for you ;-)*
 
@@ -80,7 +83,7 @@ behind a [Wireguard](https://www.wireguard.com/) VPN, so:
 And of course, if we need other web-based services (like maybe a fancier bugtracker) those can be
 run and protected in the same way.
 
-## Configuring SSH for public key authentication
+# Configuring SSH for public key authentication
 
 If you rent a (virtual private) server with Linux, you'll most probably get SSH access, likely with
 a password.  
@@ -91,7 +94,7 @@ with SSH
 
 Here you've got two options: Using your default SSH key, or creating one specifically for this server.
 
-### 1. Use your default SSH key
+## 1. Use your default SSH key
 
 Check if you already have a default SSH public key, it's in `$HOME/.ssh/id_rsa.pub` (on Windows
 `C:\Users\YourUserName\.ssh\id_rsa.pub`, on Linux something like `/home/yourusername/.ssh/id_rsa.pub`).
@@ -105,7 +108,7 @@ be used to *locally* decrypt the key, for extra security.
 When connecting to a SSH service that has public key authentication enabled, it will be used by default.
 You might be asked for the password *of your SSH key* then, which is the one you set in `ssh-keygen`.
 
-### 2. Creating one for this server
+## 2. Creating one for this server
 
 You can create an SSH key pair just for this server, possibly with a different password than the one
 you're using for your default SSH key.
@@ -127,7 +130,7 @@ Host example-host.com
 
 then `$ ssh example-host.com` will automatically set the username and the keyfile
 
-### Enabling your public SSH key on the server
+## Enabling your public SSH key on the server
 
 Of course you need to tell the server your SSH public key so it can use it to authenticate your
 connections. To do this, **on the server** edit the file `$HOME/.ssh/authorized_keys` (create it if
@@ -144,7 +147,7 @@ If this didn't work as expected, you'll have to debug and fix that problem.
 
 Once it works go on with the next step:
 
-### Disable SSH login with password
+## Disable SSH login with password
 
 Now that you can log into the server with public key authentication, logging in with a password
 can be disabled, to prevent attackers from bruteforcing the password.
@@ -166,16 +169,16 @@ Save the file and restart the SSH server to make sure the changed config is load
 
 If that failed for some reason, `systemctl status sshd` should show some information on the cause.
 
-## Setting up a WireGuard VPN server
+# Setting up a WireGuard VPN server
 
-### Install WireGuard
+## Install WireGuard
 
 `# apt install wireguard-tools`  
 
 If the Linux kernel you're using is older than 5.6 (check with `$ uname -r`), also install `wireguard-dkms`
 to get the WireGuard kernel module (it's included in Linux 5.6 and newer).
 
-### Basic setup of the server
+## Basic setup of the server
 
 > **NOTE:** This is a quite basic configuration of WireGuard, suitable for this particular usecase.
 > It fully supports IPv6 (but here having IPv4 addresses in the VPN is sufficient) and
@@ -247,7 +250,7 @@ the output should look like:
 That's a good start, but so far no one will be able to connect to this server, as no clients have
 been configured yet.
 
-### Configure a new client, on the client
+## Configure a new client, on the client
 
 This must be done on the client machine that's supposed to connect to the server!
 
@@ -255,7 +258,7 @@ This is similar to the server configuration. First you'll need to install wiregu
 see [the WireGuard Installation page](https://www.wireguard.com/install/) for installers for several
 operating systems including Windows.
 
-#### ... on Windows
+### ... on Windows
 
 Start the WireGuard application, or right-click the wireguard icon next to the clock of your taskbar
 and select "Manage tunnels..."
@@ -277,7 +280,7 @@ Note that you'll need the **Public Key** later, so you can already copy it somew
 Click `Save`. You can't activate the connection yet though, this new client must first be added
 to the server configuration, see below.
 
-#### ... on Linux and similar (using wg-quick)
+### ... on Linux and similar (using wg-quick)
 
 Like on the server, create a `/root/wireguard/` directory, make sure only root can access it and
 create a private and a public WireGuard key:  
@@ -340,7 +343,7 @@ must be told about the new client first.
 > (I also replace the last part of the  **Address** IP with `TODO` to make sure I don't forget to
 >  set a new IP when copy&pasting it to a new client configuration).
 
-#### ... on macOS
+### ... on macOS
 
 No idea, I don't have a mac :-p
 
@@ -348,7 +351,7 @@ There seems to be a WireGuard App in the [App Store](https://apps.apple.com/de/a
 and looking at [this tutorial](https://docs.oakhost.net/tutorials/wireguard-macos-server-vpn/#configuring-the-client)
 I found it seems to be pretty similar to the Windows one, so you should be able to get it to work :-)
 
-### Add new clients to the server configuration
+## Add new clients to the server configuration
 
 On the **server**, open `/etc/wireguard/wg0.conf` in a text editor (as root).
 
@@ -414,7 +417,7 @@ the WireGuard connection is closed when there's no real traffic, see also
 > WireGuard server to a server controlled by the attacker. For the general concept, see also
 > [Wikipedia on Public-key cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography)
 
-### Configure the server to automatically start the connection
+## Configure the server to automatically start the connection
 
 While you should have a working WireGuard VPN tunnel now, it won't work anymore if the server
 is rebooted. So let's tell the server to automatically start the wireguard server.
@@ -441,7 +444,7 @@ you can now also run:
 It might be a good idea to **reboot the server** and to make sure everything still works as expected
 after the boot.
 
-## A simple firewall with iptables and SSHGuard
+# A simple firewall with iptables and SSHGuard
 
 Before setting up any more services, let's create some simple firewall rules that block all
 connection attempts from the internet, except for ones to SSH and WireGuard.  
@@ -687,7 +690,7 @@ Contabo provides a command that can be executed to enable IPv6 *(but this is Con
 other hosters also disable IPv6 by default and you run into the same problem, refer to their documentation!):*  
 `# enable_ipv6`
 
-## Setting up dnsmasq as DNS server for a local domain
+# Setting up dnsmasq as DNS server for a local domain
 
 This step will set up [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html) for the local
 `example.lan` domain, so Forgejo will be reachable (in the VPN) under `http://git.example.lan`.
@@ -755,7 +758,7 @@ expand-hosts
 domain=example.lan
 ```
 
-*(You could also delete or rename `/etc/wireguard.conf`and create a fresh one that only contains
+*(You could also delete or rename `/etc/dnsmasq.conf`and create a fresh one that only contains
 the lines shown above)*
 
 Next edit `/etc/hosts`. dnsmasq uses hosts configured in that file to answer DNS requests.
@@ -772,11 +775,11 @@ Add the lines
 Now start dnsmasq again:  
 `# systemctl start dnsmasq.service`
 
-### Configure clients to use the DNS server
+## Configure clients to use the DNS server
 
 The VPN clients must be told to use the DNS server you just set up.
 
-#### Linux and other Unix-likes
+### Linux and other Unix-likes
 
 On **Linux** distros that use **systemd-resolved** (are there other Unix-likes that use systemd?),
 replace the `#PostUp = TODO` line line in the client's `/etc/wireguard/wg0.conf` with:  
@@ -823,7 +826,7 @@ but depending on your usecase this might be the path of least resistance...
 > other domains like `gibson.sh` or `google.com`)!  
 > Furthermore, it only works with resolvconf, not systemd-resolved or Windows (AFAIK).
 
-#### Windows
+### Windows
 
 On Windows, WireGuard doesn't support PostUp scripts (unless explicitly enabled in the registry),
 because apparently there are bigger security implications than on Linux.
@@ -843,7 +846,7 @@ request will timeout and fail in that case. .
 > `Remove-DnsClientNrptRule -Name "{6E6B2697-2922-49CF-B080-6884A4E396DE}"`
 > deletes the rule with that identifier.
 
-#### macOS
+### macOS
 
 Again, I can't test this myself because I don't have a Mac, but I found
 [a blog post](https://stanislas.blog/2020/02/different-nameservers-domains-macos/)
@@ -861,13 +864,13 @@ The blog posts suggests trying a reboot in case it doesn't work at all.
 I hope that it works with `git`, `git-lfs` and your web browser - if you try it,
 please let me know how it went in a comment! :-)
 
-#### Testing the DNS server
+### Testing the DNS server
 
 Now on the client you should be able to ping the new domains (if the WireGuard connection is active):  
 `$ ping example.lan`  
 `$ ping git.example.lan`
 
-## Setting up nginx as a reverse http proxy
+# Setting up nginx as a reverse http proxy
 
 [nginx](https://nginx.org/) will be used as a webserver/reverse proxy, that makes
 `http://www.example.lan` and `http://git.example.lan` and possibly other domains available,
@@ -936,7 +939,7 @@ which will open a text editor (with lots of stuff that's commented out) that all
 specify additional rules that overwrite the ones in the system nginx.service
 (at `/usr/lib/systemd/system/nginx.service`). All that's needed here are the following lines:
 
-```text
+```
 # tell systemd to start this service (nginx) after wg0 is up
 # (=> wg-quick@wg0 service is done)
 # so nginx can bind to the WireGuard device's IP
@@ -957,7 +960,8 @@ http://example.lan and http://git.example.lan (though the latter will show an er
 Forgejo isn't installed yet).  
 **Note** that you might have to actually type the whole URL including `http://` in the browser,
 because nowadays browsers only open URLs without protocol (`http://`) for known top level domains,
-otherwise they'll open a web search using "git.example.lan" or whatever you typed in as search query...
+otherwise they'll open a web search using "git.example.lan" or whatever you typed in as search
+query[^customtldworkaround]..
 
 As mentioned before, this uses plain HTTP, no HTTPS encryption, because:
 1. That would be a PITA to set up for a custom/local domain (you'd have to create your own pseudo-CA
@@ -969,7 +973,16 @@ As mentioned before, this uses plain HTTP, no HTTPS encryption, because:
    bandwidth, as both WireGuard and SSL/TLS (used by HTTPS) add their own metadata to each packet,
    *in addition* to the http message you actually want to send/receive.
 
-## Setting up dma as sendmail implementation
+> **NOTE:** If you want to host Forgejo publicly, much of this article still applies (you'd just
+> leave out the wireguard and DNS server parts). In that case you absolutely should use HTTPS
+> of course, and the place where you'd configure it would be the nginx configuration.
+> See the [nginx HTTPS documentation](https://nginx.org/en/docs/http/configuring_https_servers.html)
+> and their [blog post on using Let's Encrypt](https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/)
+> (if you want to use free Let's Encrypt SSL certificates) and 
+> [this Howto](https://www.howtoforge.com/how-to-install-gitea-on-ubuntu-22-04/)
+> on installing Gitea with Nginx and Let's Encrypt SSL.
+
+# Setting up dma as sendmail implementation
 
 It's useful for a server to be able to send E-Mails.  
 That can be used to tell you that an error happened, that updates are available, or it can just
@@ -1000,13 +1013,13 @@ edit `/etc/dma/dma.conf` and:
 * uncomment the `#AUTHPATH /etc/dma/auth.conf` line (remove the `#` at the beginning of the line)
   so auth.conf with the smtp server login data will be used (we'll edit that next)
 * uncomment `#SECURETRANSFER` so TLS/SSL is used
-* set `MASQUERADE noreply@yourmailer.com` (with the noreply address you want to use for this)
+* set `MASQUERADE noreply@yourdomain.com` (with the noreply address you want to use for this)
   to make sure that when sending mails it always uses that address as sender; your mailserver might
   even reject mails that set other senders
 
 Now edit `/etc/dma/auth.conf` to set the login data for the smtp server by adding a line like:  
-`noreply@yourmailer.com|smtp.yourmailer.com:YourPassw0rd`  
-where `smtp.yourmailer.com` is the same domain you set as "Smarthost".
+`noreply@yourdomain.com|smtp.yourdomain.com:YourPassw0rd`  
+where `smtp.yourdomain.com` is the same domain you set as "Smarthost".
 
 For other users than root to be able to use `dma` (or `sendmail`) to send a mail, the configs must
 be readable by the `mail` group. Check with:  
@@ -1034,14 +1047,14 @@ and [the ArchWiki's dma page](https://wiki.archlinux.org/title/Dma).
 > Also note that this is no endorsement for GMail (in fact I suggest not to use it),
 > but if you (or your company or project) are using it anyway, this information might be useful.
 
-### Testing the sendmail command
+## Testing the sendmail command
 
 Sending a mail on the commandline or a from script with sendmail is easy:
 It the receiver addresses are commandline arguments and the mail subject and text is read from stdin.
 
 So create a textfile like this:
 
-```text
+```
 Subject: This is a testmail!
 
 This is the body of the test mail.
@@ -1059,22 +1072,313 @@ and then send the mail with:
 
 The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail issues.
 
-## TODO: Setting up Forgejo for git hosting
+# Setting up Forgejo for git hosting
 
-TODO: install basically following https://docs.gitea.io/en-us/installation/install-from-binary/
-(adapted for forgejo), adjust its config (app.ini) (higher timeouts to allow bigger uploads and migrations,
-only listen on VPN IP, tell it to use sendmail, etc)
+> **NOTE:** Forgejo is a fork of Gitea, and at least as of release 1.19.3 they're very similar, so
+> these instructions should work for both (if you replace "forgejo" with "gitea" in paths etc).
+> Also, if you run into problems, searching your favorite search engine for `your problem "gitea"`
+> will probably give you more results than `your problem "forgejo"`, so it's worth trying. 
+> Similarly, if the [Forgejo Documentation](https://forgejo.org/docs/latest/) doesn't answer your
+> questions, check out the [Gitea Documentation](https://docs.gitea.io/en-us/).  
+> See [The Forgejo FAQ](https://forgejo.org/faq/) for more information about the project and why they forked.
+>
+> By the way, these Forgejo installation instructions are partly based on the
+> [Gitea Installation from Binary documentation](https://docs.gitea.io/en-us/installation/install-from-binary/)
+> (at time of writing, Forgejo doesn't have installation instructions yet).
 
+## Install Forgejo and git, create git user
 
-### Local storage vs. object storage for LFS
+First, download the Forgejo binary for your CPU architecture and maybe verify the GPG signature,
+as described on [the Forgejo download page](https://forgejo.org/download/).
 
-migrate LFS from local storage to S3-like object-storage:  
-`$ sudo -u git forgejo migrate-storage -t lfs -c /etc/forgejo/app.ini -s minio --minio-endpoint endpoint-url.com --minio-access-key-id YOUR_ACCESS_KEY_ID --minio-secret-access-key YOUR_SECRET_ACCESS_KEY --minio-bucket gitea --minio-use-ssl -w /var/lib/forgejo/`
+Next, copy the downloaded Forgejo binary to `/usr/local/bin/` (renaming it to just "forgejo")
+and make it executable:  
+`# cp forgejo-1.19.3-0-linux-amd64 /usr/local/bin/forgejo`  
+`# chmod 755 /usr/local/bin/forgejo`
 
-migrate from S3-like object-storage back to local:  
-`$ sudo -u git forgejo migrate-storage -t lfs -c /etc/forgejo/app.ini -s local -p /var/lib/forgejo/data/lfs -w /var/lib/forgejo/`
+Make sure `git` and `git-lfs` are installed:  
+`# apt install git git-lfs` 
 
-## TODO: Backups with restic
+Create a user `git` on the system. Forgejo will run as that user, and when accessing git through ssh
+(which is the default), this user is part of the URL *(for example in 
+`git clone git@git.example.lan:YourOrg/YourRepo.git` the `git` before the `@` is the user you'll create now).*
+
+```
+# adduser --system --shell /bin/bash --gecos 'Git Version Control' \
+  --group --disabled-password --home /home/git  git
+```
+
+## Create directories Forgejo will use
+
+Now create the directories Forgejo will use and set access rights appropriately:
+
+`# mkdir /var/lib/forgejo`  
+`# chown git:git /var/lib/forgejo && chmod 750 /var/lib/forgejo`  
+*This is the directory Forgejo will store its data in, including your git repos.*
+
+`# mkdir /etc/forgejo`  
+`# chown root:git /etc/forgejo && chmod 770 /etc/forgejo`  
+*This is the directory Forgejos config, called `app.ini`, is stored in. Initially it needs to
+be writable by Forgejo, but after the installation you can make it read-only for Forgejo because
+then it shouldn't modify it anymore.*
+
+## Optional: Set up database
+
+When using sqlite as Forgejos database, nothing needs to be done here.
+
+If you need a more powerful database, you can use MySQL/MariaDB or PostgreSQL (apparently sqlite
+is good enough for at least 10 users, but might even suffice for more[^sqlite] - and I read it's not
+too hard to migrate the database from sqlite to something else later).
+
+See [Forgejos Database Preparation guide](https://forgejo.org/docs/latest/admin/database-preparation/)
+for setup instructions.
+
+## Install systemd service for Forgejo
+
+Forgejo provides a
+[systemd service script](https://codeberg.org/forgejo/forgejo/src/branch/forgejo/contrib/systemd/forgejo.service).
+Download it to the correct location:  
+`# wget -O /etc/systemd/system/forgejo.service https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/contrib/systemd/forgejo.service`
+
+If you're *not* using sqlite, but MySQL or MariaDB or PostgreSQL, you'll have to edit that file
+(`/etc/systemd/system/forgejo.service`) and uncomment the corresponding `Wants=` and `After=` lines.
+Otherwise it should work as it is.
+
+Now enable and start the Forgejo service, so you can go on with the installation:  
+`# systemctl enable forgejo.service`  
+`# systemctl start forgejo.service`
+
+## Forgejos web-based configuration
+
+You should now be able to access Forgejo in your local web browser, so open http://git.example.lan/
+(make sure your WireGuard connection is enabled).
+
+If it doesn't work:
+* Make sure the forgejo service started successfully by checking the output of  
+  `# systemctl status forgejo.service`  
+  If that indicates an error but the log lines underneath are too incomplete to tell what caused it,  
+  `# journalctl -n 100 --unit forgejo.service`  
+  will print the last 100 lines logged by Forgejo.
+* Try http://git.example.lan:3000/ instead - that's the port Forgejo listens on,
+  this way nginx is circumvented *(later we'll configure Forgejo to make it only accessible through nginx)*.
+  If that works, [fix your nginx setup](#setting-up-nginx-as-a-reverse-http-proxy).
+* Try to ping `172.30.0.1` - if that fails, [make sure your WireGuard connection works](#setting-up-a-wireguard-vpn-server)
+* Try to ping `git.example.lan` - if you can't, fix your
+  [DNS setup](#setting-up-dnsmasq-as-dns-server-for-a-local-domain)
+  (also [on the client](#configure-clients-to-use-the-dns-server)!)
+
+You should be greeted by Forgejos "Initial Configuration" screen.  
+The settings should be mostly self-explanatory, some hints:  
+* Select the correct database (SQLite3, or if you configured something else in the 
+  [Set up database](#optional-set-up-database) step, select that and set the corresponding options)
+* **Server Domain** should be `git.example.lan` (or whatever you're actually using),  
+  **Forgejo Base URL** should be `http://git.example.lan`
+* Ignore the **Email Settings** - Forgejo can be easily configured to use system sendmail (dma), but
+  (at least in version 1.19) only in the app.ini, not in the web interface, so we'll do that later.
+* Check the **Server and Third-Party Service Settings** settings for settings that look relevant
+  for you.
+* I think it makes sense to create the administrator account right now (**Administrator Account Settings**),
+  even more so if you disabled self-registration.
+* Most settings can be easily changed in `/etc/forgejo/app.ini` later, so don't worry about them too much.
+
+Once you're done configuring, click `Install Forgejo` and a few seconds later you should be
+on the dashboard (if you created an administrator account) or at the login/register screen, where you
+can create an account to then get to the dashboard.
+
+So far, so good[^sowhat], but we're not quite done yet - some manual configuration in the app.ini is needed!
+
+## Further configuration in Forgejos app.ini
+
+Stop the forgejo service:  
+`# systemctl stop forgejo.service`
+
+While at it, make `/etc/forgejo/` and the `app.ini` read-only for the git user (Forgejo doesn't 
+write to it after the initial configuration):  
+`# chmod 750 /etc/forgejo && chmod 640 /etc/forgejo/app.ini`
+
+Now (as root) edit `/etc/forgejo/app.ini`
+
+> **NOTE:** You'll probably find the
+> [Configuration Cheat Sheet](https://forgejo.org/docs/latest/admin/config-cheat-sheet/) and the
+> [Example app.ini](https://codeberg.org/forgejo/forgejo/src/branch/forgejo/custom/conf/app.example.ini)
+> that contains all options incl. descriptions helpful.
+
+I recommend the following changes (in the order of where I put them in the app.ini):
+
+* Forgejo allows uploading files to git repos through the web interface.
+  By default the **file size for uploads**
+  is limited to 3MB per file, and 5 files at once. To increase it, under the `[repository]` section,
+  add a `[repository.upload]` section with a line like `FILE_MAX_SIZE = 4095`
+  (that would be 4095MB, about 4GB) and `MAX FILES = 20`
+  It'll look somehow like this:  
+  ```ini
+  ...
+  [repository]
+  ROOT = /var/lib/forgejo/data/forgejo-repositories
+
+  [repository.upload]
+  ;; max size for files to the repo via web interface, in MB, 
+  ;; defaults to 3 (this sets a limit of about 4GB)
+  FILE_MAX_SIZE = 4095
+  ;; by default 5 files can be uploaded at once, increase to 20
+  MAX_FILES = 20
+
+  [server]
+  ...
+  ```
+  Similar restrictions restrictions exist for attachments to issues/pull requests, configured
+  in the [`[attachment]` sections](https://forgejo.org/docs/latest/admin/config-cheat-sheet/#issue-and-pull-request-attachments-attachment)
+  `MAX_SIZE` (default 4MB) and `MAX_FILES` (default 5) settings.
+* In the `[server]` section add a line `HTTP_ADDR = 127.0.0.1` to ensure that Forgejo **only
+  listens on localhost** and is not reachable from the outside at all, except through nginx.
+* By default **LFS data uploads expire** after 20 minutes - this can be too short for big files,
+  slow connections or slow LFS storage (git-lfs seems to automatically restart the upload then -
+  which means that it can take forever and use lots of traffic)..  
+  If you're going to use LFS with big uploads, increase thus limit, by adding a line
+  `LFS_HTTP_AUTH_EXPIRY = 180m` (for 180 minutes) to the `[server]` section.
+* Similarly there are timeouts for all kinds of git operations, that can be too short.  
+  I ran into the problem that a migration of a big repository from our old Gitlab server timed out
+  and left the repository in an inconsistent state
+  ([due to a bug in Forgejo/Gitea](https://codeberg.org/forgejo/forgejo/issues/715) that
+  [should be fixed in the next version](https://github.com/go-gitea/gitea/pull/24605) I wasn't even
+  warned about this in the web interface, there were only some log messages).  
+  Anyway, I **increased all those git timeouts** by adding a `[git.timeout]` section
+  below the `[server]` section:
+  ```ini
+  ;; Git Operation timeout in seconds
+  ;; increase the timeouts, so importing big repos (and presumably
+  ;; pushing large files?) hopefully won't fail anymore
+  [git.timeout]
+  DEFAULT = 3600 ; Git operations default timeout seconds
+  MIGRATE = 6000 ; Migrate external repositories timeout seconds
+  MIRROR  = 3000 ; Mirror external repositories timeout seconds
+  CLONE   = 3000 ; Git clone from internal repositories timeout seconds
+  PULL    = 3000 ; Git pull from internal repositories timeout seconds
+  GC      = 600  ; Git repository GC timeout seconds
+  ```
+  I increased all timeouts to factor 10 (by adding a 0 at the end); probably not all these timeouts
+  need to be increased (and if, then maybe not this much).. use your own judgement, this worked for me ;-)
+* By default LFS files are stored in the filesystem, in `/var/lib/forgejo/data/lfs`.
+  In the `[lfs]` section you can change the `PATH = ...` line to store elsewhere, but you can also
+  configure Forgejo to store the files in an S3-like Object-Storage. More information on that in the
+  [object storage subchapter below](#local-storage-vs-object-storage-for-lfs).
+* Enable sending E-Mails with sendmail/dma by changing the `[mailer]` section like this:
+  ```ini
+  [mailer]
+  ;; send mail with systemwide "sendmail" (actually dma in our case)
+  ENABLED = true
+  PROTOCOL = sendmail
+  FROM = "Forgejo Git" <noreply@yourdomain.com>
+  ```
+
+When you're done editing the app.ini, save it and start the forgejo service again:  
+`# systemctl start forgejo.service`
+
+You can test sending a mail by clicking the user button on the upper right of the Forgejo page
+("Profile and Settings"), then `Site Administration`, then `Configuration` and under
+`Mailer Configuration` type in your mail address and click `Send Testing Email`.
+
+## General hints for using Forgejo
+
+If you've used Github or Gitlab before, the user interface should be familiar; if you're not sure
+how something is done, consult the [Forgejo user guide](https://forgejo.org/docs/latest/user/) and/or
+[Forgejo administrator guide](https://forgejo.org/docs/latest/admin/). If that doesn't answer your
+questions check the [Gitea documentation](https://docs.gitea.io/en-us/) or 
+[ask the Forgejo community](https://forgejo.org/docs/latest/admin/seek-assistance/).
+
+Remember that to use Git you'll need to add your SSH public key to Forgejo (User Button on upper right ->
+`Settings` -> `SSH / GPG Keys` -> `[Add Key]`, paste the contents of `$HOME/.git/id_rsa.pub`)
+
+Sometimes you may want/need to use the Forgejo
+[command line interface](https://forgejo.org/docs/latest/admin/command-line/).
+Keep in mind that:
+* You need to **run it as `git` user**, for example with `$ sudo -u git forgejo command --argument`
+* You need to specify the **Forgejo work path**, either with the `--work-path /var/lib/forgejo` 
+  (or `-w /var/lib/forgejo`) commandline option or by setting the `FORGEJO_WORK_DIR` environment variable
+  (`$ export FORGEJO_WORK_DIR=/var/lib/forgejo`) before calling `forgejo`
+* You need to specify the path to the config (app.ini) with `--config /etc/forgejo/app.ini`
+  (or `-c /etc/forgejo/app.ini`).
+
+So all in all your command might look like:  
+`$ sudo -u git forgejo -w /var/lib/forgejo -c /etc/forgejo/app.ini admin user list`
+
+> **_For convenience_**, you could create a `/usr/local/bin/forgejo.sh` with the following contents:
+> ```sh
+> #!/bin/sh
+> sudo -u git forgejo -w /var/lib/forgejo -c /etc/forgejo/app.ini "$@"
+>```
+> and make it executable:  
+> `# chmod 755  /usr/local/bin/forgejo.sh`
+> 
+> Now if you want to call `forgejo` on the commandline (for the default system-wide installation
+> in `/var/lib/forgejo`), just use e.g. `$ forgejo.sh admin user list` instead of the long
+> line shown above.
+
+You can always call forgejo and its subcommands with `-h` or `--help` to make it output usage
+information like available options and (sub)commands, for example  
+`$ forgejo admin user -h`  
+to show available subcommands to administrate users on the commandline.
+
+## Local storage vs. object storage for LFS
+
+Instead of storing the LFS files locally on the server (by default under `/var/lib/forgejo/data/lfs/`),
+Forgejo (and Gitea) supports storing them in an ([Amazon S3](https://aws.amazon.com/s3/)-compatible)
+*object storage*. If your server is at risk of running out of diskspace, it *might* be easier/cheaper
+to host the LFS files in an object storage instead of renting a bigger server.
+
+While Amazon S3 itself is way too expensive, there are open source solutions (like [MinIO](https://min.io/)
+or [Ceph](https://ceph.io/)) that implement S3's protocol, and providers that use those to offer
+S3-like object storage for much affordable prices, starting at around $10/month for 1TB[^storageprovider].
+
+To use such an object storage, the `[lfs]` section would look kinda like this
+([see also documentation](https://forgejo.org/docs/latest/admin/config-cheat-sheet/#lfs-lfs)):
+```ini
+[lfs]
+; PATH = /var/lib/forgejo/data/lfs ; only used for local storage
+;; adjust these settings for the logindata of your object storage provider
+STORAGE_TYPE     = minio
+MINIO_ENDPOINT   = endpoint-url.com
+MINIO_ACCESS_KEY_ID     = YOUR_ACCESS_KEY_ID
+MINIO_SECRET_ACCESS_KEY = YOUR_SECRET_ACCESS_KEY
+MINIO_BUCKET     = gitea
+MINIO_USE_SSL    = true ; encrypt connections to the object storage
+;; if your object storage provider needs it, set the location
+; MINIO_LOCATION: us-east-1
+```
+(Refer to your object storage providers documentation on how to get the needed keys and what the endpoint is.)
+
+> **One thing to keep in mind** with object storage is that when making **backups** of Forgejo, the data
+> in object storage isn't easily backed up together with the rest, because it's not on the same server.
+> So unless you trust the object storage provider to keep your data with enough redundancy that it will
+> never get destroyed (if their datacenter burns down, for example), you need to back up the data in
+> the object storage in an additional step after the ["normal" backup of your server](#backups-with-restic).
+> [Rclone](https://rclone.org/) is a great tool to access object storage (and lots of other kinds of
+> remote storage) and allows you to mount the object storage as a local pseudo-filesystem, so you
+> can copy its contents to a local backup disk, for example (or copy it to a different cloud storage).
+
+### Migrating to/from object-storage
+
+You can also migrate to object-storage later (or back from object-storage to local storage). 
+*(You don't need this when setting up forgejo initially, only if commits with LFS data have already
+been pushed to the server!)*
+
+To migrate, first stop Forgejo (`# systemctl stop forgejo.service`).
+
+To migrate LFS from local storage to object-storage (**while the app.ini still has local storage
+configured!**) run:  
+`$ sudo -u git forgejo -w /var/lib/forgejo/ -c /etc/forgejo/app.ini migrate-storage -t lfs -s minio --minio-endpoint endpoint-url.com --minio-access-key-id YOUR_ACCESS_KEY_ID --minio-secret-access-key YOUR_SECRET_ACCESS_KEY --minio-bucket gitea --minio-use-ssl `
+
+To migrate from S3-like object-storage back to local (**while the app.ini still has minio object
+storage configured!**) run:  
+`$ sudo -u git forgejo -w /var/lib/forgejo/ -c /etc/forgejo/app.ini migrate-storage -t lfs -s local -p /var/lib/forgejo/data/lfs`
+
+After the migration is done, adjust `/etc/forgejo/app.ini` for the new storage type and start Forgejo
+again (`# systemctl stop forgejo.service`).
+
+When you're done migrating *to* object storage, you may want to delete `/var/lib/forgejo/data/lfs/*`
+to free up the disk space.
+
+# Backups with restic
 
 TODO: setting up restic, link to docs for setting up rclone (for google drive),
 pg_basebackup? (maybe only if I also describe OpenProject here?)
@@ -1205,7 +1509,11 @@ fi
 
 TODO: cronjob to run backup every night
 
-## Thanks
+# TODO: basic monitoring
+
+.. finish that script and run it every 10 minutes or whatever ..
+
+# Thanks
 
 Thank you for reading this, I hope you found it helpful!
 
@@ -1214,6 +1522,11 @@ for setting up our server into a proper blog post!
 
 Thanks to [Yamagi](https://www.yamagi.org//) for proofreading this and answering my stupid questions
 about server administration :-)
+
+# Bonus: OpenProject
+
+link to install instructions, some short notes on them (no ssl, no apache),
+double-check ssl-settings in /etc/, nginx config
 
 <!-- Below: Footnotes -->
 
@@ -1285,3 +1598,34 @@ about server administration :-)
     Do **not** use **.local**, it's [reserved for multicast DNS / zeroconf (avahi, bonjour)](https://en.wikipedia.org/wiki/.local)
     and using it as a TLD for normal DNS just causes headaches (will need explicit configuration on
     many clients to work, because by default they assume that it's mDNS-only).
+
+[^customtldworkaround]: In **Firefox** you can fix this issue by opening `about:config` (enter that in
+    the URL bar), and then in the search field enter `browser.fixup.domainsuffixwhitelist.lan`, select
+    `Boolean` and press the `[+]` button on the right to add the setting, make sure it's set to `true`.  
+    For **Chrome** (and probably in derived browsers like Edge and modern Opera and whatever),
+    there is no good workaround AFAIK.
+    [Apparently](https://superuser.com/questions/274562/teach-google-chrome-to-understand-custom-tld)
+    you can teach it to always treat things typed into the URL bar as search terms, but then that
+    doesn't only affect example.lan (or \*.lan), but all search terms, so to search you'd either
+    have to press Ctrl-K before typing, or type `? ` before your search term (like
+    `? why are computers so horrible`). Alternatively, it helps if you add a slash, like
+    `git.example.lan/` instead of just `git.example.lan` - that's easier to type than
+    `http://git.example.lan` (though once the browser knows the URL you should get the version with
+    http:// anyway through autocompletion).
+
+[^sowhat]: ... so what!
+
+[^storageprovider]: Some examples for comparison:
+    * [Amazon S3](https://aws.amazon.com/s3/pricing/) $21/month for 1TB of storage, $90/TB for
+      *downloading* traffic (uploading is free), requests cost extra
+    * [Backblaze B2](https://www.backblaze.com/b2/cloud-storage.html) $5/month for 1TB of storage and
+      $10 per **downloaded** TB (uploads seem to be free?).
+    * [Contabo](https://contabo.com/en/object-storage/) around €10/month for 1TB, incl. traffic.
+      They say that they [throttle bandwidth to 80MBit/s (10MByte/s)](https://docs.contabo.com/docs/products/Object-Storage/technical-description/#limits),
+      but in my tests (this is the only provider I tested), especially uploads were even slower:
+      Usually between 2.5 and 4.5 MByte/s, often below 1.5 MByte/s. Maybe that improves in the
+      future, but in the two weeks or so that I've (occasionally) done tests, it was like this.
+    * [Vultr](https://www.vultr.com/products/object-storage/) $5/month for 1TB of storage and
+      1TB of traffic, each additional TB of storage costs $5/month, each additional TB of traffic
+      costs $10/month
+

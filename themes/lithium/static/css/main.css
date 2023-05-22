@@ -40,7 +40,6 @@ code {
   hyphens: none; /* breaking inline-code sections with hyphens looks bad */
   padding: 2px 3px 2px 3px;
   border-radius: 3px;
-  /*font-size: 100%;*/
 }
 
 .wrapper {
@@ -133,10 +132,6 @@ code {
   border-radius: 8px;
 }
 
-.toc nav {
-  margin-top: -1em;
-}
-
 .toc nav a {
   color: #050505;
 }
@@ -181,7 +176,7 @@ code {
 
 
 .article-content p {
-  margin: 15px 0 25px;
+  margin: 16px 0 8px;
 }
 
 .footnotes {
@@ -331,17 +326,50 @@ code {
   margin-left: 2px;
 }
 
-@media (min-width: 800px) {
+blockquote {
+  /* top right bottom left - default: 17px 40px*/
+  margin: 0 0 0 0px;
+  border-left: 3px solid #CCC;
+  padding-left: 0.25em;
+}
 
-  /* if there's some margin on the left, move the heading link
+ol, ul {
+  padding-left: 1.5em;
+  margin: 0 0 0 0;
+}
+
+/* when using ``` code blocks without specifying a highlight language,
+   just <pre><code>...</code></pre> is generated. add rules for that so it looks
+   like the highlighted code blocks (just without the highlighting)
+   (those rules mostly apply to highlighted blocks as well, as they also use <pre> somewhere */
+pre {
+  overflow: auto !important;
+  border-radius: 6px;
+  background-color: #f8f8f8;
+  padding: 0.5em 1em;
+  line-height: 1.2em;
+  font-size: 14px;
+}
+pre code {
+  /* code sets a background color and padding,
+      we only want that for inline code, not in <pre> blocks */
+  background-color: unset;
+  border: unset;
+  padding: 0;
+}
+
+@media (min-width: 870px) {
+/* if there's some margin on the left, move the heading link
    * to the left so the heading itself is roughly where it would be
    * without the "# " link */
   .article-content .headinglink {
     margin-left: -1em;
   }
+}
 
+@media (min-width: 850px) {
   .header {
-    padding: 25px 0;
+    padding: 25px 0; /**/
   }
 
   .nav-logo {
@@ -367,11 +395,17 @@ code {
     margin: 30px auto;
   }
 
-  .highlight {
-    font-family: 'Source Code Pro', monospace;
+  blockquote {
+    /* top right bottom left - default: 17px 40px*/
+    margin: 0 0 0 10px;
+    padding-left: 0.5em;
+  }
+
+  /* code blocks (with and without highlight) are indented slightly
+     and get a bigger font, if the screen is big enough */
+  .highlight, pre {
+    margin: 0px 6px;
     font-size: 16px;
-    /*font-size: 120%;*/
-    margin: 0px 10px;
   }
 
   .archive {
@@ -407,19 +441,13 @@ code {
 
 .highlight {
   font-family: 'Source Code Pro', monospace;
-  border-radius: 23px;
   position: relative;
-  /*margin: 40px 0;*/
-  line-height: 1.4em;
-  font-size: 14px;
-  /*font-size: 100%;*/
   text-align: left;
 }
 
 .highlight pre {
-  padding: 0.5em 1em;  
-  overflow: auto !important;
   margin: 0; /* 0.5em 0 0.0em; */
+  line-height: 1.3em;
 }
 
 /* padding for highlighting with linenumbers (lntable), extra padding on the left for space
@@ -431,8 +459,7 @@ code {
 
 /* the first column in a line number code table is the line numbers, we don't want padding on the left there,
    but we *do* want a darker background to separate linenumbers and code */
-.highlight .lntable td:first-child .chroma,
-.highlight .lntable td:first-child .chroma code {
+.highlight .lntable td:first-child .chroma {
 	padding-left: 0;
 	background-color: #e8e8e8;
 	/* only round the left corners (the outer ones), the right ones are direct neighbours of the code column */
@@ -442,13 +469,9 @@ code {
 
 /* generated with: hugo gen chromastyles --style=tango */
 /* Background */ .chroma {
- background-color: #f8f8f8 ;
+ background-color: #f8f8f8;
  border-radius: 6px; /* DG: added this */
 }
-/* DG: must specify background-color for .chrome code, otherwise the default code style
-       for normal text overwrites the chroma background color.
-       same for padding, else the first line is misaligned (?!) */
-.chroma code { background-color: unset; padding: 0; }
 /* Other */ .chroma .x { color: #000000 }
 /* Error */ .chroma .err { color: #a40000 }
 /* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
