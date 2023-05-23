@@ -1383,8 +1383,7 @@ to free up the disk space.
 TODO: setting up restic, link to docs for setting up rclone (for google drive),
 pg_basebackup? (maybe only if I also describe OpenProject here?)
 
-Suggested backup script (TODO: make lines fit in blog):
-
+Suggested backup script:
 ```bash
 #!/bin/bash
 
@@ -1392,117 +1391,155 @@ export RESTIC_REPOSITORY="TODO_YOUR_RESTIC_REPO"
 export RESTIC_PASSWORD_FILE=/root/backup/.restic-pw.txt
 
 # who will get an e-mail if some part of the backup has an error?
-# uses the "sendmail" command
 WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
-# NOTE: if you don't want any emails sent, use an empty list, like in the next line
+# NOTE: if you don't want any emails sent, use an empty list, like this:
 #WARN_MAIL_RECP=()
 
 NUM_ERRORS=0
 
+# helper function, prints current time in format "15:34:02"
 mytime() {
-	date +'%R:%S'
+    date +'%R:%S'
 }
 
+# helper function, called with an error string as argument
+# checks if the last run command was successful (returned 0)
+# otherwise increments NUM_ERRORS and prints the given error string
 checklastcommand() {
-	if [ $? != 0 ]; then
-		NUM_ERRORS=$(($NUM_ERRORS+1))
-		echo "$*"
-	fi
+    if [ $? != 0 ]; then
+        NUM_ERRORS=$((NUM_ERRORS + 1))
+        echo "$*"
+    fi
 }
 
+# backs up just the data from OpenProject (and postgresql),
+# feel free to remove this function if you don't use that
+# !! if you *do* use OpenProject, uncomment the call !!
+# !! to backupopenproject in backupallthethings()    !!
+# based on:
+# https://www.openproject.org/docs/installation-and-operations/operation/backing-up/
+# https://www.openproject.org/docs/installation-and-operations/operation/restoring/
+# (meaning, the restore instructions should work with this data,
+#  except you'll copy the directories from the backup instead
+#  of extracting them from a .tar.gz)
+backupopenproject() {
+    echo -e "\n$(mytime) Backing up OpenProject"
+
+    systemctl stop openproject
+    checklastcommand "ERROR: Stopping OpenProject service failed!"
+
+    # remove old postgres-backup dir, recreate an empty one
+    [ -e /tmp/postgres-backup/ ] && rm -r /tmp/postgres-backup/
+    mkdir /tmp/postgres-backup
+    chown postgres:postgres /tmp/postgres-backup
+    
+    echo "$(mytime) .. dumping PostgreSQL database for OpenProject backup"
+    
+    # this line is like described in the openproject docs
+    su -l postgres -c "pg_dump -U postgres -d openproject -x -O \
+        > /tmp/postgres-backup/openproject.sql"
+    checklastcommand "ERROR: pg_dump for openproject.sql failed!"
+    
+    # this is just to be double-sure, so we have a backup of all postgres
+    # tables, not just openproject (mostly redundant with openproject.sql,
+    # but whatever, it's not that big..)
+    su -l postgres -c "pg_dumpall > /tmp/postgres-backup/all.sql"
+    checklastcommand "ERROR: pg_dumpall for all.sql failed!"
+
+    echo "$(mytime) .. backing up OpenProject files"
+
+    restic backup /var/db/openproject/files/ /tmp/postgres-backup/
+    checklastcommand "ERROR: backing up OpenProject"
+
+    # Note: we don't manage git/svn repos with openproject,
+    # so those steps from the official docs are missing
+    # also: /etc/openproject/ is backed up as part of
+    #       /etc/ in an earlier backup step
+
+    service openproject start
+    checklastcommand "ERROR: Starting OpenProject service failed!"
+}
+
+# does all backup steps, prints messages to stdout
+# (commands called by it might also print to stderr)
+# in function so we can easily redirect all output to a logfile
 backupallthethings() {
-	echo -e "Running Backup at $(date +'%F %R:%S')\n"
-	
-	echo "$(mytime) Backing up /root/ and /etc/"
+    echo "Running Backup at $(date +'%F %R:%S')"
+    
+    echo -e "\n$(mytime) Backing up /root/ and /etc/"
 
-	# let's backup all of /etc/, it's just a few MB and may generally come in handy
-	# (also all of /root/)
-	restic backup --exclude /root/.cache/ /root/ /etc/
-	checklastcommand "ERROR: restic failed backing up /root/ and /etc"
+    # backup all of /etc/, it's just a few MB and may come in handy
+    # (also all of /root/, except for the cache folder which is
+    #  actively used by restic when it's backing up)
+    restic backup --exclude /root/.cache/ /root/ /etc/
+    checklastcommand "ERROR: restic failed backing up /root/ and /etc"
 
+    ##### Forgejo #####
 
-	##### Forgejo #####
+    echo -e "\n$(mytime) Backing up Forgejo"
 
-	echo "$(mytime) Backing up Forgejo"
+    # TODO: somehow check if someone is currently pushing
+    #       before stopping the service? how?
+    
+    # flush forgejos queues
+    su -l git -c "forgejo -c /etc/forgejo/app.ini -w /var/lib/forgejo \
+        manager flush-queues"
 
-	# TODO: somehow check if someone is currently pushing before stopping the service?
+    checklastcommand "ERROR: Flushing forgejo queues failed!"
 
-	# flush forgejos queues
-	su -l git -c "forgejo -c /etc/forgejo/app.ini -w /var/lib/forgejo manager flush-queues"
-	checklastcommand "ERROR: Flushing forgejo queues failed!"
+    # stop the service, so we backup a consistent state
+    systemctl stop forgejo
+    checklastcommand "ERROR: Stopping forgejo service failed!"
 
-	# stop the service, so we backup a consistent state
-	systemctl stop forgejo
-	checklastcommand "ERROR: Stopping forgejo service failed!"
+    # Note: when using forgejo with sqlite, this also backs up the database
+    # if you use postgres or mysql/mariadb, you need to do that
+    # in an extra step (as shown in backupopenproject())
+    restic backup /var/lib/forgejo/
+    checklastcommand "ERROR: backing up /var/lib/forgejo failed!"
 
-	# Note: we're using forgejo with sqlite, so this also backs up the database
-	restic backup /var/lib/forgejo/
-	checklastcommand "ERROR: backing up /var/lib/forgejo failed!"
+    # we're done backing up forgejo, start the service again
+    systemctl start forgejo
+    checklastcommand "ERROR: Starting forgejo service failed!"
 
-	# we're done backing up forgejo, start the service again
-	systemctl start forgejo
-	checklastcommand "ERROR: Starting forgejo service failed!"
+    ##### OpenProject #####
+    # uncomment the next line if you're using OpenProject
+    #backupopenproject
+    
+    # TODO: rotate backups by forgetting old ones,
+    #       with restic forget --keep-within 1y ?
+    # TODO: remove unreferenced data with restic prune ?
+    # TODO: maybe only do that occasionally, on sundays?
 
-
-	##### OpenProject #####
-
-	# based on: https://www.openproject.org/docs/installation-and-operations/operation/backing-up/
-	# and:      https://www.openproject.org/docs/installation-and-operations/operation/restoring/
-	# (meaning, the restore instructions should work with this data, except you'll copy the directories 
-	#  from the backup instead of extracting them from a tar.gz)
-
-	echo "$(mytime) Backing up OpenProject"
-
-	systemctl stop openproject
-	checklastcommand "ERROR: Stopping OpenProject service failed!"
-
-	[ -e /tmp/postgres-backup/ ] && rm -r /tmp/postgres-backup/
-	mkdir /tmp/postgres-backup
-	chown postgres:postgres /tmp/postgres-backup
-	
-	echo "$(mytime) .. dumping PostgreSQL database for OpenProject backup"
-	
-	# this line is like described in the openproject docs
-	su -l postgres -c "pg_dump -U postgres -d openproject -x -O > /tmp/postgres-backup/openproject.sql"
-	checklastcommand "ERROR: pg_dump for openproject.sql failed!"
-	
-	# this is just to be double-sure, so we have a backup of all postgres tables, not just openproject
-	# (mostly redundant with openproject.sql, but whatever, it's not that big..)
-	su -l postgres -c "pg_dumpall > /tmp/postgres-backup/all.sql"
-	checklastcommand "ERROR: pg_dump for all.sql failed!"
-
-	echo "$(mytime) .. backing up OpenProject files"
-
-	restic backup /var/db/openproject/files/ /tmp/postgres-backup/
-	checklastcommand "ERROR: backing up OpenProject"
-
-	# Note: we don't manage git/svn repos with openproject, so those steps are missing
-	# also: /etc/openproject/ is backed up as part of /etc/ above
-
-	service openproject start
-	checklastcommand "ERROR: Starting OpenProject service failed!"
-
-
-	# TODO: rotate backups by forgetting old ones, with restic forget --keep-within 1y ?
-	# TODO: remove unreferenced data with restic prune ?
-	# TODO: maybe only do that occasionally, on sundays?
-
-	echo -e "$(mytime) Backup done!\n"
+    echo -e "\n$(mytime) Backup done!\n"
 }
 
-[ -e /root/backup/backuplog.txt ] && mv /root/backup/backuplog.txt /root/backup/backuplog-old.txt
+## actual execution of this script starts here:
+
+# if there already is a backuplog.txt (from last run)
+# rename it to backuplog-old.txt
+if [ -e /root/backup/backuplog.txt ]; then
+    mv /root/backup/backuplog.txt /root/backup/backuplog-old.txt
+fi
+# run the backupallthetings() function. its output is both
+# printed to stdout and written into backuplog.txt
 backupallthethings 2>&1 | tee /root/backup/backuplog.txt
 
 if [ $NUM_ERRORS != 0 ]; then
-	echo "$NUM_ERRORS errors during backup!"
+  echo "$NUM_ERRORS errors during backup!"
 
-	# if the list of mail recipients isn't emtpy, send them a mail about the error
-	if [ ${#WARN_MAIL_RECP[@]} != 0 ]; then
-		echo -e "Subject: WARNING: $NUM_ERRORS errors happened when trying to backup $(hostname)!\n" > /tmp/backuperrmail.txt
-		echo -e "Please see log below for details\n" >> /tmp/backuperrmail.txt
-		cat /root/backuplog.txt >> /tmp/backuperrmail.txt
-		sendmail ${WARN_MAIL_RECP[@]} < /tmp/backuperrmail.txt
-	fi
+  # if the list of mail recipients isn't emtpy,
+  # send them a mail about the error
+  if [ ${#WARN_MAIL_RECP[@]} != 0 ]; then
+    # (yes, the following three lines are all for the subject line and could
+    #  be one long line, I split them up so they'd fit in the blogs width...)
+    echo -n "Subject: WARNING: $NUM_ERRORS errors" > /tmp/backuperrmail.txt
+    echo -n " happened when trying to" >> /tmp/backuperrmail.txt
+    echo -e " backup $(hostname)!\n" >> /tmp/backuperrmail.txt
+
+    echo -e "Please see log below for details\n" >> /tmp/backuperrmail.txt
+    cat /root/backup/backuplog.txt >> /tmp/backuperrmail.txt
+    sendmail "${WARN_MAIL_RECP[@]}" < /tmp/backuperrmail.txt
+  fi
 fi
 
 ```
