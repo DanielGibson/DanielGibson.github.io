@@ -25,6 +25,8 @@ You'll also need full **root privileges** on the system.
 Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).
 
+<!--more-->
+
 **Note:** You'll often need to enter commands in the shell. The following convention will be used:
 
 `$ some_command --some argument`  
@@ -1327,10 +1329,10 @@ Forgejo (and Gitea) supports storing them in an ([Amazon S3](https://aws.amazon.
 to host the LFS files in an object storage instead of renting a bigger server.
 
 While Amazon S3 itself is way too expensive, there are open source solutions (like [MinIO](https://min.io/)
-or [Ceph](https://ceph.io/)) that implement S3's protocol, and providers that use those to offer
-S3-like object storage for much affordable prices, starting at around $10/month for 1TB[^storageprovider].
+or [Ceph](https://ceph.io/)) that implement S3's protocol, and providers that use those to offer S3-like
+object storage for much more affordable prices, starting at around $10/month for 1TB[^storageprovider].
 
-To use such an object storage, the `[lfs]` section would look kinda like this
+To use such an object storage, the `[lfs]` section in `/etc/forgejo/app.ini` would look kinda like this
 ([see also documentation](https://forgejo.org/docs/latest/admin/config-cheat-sheet/#lfs-lfs)):
 ```ini
 [lfs]
@@ -1353,8 +1355,9 @@ MINIO_USE_SSL    = true ; encrypt connections to the object storage
 > never get destroyed (if their datacenter burns down, for example), you need to back up the data in
 > the object storage in an additional step after the ["normal" backup of your server](#backups-with-restic).
 > [Rclone](https://rclone.org/) is a great tool to access object storage (and lots of other kinds of
-> remote storage) and allows you to mount the object storage as a local pseudo-filesystem, so you
-> can copy its contents to a local backup disk, for example (or copy it to a different cloud storage).
+> remote storage) and allows you to mount the object storage as a local virtual filesystem, so you
+> can copy its contents to a local backup disk, for example (or copy it to a different cloud storage;
+> you could probably even run **restic** on the mounted folder).
 
 ### Migrating to/from object-storage
 
@@ -1380,10 +1383,158 @@ to free up the disk space.
 
 # Backups with restic
 
-TODO: setting up restic, link to docs for setting up rclone (for google drive),
-pg_basebackup? (maybe only if I also describe OpenProject here?)
+[restic](https://restic.net/) is a powerful backup tool that's easy to install and relatively easy
+to use.  
+Restic creates **incremental backups** - each time it's run for a specific path, it creates a new
+**snapshot** for it (that can later be restored), but only saves the difference to the last snapshot,
+which is pretty **space-efficient** and **fast**. Furthermore, it **compresses** the backups
+(saves even more space) and **encrypts** them, so if someone gets access to wherever you store you
+backups (for example backup space provided by your hoster), they still can't access your data
+*(unless the attacker somehow managed to steal your password as well, but it's not stored with the
+ backups, of course)*.
 
-Suggested backup script:
+It directly supports **storing the backups** on a **local path**, or on **another server** with a
+variety of protocols including SFTP, the Amazon S3 protocol and a custom REST protocol - and when 
+combining it with [Rclone](https://rclone.org/) (which it supports out of the box, if Rclone is
+installed), it supports literally dozens of additional protocols and providers, including FTP(S),
+WebDAV (ownCloud/Nextcloud), Google Drive, MS OneDrive, SMB/CIFS (Windows share)
+[and more](https://rclone.org/#providers).
+
+## Installing restic
+
+Download their [latest release](https://github.com/restic/restic/releases/latest) for your platform
+(probably linux_amd64) and extract it:  
+`$ bunzip2 restic_0.15.2_linux_amd64.bz2`  
+(adjust filename for the version your downloaded)  
+Then copy it to `/usr/local/bin/restic`:  
+`# cp restic_0.15.2_linux_amd64 /usr/local/bin/restic`  
+and make it executable:  
+`# chmod 755 /usr/local/bin/restic`
+
+## Optional: Install and configure rclone
+
+If you want to upload your backups to a storage provider not directly supported by restic
+(check [this list](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html)),
+you'll need to install Rclone.
+
+You can download it at <https://rclone.org/downloads/> - I chose the `.deb` version for 
+"Intel/AMD - 64 Bit" (I guess it should work on most recent-ish versions of Debian, Ubuntu and derivates)
+and installed it with:  
+`# dpkg -i ./rclone-v1.62.2-linux-amd64.deb`
+
+> **NOTE:** Ubuntu provides an rclone package in their repo as well, but it's older (1.53).
+> For best compatibility with storage providers, using the latest version is probably best.  
+> (I couldn't get 1.53 to work with Google Drive, I think the authorization link changed
+>  since 1.53 was released).
+
+You can configure a remote (incl. login-data etc) with  
+`# rclone config`  
+*(this doesn't generally require root privileges, but as you're going to use this with restic
+ that will be run as root, configure rclone as/for root as well)*  
+Find your provider in [this list](https://rclone.org/#providers) and click the `(Config)` button
+on the right to get detailed provider-specific instructions (make sure to read them completely,
+for example for Google Drive, their
+[*Making your own client_id*](https://rclone.org/drive/#making-your-own-client-id) section is said
+to be important to get decent performance).
+
+Remember the **_name_** you chose for the remote, you'll have to pass it to restic as "repository"
+(with `-r` or in the `$RESTIC_REPOSITORY` environment variable) in the form
+`rclone:NameYouChose:basePathFor/backup`.
+
+One nice feature of rclone is that you can [**mount remotes**](https://rclone.org/commands/rclone_mount/),
+which allows accessing the files on your remote storage like they were on a (probably pretty slow..)
+local harddisk (or, maybe closer to the truth, a mounted network share).  
+*I've used this to copy the restic binary and the clone package to the cloud storage, so if I have to
+restore the backup on a fresh system I have the exact same versions for restic and rclone, which
+should ensure compatibility with the backed up data (in theory restics backup data format could
+change in the future).*
+
+## Setting up a new restic backup repository
+
+First create a directory `/root/backup/` that the backup script and logs and some other things will
+put in. Then create an empty file `.restic-pw.txt` in it, make sure that it can only be accessed by root
+and then edit it.  
+`# mkdir /root/backup && cd /root/backup`  
+`# touch .restic-pw.txt && chmod 600 .restic-pw.txt`
+
+That file will contain the password used by restic to encrypt the backup. I suggest using a long
+completely random password - you shouldn't have to type it in, but use that file (or a copy) instead.
+You can *either* use a **text editor** to fill in the password, *or* generate one with a tool like 
+**`pwgen`** (can be installed with `# apt install pwgen`) and store it directly in the file, like:  
+`# pwgen -1ncys 32 > .restic-pw.txt`  
+*This creates a single (`-1` - that's a one) password consisting of `32` characters:
+at least one `c`apital letter, one `n`umber, one "special s`y`mbol" and is
+`s`secure/"completely random" (instead of easily memorable).*
+
+**!! Make a local copy of `.restic-pw.txt` on your machine !!**  
+**!! Without this password the backups can't be restored !!**   
+Or put it on a (possibly encrypted) USB memory key or whatever, and maybe give a copy to a trusted
+friend or coworker (depending on what your server is for). The point is, if your server dies for some
+reason - *this can absolutely happen and is the main scenario backups are for, right?* - you obviously
+won't be able to access it to get the password from the file. But you'll need the password to
+restore the backup on your new server.
+
+> **NOTE:** Because of restics clever design, you're able to change the password later (see 
+> [restic Encryption documentation](https://restic.readthedocs.io/en/stable/070_encryption.html)),
+> or even have multiple passwords. This is possible because restic generates its own completely
+> random password for the encryption of the actual backed up data - and only uses your key to encrypt
+> its generated key (the generated key, encrypted with your key, is stored on the backup server
+> together with the backed up data). So if you change the key, restic only needs to decrypt the
+> generated key with your old key and encrypt it again with your new key (and delete the old version
+> of the encrypted key).
+
+Anyway, time to **finally initialize the restic backup repository!**  
+That's done with:  
+`# restic -r YOUR_RESTIC_REPO -p /root/backup/.restic-pw.txt init`  
+You need to replace `YOUR_RESTIC_REPO` with something that's specific to the storage backend you want
+to use, see [the restic docs for details](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html).  
+
+**NOTE:** Instead of providing the repo name and password file with commandline arguments,
+you can also use **environment variables**, like:  
+`# export RESTIC_REPOSITORY="/mnt/backup-disk/"`  
+*(that example is for a local backup disk mounted at `/mnt/backup-disk/`, more useful for your
+  PC/laptop than a server in a datacenter)*  
+`# export RESTIC_PASSWORD_FILE="/root/backup/.restic-pw.txt"`  
+Afterwards you can run restic commands without specifying `-r` or `-p`.  
+The remaining example restic calls in this Howto will do just that.
+
+**Example:** If your backup server can be accesses through **SFTP (SSH)** at address
+`backup-host.example`, and you want to store the backup data in the directory `/srv/restic/` 
+on that server, you'd use something like:  
+`# export RESTIC_REPOSITORY="sftp:user@backup-host.example:/srv/restic"`  
+`# restic init`
+
+If you're using **Google Drive through Rclone** and named the Rclone remote "gdrive" and want to
+store the backups under `backups/gitserver` in the Google drive, it'd look like:  
+`# export RESTIC_REPOSITORY="rclone:gdrive:backups/gitserver"`  
+`# restic init`
+
+For most other backends you'll need to set environment variables with access keys,
+see [the documentation](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html).
+
+Once the `init` step has finished successfully, you're ready to backup with restic!
+
+## Actually backing up
+
+Generally, backing up is done with `# restic backup /path1 /path2 /path3`.
+This will create one snapshot containing those three paths - and if they have been backed up (together)
+before, that snapshot will be based on the last one and only the difference will be stored, which
+makes backing up pretty fast and small.
+
+So each call to `restic backup` creates a new snapshot - IMHO this is a bit annoying, I'd like to
+do multiple successive calls for different services on the same server (and in between stop/restart
+those services) and still have them grouped in one logical snapshot, but it is what it is, and
+I can live with it.. just keep it in mind when browsing snapshots (e.g. after `restic mount`).
+
+Backing up should be done with a script that can be called automatically once a day or so.
+The following (saved in `/root/backup/backup.sh`) should be a good start: It backs up the forgejo data,
+`/etc/` and `/root/` and optionally an [OpenProject](https://www.openproject.org/) installation
+(if you want to use that, uncomment the `#backupopenproject` line in `backupallthethings()`)[^op-bk].
+It also checks if each command succeded, and if anything goes wrong sends you an E-Mail with further
+information, and stores a log in `/root/backup/backuplog.txt`.
+
+Remember to adjust the `export RESTIC_REPOSITORY="..."` and `WARN_MAIL_RECP=(...)` lines!
+
 ```bash
 #!/bin/bash
 
@@ -1504,12 +1655,19 @@ backupallthethings() {
     ##### OpenProject #####
     # uncomment the next line if you're using OpenProject
     #backupopenproject
-    
-    # TODO: rotate backups by forgetting old ones,
-    #       with restic forget --keep-within 1y ?
-    # TODO: remove unreferenced data with restic prune ?
-    # TODO: maybe only do that occasionally, on sundays?
 
+    echo -e "\n$(mytime) Checking basic backup consistency with restic check"
+    # Note: this does *not* read all the data on the backup server to ensure
+    # that data files weren't damaged there (that would required downloading
+    # it and thus take a long time and use up lots of traffic), but (AFAIK)
+    # only checks the metadata and probably the size of the stored files.
+    restic check
+    if [ $? != 0 ]; then
+      NUM_ERRORS=$((NUM_ERRORS + 1))
+      echo "ERROR: restic check failed!"
+      echo "  *might* be harmless, see https://restic.readthedocs.io/en/v0.15.2/faq.html"
+    fi
+    
     echo -e "\n$(mytime) Backup done!\n"
 }
 
@@ -1544,11 +1702,174 @@ fi
 
 ```
 
-TODO: cronjob to run backup every night
+After saving this script at `/root/backup/backup.sh`, make it executable (for root):  
+`# chmod 700 /root/backup/backup.sh`
+
+Run it once to make sure it works (might take a while, especially if you've already imported
+bigger git repos):  
+`# /root/backup/backup.sh`
+
+## Create a cronjob to do a backup every night
+
+If the manual run worked, create a cronjob so it runs every night, by creating a file
+`/etc/cron.d/my_backup` with the following contents:
+```
+# every night at 05:03, do a backup
+3 5 * * * root  /root/backup/backup.sh
+```
+
+the format is (copied from Ubuntu's /etc/crontab):
+```
+.---------------- minute (0 - 59)
+|  .------------- hour (0 - 23)
+|  |  .---------- day of month (1 - 31)
+|  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+|  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+|  |  |  |  |
+3  5  *  *  * user-name command to be executed
+```
+(`*` means "any", in our case "on any day of month in any month on any day of week",
+ see also [man 5 crontab](https://manpages.ubuntu.com/manpages/focal/en/man5/crontab.5.html))
+
+## Some more notes on restic
+
+Some general restic tips:
+* `$ restic --help` (or just `restic -h`) shows available commands and generic flags,  
+  `$ restic subcommand --help` (e.g `$ restic ls --help`) shows information and flags for a subcommand.
+* The full documentation can be found [here](https://restic.readthedocs.io/)
+* `# restic generate --bash-completion /etc/bash_completion.d/restic`  
+  Creates a bash-completion file for restic, so you can complete restic subcommands and arguments
+  by pressing tab (after running this, you need to log out and log in again for it to be used, or
+  run `# source /etc/bash_completion.d/restic` to use it immediately).
+* `# restic snapshots --latest 10` shows the 10 most recent snapshots
+* `# restic mount /mnt` mounts the backup repository to `/mnt`, so you can browse the snapshots and
+  contained files there, and copy them to your server to restore a backup. **Note** that this command
+  might take some time until the mountpoint is usable, and it runs in the foreground - it will print
+  something this once it's ready:
+  ```
+  Now serving the repository at /mnt
+  Use another terminal or tool to browse the contents of this folder. 
+  When finished, quit with Ctrl-c here or umount the mountpoint.
+  ```
+* To prevent your backup storage from growing indefinitely over time, you can tell restic to delete
+  old snapshots, for example `# restic forget --keep-within 1y` deletes snapshots that are older than
+  a year. Apparently `restic forget` itself is pretty fast, but to actually delete the data you need
+  to call `# restic prune` afterwards which deletes unreferenced objects from the backup repository
+  and might take a while (while `prune` is running you can't create new backups). After pruning, you
+  should run `# restic check` to make that the repository isn't damaged. See also
+  [the restic docs on forget](https://restic.readthedocs.io/en/stable/060_forget.html) and
+  [on check](https://restic.readthedocs.io/en/stable/045_working_with_repos.html#checking-integrity-and-consistency).  
+  You may want to run `forget` and `prune` every once in a while, either manually or maybe once
+  a week or so in a cronjob.
+
+## Backing up the backup
+
+If you consider **ransomware** that encrypts/destroys the data on your server a possible threat,
+keep in mind that, if the ransomware gains root access, it can also access your backup storage, and
+could **delete your backup** (unless you're using some kind of append-only remote storage, where
+existing data can't be modified or deleted - at least restics
+[rest-server](https://github.com/restic/rest-server) supports that mode with `--append-only`).  
+
+To prevent that (or generally for an **additional level of redundancy**), you could **mirror your backup
+storage**, for example locally on an USB drive (you can mount the backup storage locally with
+[Rclone](https://rclone.org/commands/rclone_mount/)). As restic never modifies existing files in the 
+backup repository (see [design document](https://github.com/restic/restic/blob/master/doc/design.rst)), 
+you can just copy the mounted backup repo to your local backup drive with  
+`$ cp -R -n /mnt/backuprepo/ /mnt/backupdisk/restic-backup/`  
+(if your `cp` supports `-n` - at least the versions of Linux, FreeBSD, Git Bash for Windows
+ and macOS support it; see[^robocopy] for robocopy on Windows).  
+`-R` copies recursively (all the 
+folders and files contained in `/mnt/backuprepo/`) and `-n` makes sure that existing files aren't
+overwritten, so even if a file has been scrambled on your backup server, you won't get that broken
+version in your local backup as long as you've copied the a good version of that file to your local
+backup before.  
+
+It's probably a good idea to call `restic check --read-data` on your local copy of the backup repo,
+to make sure that it's consistent (`--read-data` actually reads all files and checks their checksums,
+so it might take a while - but will be a lot faster with a local copy of the backup than with
+a remote backup that's on a server, where all files need to be downloaded while doing this - yes,
+this requires installing restic locally).  
+Note that, due to only copying over new files from the backup repo, if you ran `restic forget` and
+`restic prune` there, that won't free any space on your local mirror, so you may want to call
+`restic forget` and `restic prune` on it as well, *though to be honest I'm not sure if that might get
+the real backup repo and the local clone into a state that's inconsistent with each other*.
+Alternatively you could do a proper sync that deletes files that only exist locally (or even delete the
+local backup and copy everything again) **if you're certain that your remote backup repo is in a good state**.
+
 
 # TODO: basic monitoring
 
 .. finish that script and run it every 10 minutes or whatever ..
+
+```bash
+#!/bin/bash
+
+create_report() {
+
+    HAD_WARNING=0
+
+    NUM_CPU_CORES=$(grep -c "cpu MHz" /proc/cpuinfo)
+
+    read a1 a5 avg15min rest <<< "$(cat /proc/loadavg)"
+
+    AVG_PER_CORE=$(bc -l <<< "$avg15min / $NUM_CPU_CORES")
+
+    #echo "avg per core: $AVG_PER_CORE"
+
+    if [ $(bc -l <<< "$AVG_PER_CORE > 0.95") = "1" ]; then
+        HAD_WARNING=1
+        echo "High load in last 15 minutes: $AVG_PER_CORE per core!"
+        echo "Details from top:"
+        top -b -n 1 -o "%CPU" -c -w 512 | head -n 20
+        echo # add empty line
+    fi
+
+    # /proc/meminfo has values in KB, convert to MB
+    MEM_AVAILABLE_KB=$(grep "MemAvailable:" /proc/meminfo | grep -o "[0-9]*")
+    MEM_AVAILABLE=$(( MEM_AVAILABLE_KB / 1000 ))
+
+    # TODO: adjust this to your server - ours has 16GB of RAM,
+    #  so if it runs below 900MB that's probably not good, but
+    #  if yours only has 2GB or so, you'll want a lower limit
+    if [ "$MEM_AVAILABLE" -lt 900 ]; then
+        HAD_WARNING=1
+        echo -e "low on main memory, only $MEM_AVAILABLE MB left!\nfree -m:"
+        free -m
+        echo "Biggest offenders:"
+        #ps aux --sort=-%mem | head
+        top -b -n 1 -o "%MEM" -c -w 512 | head -n 20
+        echo # add empty line
+    fi
+
+    DISKUSE_PERC=$(df --output=pcent / | tail -n 1 | grep -o "[0-9]*")
+
+    # echo "$DISKUSE_PERC percent of root partition is used"
+
+    if [ "$DISKUSE_PERC" -gt 85 ]; then
+        HAD_WARNING=1
+        echo "Disk is getting full, already $DISKUSE_PERC percent used!"
+        lsblk -e 7 -T -o NAME,TYPE,FSTYPE,MOUNTPOINT,SIZE,FSSIZE,FSAVAIL,FSUSE%
+        echo -e "\nBiggest offenders:"
+        du -h --max-depth=6 -x / | sort -h -r | head -n 20
+        echo # add empty line
+    fi
+
+    # TODO: what else could I check?
+    #       some way to check for random bad errors? logs?
+
+}
+
+create_report > /tmp/report.txt
+if [ $HAD_WARNING = 1 ]; then
+    # TODO: send email, if we haven't already sent one at the last check
+    echo "Alert!"
+fi
+
+```
+
+# Automatic updates
+
+...
 
 # Thanks
 
@@ -1666,3 +1987,22 @@ double-check ssl-settings in /etc/, nginx config
       1TB of traffic, each additional TB of storage costs $5/month, each additional TB of traffic
       costs $10/month
 
+[^op-bk]: Even if you're not using OpenProject, it shows how to backup PostgreSQL databases, which
+    might come in handy elsewhere. **NOTE:** It might be useful to additionally/manually run
+    `# su -l postgres -c "pg_basebackup -D /tmp/postgres-base/ -R"` once to get a base backup that
+    can easily restore the whole postgres setup (I think) - just put /tmp/postgres-base/ in a tar
+    archive and store that in /root/ somewhere so it's backed up with the regular backups.  
+    I *think* that such a base backup together with the normal SQL dumps from the daily backup make
+    restoring the PostgreSQL server relatively easy, but TBH I haven't tried it myself yet and
+    the pg_basebackup manpage unfortunately doesn't document how this is done..  
+    **TODO:** how do I restore a pg_basebackup?
+
+[^robocopy]: If you're using Windows and don't have Git Bash installed, you can *probably* use
+    robocopy, like this (**untested!**; assuming `X:` is your mounted restic repo and `D:` is you backup disk):  
+    `> robocopy X:\ D:\restic-backup\ /XC /XN /XO`  
+    * `/XC` means "don't copy ("e**X**clude") files that are **C**hanged (have different size) in
+      the destination, but have the same timestamp
+    * `/XN` means "don't copy files that have a **N**ewer timestamp in the destination than in the source"
+    * `/XO` means "don't copy files that have a **O**lder timestamp in the destination than in the source"
+    * => those three options together should hopefully make sure that only files that don't exist
+      on your backup disk at all are copied from the restic repository
