@@ -1400,6 +1400,14 @@ installed), it supports literally dozens of additional protocols and providers, 
 WebDAV (ownCloud/Nextcloud), Google Drive, MS OneDrive, SMB/CIFS (Windows share)
 [and more](https://rclone.org/#providers).
 
+> **NOTE:** If you don't want to do (automated) backups because setting up the server
+> is easy enough and all local git clones contain the whole history anyway:  
+> Yes, that's *mostly* true, but please keep in mind that when using git **LFS**, the local clones
+> by default do **not have the whole history** of files managed with LFS, but only the version
+> currently checked out.
+> However, calling `$ git lfs fetch --all` *does* download all git LFS objects (but of course uses
+> a lot more disk space on your PC).
+
 ## Installing restic
 
 Download their [latest release](https://github.com/restic/restic/releases/latest) for your platform
@@ -1411,7 +1419,7 @@ Then copy it to `/usr/local/bin/restic`:
 and make it executable:  
 `# chmod 755 /usr/local/bin/restic`
 
-## Optional: Install and configure rclone
+## Optional: Install and configure Rclone
 
 If you want to upload your backups to a storage provider not directly supported by restic
 (check [this list](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html)),
@@ -1619,6 +1627,16 @@ backupallthethings() {
     
     echo -e "\n$(mytime) Backing up /root/ and /etc/"
 
+    # Debian/Ubuntu and -derivatives specific:
+    # create a list of currently installed packages that
+    # contains the versions etc
+    dpkg -l > /root/backup/inst_packages.txt
+    # create a second list of installed packages in a format suitable
+    # for dpkg --set-selections (helpful when reinstalling a system:
+    #  dpkg --set-selections < dpkg_selections.txt
+    #  apt-get dselect-upgrade
+    dpkg --get-selections > /root/backup/dpkg_selections.txt
+
     # backup all of /etc/, it's just a few MB and may come in handy
     # (also all of /root/, except for the cache folder which is
     #  actively used by restic when it's backing up)
@@ -1766,7 +1784,7 @@ Some general restic tips:
 
 If you consider **ransomware** that encrypts/destroys the data on your server a possible threat,
 keep in mind that, if the ransomware gains root access, it can also access your backup storage, and
-could **delete your backup** (unless you're using some kind of append-only remote storage, where
+could **destroy your backup** (unless you're using some kind of append-only remote storage, where
 existing data can't be modified or deleted - at least restics
 [rest-server](https://github.com/restic/rest-server) supports that mode with `--append-only`).  
 
@@ -1778,11 +1796,10 @@ you can just copy the mounted backup repo to your local backup drive with
 `$ cp -R -n /mnt/backuprepo/ /mnt/backupdisk/restic-backup/`  
 (if your `cp` supports `-n` - at least the versions of Linux, FreeBSD, Git Bash for Windows
  and macOS support it; see[^robocopy] for robocopy on Windows).  
-`-R` copies recursively (all the 
-folders and files contained in `/mnt/backuprepo/`) and `-n` makes sure that existing files aren't
-overwritten, so even if a file has been scrambled on your backup server, you won't get that broken
-version in your local backup as long as you've copied the a good version of that file to your local
-backup before.  
+`-R` copies recursively (all the folders and files contained in `/mnt/backuprepo/`) and `-n` makes
+sure that existing files aren't overwritten, so even if a file has been scrambled on your backup
+server, you won't get that broken version in your local backup as long as you've copied the a good
+version of that file to your local backup before.  
 
 It's probably a good idea to call `restic check --read-data` on your local copy of the backup repo,
 to make sure that it's consistent (`--read-data` actually reads all files and checks their checksums,
@@ -1791,10 +1808,11 @@ a remote backup that's on a server, where all files need to be downloaded while 
 this requires installing restic locally).  
 Note that, due to only copying over new files from the backup repo, if you ran `restic forget` and
 `restic prune` there, that won't free any space on your local mirror, so you may want to call
-`restic forget` and `restic prune` on it as well, *though to be honest I'm not sure if that might get
-the real backup repo and the local clone into a state that's inconsistent with each other*.
-Alternatively you could do a proper sync that deletes files that only exist locally (or even delete the
-local backup and copy everything again) **if you're certain that your remote backup repo is in a good state**.
+`restic forget` and `restic prune` on it as well, *though to be honest I'm not sure if that could
+get the real backup repo and the local clone into a state that's inconsistent with each other*.
+Alternatively, **if you're certain that your remote backup repo is (currently) in a good state**,
+you could do a proper sync that deletes files that only exist locally (or even delete the local
+backup and copy everything again).
 
 
 # TODO: basic monitoring
@@ -1867,9 +1885,78 @@ fi
 
 ```
 
-# Automatic updates
+# Keeping the server updated
 
-...
+You should try to keep your server up-to-date, especially the parts that are facing the public
+internet (the Linux kernel, SSH, WireGuard).
+
+There two major ways to achieve this: a service that sends you a mail when updates are available,
+so you can run them manually (apticron) - or one that installs security-updates automatically 
+(and possibly reboots the system afterwards, if needed - unattended-upgrades). You can also use both,
+so security updates are installed automatically, and you get mails about normal updates to do them manually.
+
+Both apticron and unattended-upgrades use the `mailx` program to send mails, so make sure it's 
+installed:  
+`$ which mailx`  
+If that does *not* print something like `/usr/bin/mailx`, install it with:  
+`# apt install bsd-mailx`  
+(it will use sendmail to send the mails, if you followed the instructions above that will actually
+ happen with `dma`, using an external SMTP server)
+
+## apticron - send mail if updates are available
+
+Install apticron (the version for systems using systemd):  
+`# apt install apticron-systemd`
+
+Configure it by copying its default config to `/etc/apticron/`:  
+`# cp /usr/lib/apticron/apticron.conf /etc/apticron/`
+
+Open `/etc/apticron/apticron.conf` in a text editor to adjust it to your needs.
+You should change `EMAIL="root"` to `EMAIL="yourname@example.com"` (use your mail address,
+of course), so the mails about updates go to your real E-Mail account where you can see them.
+Take a look at the other options in the config (they're all described in comments); I personally
+didn't change any of them, though the `CUSTOM_SUBJECT` option probably is useful to make filtering
+those mails easier.
+
+If you want to specify the exactl time this runs, run  
+`# systemctl edit apticron.timer`  
+and edit it accordingly - see the unattended-upgrades footnote[^upgradetime] for an example.
+
+## unattended-upgrades - install security updates automatically
+
+Install unattended-upgrades:  
+`# apt install unattended-upgrades`
+
+On Ubuntu (but not Debian), if you want to enable automatic reboots (when needed by the update), 
+you also need to install `update-notifier-common`[^update-notifier]:  
+`# apt install update-notifier-common`
+
+Apparently it must be enabled by reconfiguring it:  
+`# dpkg-reconfigure --priority=low unattended-upgrades` (select `<Yes>`)
+
+Edit (as root) `/etc/apt/apt.conf.d/50unattended-upgrades` for further configuration:
+* Find the line `//Unattended-Upgrade::Mail "";`, uncomment it and set your mail address
+  to receive reports: `Unattended-Upgrade::Mail "yourname@example.com";`
+* Below it, change `//Unattended-Upgrade::MailReport "on-change";` to
+  `Unattended-Upgrade::MailReport "on-change";` (or possibly `"only-on-error"` if you prefer that)
+* To enable automatic reboots, replace the line `//Unattended-Upgrade::Automatic-Reboot "false";`
+  with `Unattended-Upgrade::Automatic-Reboot "true";`
+* If you enabled automatic reboots, to specify at what time they should happen (the default is "now",
+  immediately after installing an update that needs it), you can set:  
+  `Unattended-Upgrade::Automatic-Reboot-Time "02:00";`  
+  (that would be for 2am) - might make more sense to modify the systemd timers that control when
+  updates are installed and leave this commented out[^upgradetime].
+
+> **NOTE:** If you don't want unattended-upgrades to reboot your system, but want to get a mail
+> telling you to reboot instead, that unfortunately isn't supported out of the box, but you
+> can write a custom script that checks if `/var/run/reboot-required` exists and
+> [sends an E-Mail](#testing-the-sendmail-command).
+> See also [this post on Ask Ubuntu](https://askubuntu.com/a/540973).
+
+For further information on unattended-upgrades, see the articles in the
+[Debian Wiki](https://wiki.debian.org/UnattendedUpgrades) and
+[Ubuntu Wiki](https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package)
+and [this blogpost](https://haydenjames.io/how-to-enable-unattended-upgrades-on-ubuntu-debian/).
 
 # Thanks
 
@@ -1883,8 +1970,78 @@ about server administration :-)
 
 # Bonus: OpenProject
 
-link to install instructions, some short notes on them (no ssl, no apache),
-double-check ssl-settings in /etc/, nginx config
+I'll keep this short(ish), I just thought I'd mention it as I installed it on our server because we
+wanted to try it out.
+
+Before the actual installation, add an entry for `openproject.example.lan` to `/etc/hosts`
+(a line like `172.30.0.1  openproject.example.lan`) and restart `dnsmasq` 
+(`# systemctl restart dnsmasq.service`).
+
+
+Basically, follow the
+[official installation instructions for Ubuntu 22.04](https://www.openproject.org/docs/installation-and-operations/installation/packaged/#ubuntu-2204)
+and then the 
+[initial configuration guide](https://www.openproject.org/docs/installation-and-operations/installation/packaged/#initial-configuration).
+
+**HOWEVER**, some specialties:
+* The instructions to import the PGP key for the apt repo are using the deprecated `apt-key` tool.
+  Better alternative:  
+  `# wget -O /etc/apt/trusted.gpg.d/openproject.asc https://dl.packager.io/srv/opf/openproject/key`
+* **Do _not_ install the Apache2** web server! (We'll use nginx) => select `skip` in that step
+* As "server/hostname" select `openproject.example.lan` (or whatever you added to `/etc/hosts`
+  before the installation)
+* **Do _not_ enable SSL**!
+* **_Skip_ the Subversion (SVN) and Git support** (according to the documentation they require Apache)
+
+Once that's done, **make sure that SSL *really* is disabled** (it wasn't for me, I'm not sure if I
+accidentally chose the wrong option in the configuration or if there was a bug). To do that, open
+`/etc/openproject/conf.d/other` in a text editor and check if
+`export OPENPROJECT_HTTPS="false"` and `export OPENPROJECT_HSTS="false"` are indeed set to `"false"`.
+If they aren't, change them accordingly, afterwards restart OpenProject:  
+`# systemctl restart openproject.service`
+
+Now configure **nginx** to redirect `openproject.example.lan` to the OpenProject service, which
+listens on `localhost:6000`. Create the file `/etc/nginx/sites-available/openproject`
+with the following contents:
+```nginx
+server {
+    # only listen on the WireGuard VPN IP
+    listen 172.30.0.1:80;
+    server_name openproject.example.lan;
+    root /opt/openproject/public;
+    # allow more than 1MB for uploads
+    client_max_body_size 64m;
+
+    location ~ / {
+        proxy_pass_request_headers on;
+        proxy_set_header X-Forwarded-Host $host:$server_port;
+        proxy_set_header X-Forwarded-Server $host:$server_port;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://127.0.0.1:6000;
+    }
+}
+```
+Create a symlink to `/etc/nginx/sites-enabled/`:  
+`# ln -s /etc/nginx/sites-available/openproject /etc/nginx/sites-enabled/`  
+and restart nginx:  
+`# systemctl restart nginx.service`
+
+Now you should be able to access and configure OpenProject in the browser,
+under <http://openproject.example.lan>.
+
+See the [OpenProject System admin guide](https://www.openproject.org/docs/system-admin-guide/) for
+more information on administrating it, and the [user guide](https://www.openproject.org/docs/user-guide/)
+for information on using it.
+
+You can configure the E-Mail settings at `Administration` -> `Emails and notification` ->
+`Email notifications`. The "Emission email address" should be something like
+`OpenProject <noreply@yourdomain.com>`, the "Email delivery method" should be `sendmail` and the 
+"Location of the sendmail executable" is `/usr/sbin/sendmail`. Save and then click "Send a test email"
+to test it.
+
+The [**backup** script above](#actually-backing-up) is already prepared for OpenProject, the only
+thing you need to do is to **uncomment** the `#backupopenproject` line in `backupallthethings()` by
+removing the `#` at the beginning of the line.
 
 <!-- Below: Footnotes -->
 
@@ -2006,3 +2163,37 @@ double-check ssl-settings in /etc/, nginx config
     * `/XO` means "don't copy files that have a **O**lder timestamp in the destination than in the source"
     * => those three options together should hopefully make sure that only files that don't exist
       on your backup disk at all are copied from the restic repository
+
+[^update-notifier]: At least that's what the
+    [Ubuntu Wiki on Automatic Security Updates](https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package)
+    says: 
+    > If you want the script to automatically reboot when needed, you not only need to set 
+    > Unattended-Upgrade::Automatic-Reboot "true", but you also need to have the "update-notifier-common"
+    > package installed.
+
+    Debian on the other hand doesn't even have a package with that name.
+
+[^upgradetime]: According to  [the Debian Wiki](https://wiki.debian.org/UnattendedUpgrades#Modifying_download_and_upgrade_schedules_.28on_systemd.29)
+    updates are downloaded by the systemd `apt-daily.timer` and installed (upgrade) by the
+    `apt-daily-upgrade.timer`, and apparently by default they happen at 6am or 6pm with a randomized
+    delay of 12h.. I think this means they happen pretty much randomly, the download part maybe even
+    twice a day, the upgrade/install part once a day.  
+    Might make sense to at least modify the upgrade timer (`# systemctl edit apt-daily-upgrade.timer`,
+    afterwards `# systemctl restart apt-daily-upgrade.timer`)
+    to make sure that the installation of packages and possible reboot afterwards don't interfere
+    with scheduled backups or people who want to use the server for work, I used this:
+    ```systemd
+    # define the time when unattended-updates upgrades packages
+    # (and possibly reboots afterwards),
+    # to prevent conflicts with the backup script (that starts at 05:03)
+    [Timer]
+    # the following line resets the default value from
+    # /lib/systemd/system/apt-daily-upgrade.timer
+    OnCalendar=
+    # now we can specify the actual time
+    # (around 4pm, note that the backup starts shortly after 5am)
+    OnCalendar=03:55
+    # Overwrite the randomized delay set by default,
+    # so it happens exactly at that time
+    RandomizedDelaySec=0
+    ```
