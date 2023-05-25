@@ -30,10 +30,10 @@ a public Forgejo instance, or just a Wireguard server without Forgejo on it).
 **Note:** You'll often need to enter commands in the shell. The following convention will be used:
 
 `$ some_command --some argument`  
-means: Enter "some_command --some argument" (without quotes) in a Linux terminal, _as **normal user**_.
+means: Enter "some_command \-\-some argument" (without quotes) in a Linux terminal, _as **normal user**_.
 
 `# some_command --some argument`  
-means: Enter "some_command --some argument" (without quotes) in a Linux terminal, _as **root**_,
+means: Enter "some_command \-\-some argument" (without quotes) in a Linux terminal, _as **root**_,
 or maybe with `sudo` (you can use `$ sudo -i` to get a root-shell so you don't have to use sudo
 for each command).
 
@@ -453,13 +453,14 @@ connection attempts from the internet, except for ones to SSH and WireGuard.
 Furthermore [SSHGuard](https://www.sshguard.net/) is used to block hosts that are attacking our
 SSH server.
 
-Install SSHGuard:  
-`# apt install sshguard`
+Install SSHGuard and ipset:  
+`# apt install sshguard ipset`
 
-Edit `/etc/sshguard/sshguard.conf` (as root) and replace the `BACKEND=...` line near the top of
-the file with `BACKEND="/usr/libexec/sshguard/sshg-fw-ipset"` so SSHGuard stores the IPs that
-should be blocked in an [ipset](https://linux.die.net/man/8/ipset) that can be used in iptables rules.
-Save the file, then restart SSHGuard so it applies the changed config:  
+**Configure sshguard** by editing `/etc/sshguard/sshguard.conf` (as root) and replace the 
+`BACKEND=...` line near the top of the file with  
+`BACKEND="/usr/libexec/sshguard/sshg-fw-ipset"`  
+so SSHGuard stores the IPs that should be blocked in an [ipset](https://linux.die.net/man/8/ipset) that
+can be used in iptables rules. Save the file, then restart SSHGuard so it applies the changed config:  
 `# systemctl restart sshguard.service`
 
 > **NOTE:** *If your server hoster supports creating **snapshots** of the server, now would be
@@ -1376,14 +1377,14 @@ storage configured!**) run:
 `$ sudo -u git forgejo -w /var/lib/forgejo/ -c /etc/forgejo/app.ini migrate-storage -t lfs -s local -p /var/lib/forgejo/data/lfs`
 
 After the migration is done, adjust `/etc/forgejo/app.ini` for the new storage type and start Forgejo
-again (`# systemctl stop forgejo.service`).
+again (`# systemctl start forgejo.service`).
 
 When you're done migrating *to* object storage, you may want to delete `/var/lib/forgejo/data/lfs/*`
 to free up the disk space.
 
 # Backups with restic
 
-[restic](https://restic.net/) is a powerful backup tool that's easy to install and relatively easy
+[Restic](https://restic.net/) is a powerful backup tool that's easy to install and relatively easy
 to use.  
 Restic creates **incremental backups** - each time it's run for a specific path, it creates a new
 **snapshot** for it (that can later be restored), but only saves the difference to the last snapshot,
@@ -1786,7 +1787,7 @@ If you consider **ransomware** that encrypts/destroys the data on your server a 
 keep in mind that, if the ransomware gains root access, it can also access your backup storage, and
 could **destroy your backup** (unless you're using some kind of append-only remote storage, where
 existing data can't be modified or deleted - at least restics
-[rest-server](https://github.com/restic/rest-server) supports that mode with `--append-only`).  
+[rest-server](https://github.com/restic/rest-server) supports that mode with `--append-only`)[^REST].  
 
 To prevent that (or generally for an **additional level of redundancy**), you could **mirror your backup
 storage**, for example locally on an USB drive (you can mount the backup storage locally with
@@ -1794,12 +1795,12 @@ storage**, for example locally on an USB drive (you can mount the backup storage
 backup repository (see [design document](https://github.com/restic/restic/blob/master/doc/design.rst)), 
 you can just copy the mounted backup repo to your local backup drive with  
 `$ cp -R -n /mnt/backuprepo/ /mnt/backupdisk/restic-backup/`  
-(if your `cp` supports `-n` - at least the versions of Linux, FreeBSD, Git Bash for Windows
- and macOS support it; see[^robocopy] for robocopy on Windows).  
 `-R` copies recursively (all the folders and files contained in `/mnt/backuprepo/`) and `-n` makes
 sure that existing files aren't overwritten, so even if a file has been scrambled on your backup
 server, you won't get that broken version in your local backup as long as you've copied the a good
-version of that file to your local backup before.  
+version of that file to your local backup before. *(This assumes that your `cp` supports `-n` - at 
+least the cp versions of Linux, FreeBSD, Git Bash for Windows and macOS support it; alternatively
+see[^robocopy] for robocopy on Windows.)*
 
 It's probably a good idea to call `restic check --read-data` on your local copy of the backup repo,
 to make sure that it's consistent (`--read-data` actually reads all files and checks their checksums,
@@ -1891,8 +1892,8 @@ You should try to keep your server up-to-date, especially the parts that are fac
 internet (the Linux kernel, SSH, WireGuard).
 
 There two major ways to achieve this: a service that sends you a mail when updates are available,
-so you can run them manually (apticron) - or one that installs security-updates automatically 
-(and possibly reboots the system afterwards, if needed - unattended-upgrades). You can also use both,
+so you can run them manually (*apticron*) - or one that installs security-updates automatically 
+(and possibly reboots the system afterwards, if needed - *unattended-upgrades*). You can also use both,
 so security updates are installed automatically, and you get mails about normal updates to do them manually.
 
 Both apticron and unattended-upgrades use the `mailx` program to send mails, so make sure it's 
@@ -1958,16 +1959,6 @@ For further information on unattended-upgrades, see the articles in the
 [Ubuntu Wiki](https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package)
 and [this blogpost](https://haydenjames.io/how-to-enable-unattended-upgrades-on-ubuntu-debian/).
 
-# Thanks
-
-Thank you for reading this, I hope you found it helpful!
-
-Thanks to [my employer](https://www.masterbrainbytes.com/) for letting me turn the documentation
-for setting up our server into a proper blog post!
-
-Thanks to [Yamagi](https://www.yamagi.org//) for proofreading this and answering my stupid questions
-about server administration :-)
-
 # Bonus: OpenProject
 
 I'll keep this short(ish), I just thought I'd mention it as I installed it on our server because we
@@ -1976,7 +1967,6 @@ wanted to try it out.
 Before the actual installation, add an entry for `openproject.example.lan` to `/etc/hosts`
 (a line like `172.30.0.1  openproject.example.lan`) and restart `dnsmasq` 
 (`# systemctl restart dnsmasq.service`).
-
 
 Basically, follow the
 [official installation instructions for Ubuntu 22.04](https://www.openproject.org/docs/installation-and-operations/installation/packaged/#ubuntu-2204)
@@ -2042,6 +2032,16 @@ to test it.
 The [**backup** script above](#actually-backing-up) is already prepared for OpenProject, the only
 thing you need to do is to **uncomment** the `#backupopenproject` line in `backupallthethings()` by
 removing the `#` at the beginning of the line.
+
+# Thanks
+
+Thank you for reading this, I hope you found it helpful!
+
+Thanks to [my employer](https://www.masterbrainbytes.com/) for letting me turn the documentation
+for setting up our server into a proper blog post!
+
+Thanks to [Yamagi](https://www.yamagi.org//) for proofreading this and answering my stupid questions
+about server administration :-)
 
 <!-- Below: Footnotes -->
 
@@ -2154,6 +2154,11 @@ removing the `#` at the beginning of the line.
     the pg_basebackup manpage unfortunately doesn't document how this is done..  
     **TODO:** how do I restore a pg_basebackup?
 
+[^REST]: You could run restic's [rest-server](https://github.com/restic/rest-server)
+    (in `--append-only` mode) on a backupserver at home (or in your office), and make that
+    backupserver connect to your WireGuard VPN, so it can be easily reached from the git server.
+    And "backupserver" could just be a Raspberry Pi with with a big USB harddrive.
+
 [^robocopy]: If you're using Windows and don't have Git Bash installed, you can *probably* use
     robocopy, like this (**untested!**; assuming `X:` is your mounted restic repo and `D:` is you backup disk):  
     `> robocopy X:\ D:\restic-backup\ /XC /XN /XO`  
@@ -2183,7 +2188,7 @@ removing the `#` at the beginning of the line.
     to make sure that the installation of packages and possible reboot afterwards don't interfere
     with scheduled backups or people who want to use the server for work, I used this:
     ```systemd
-    # define the time when unattended-updates upgrades packages
+    # define the time when unattended-upgrades upgrades packages
     # (and possibly reboots afterwards),
     # to prevent conflicts with the backup script (that starts at 05:03)
     [Timer]
