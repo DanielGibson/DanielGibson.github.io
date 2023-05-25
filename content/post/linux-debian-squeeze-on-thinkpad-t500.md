@@ -51,6 +51,7 @@ Some notes:
 	<li>Yes, you want to install grub to the MBR</li>
 </ul>
 Because I like my debian installation to be slim I always disallow apt to install the recommended packages of packages I install, by creating a file <strong>/etc/apt/apt.conf.d/06-norecommends</strong> with the following content:
+
 ```text
 APT
 {
@@ -114,6 +115,7 @@ However, two things could not be configured with gpointing-device-settings:
 <ol>
 <li>I want to be able to perform a <strong>click by tapping the touchpad</strong>. This should be configurable with gpointing-device-settings, but it didn't work anyway, so I had to do it at X.org configuration level.  
 I created the directory <strong>/etc/X11/xorg.conf.d/</strong> and within that directory a file called <strong>10-synaptics.conf</strong> with the following content:
+
 ```text
 # adapted from https://wiki.archlinux.org/index.php/Touchpad_Synaptics
 Section "InputClass"
@@ -127,6 +129,7 @@ EndSection
 </li>
 <li>I want to be able to <strong>scroll with the Trackpoint</strong> by holding down the middle mouse button and moving the nipple. Also I want to emulate the third mouse button by pressing the other two - this is just out of habit, it's not needed, because the middle mouse button works as well.  
 So I created a file name <strong>20-trackpoint.conf</strong> in the directory <strong>/etc/X11/xorg.conf.d/</strong> (see above), with the following content:
+
 ```text
 # adapted from http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint#xorg.conf.d
 Section "InputClass"
