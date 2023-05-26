@@ -91,14 +91,12 @@ Some notes:</p>
 	<li>Yes, you want to install grub to the MBR</li>
 </ul>
 Because I like my debian installation to be slim I always disallow apt to install the recommended packages of packages I install, by creating a file <strong>/etc/apt/apt.conf.d/06-norecommends</strong> with the following content:
-```text
-APT
-{
-        Install-Recommends "false";
-        Install-Suggests "false";
-};
-```
-But of course this is optional and has nothing to do with making Debian work on a Thinkpad ;-)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">APT
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">        Install-Recommends &#34;false&#34;;
+</span></span><span class="line"><span class="cl">        Install-Suggests &#34;false&#34;;
+</span></span><span class="line"><span class="cl">};
+</span></span></code></pre></div><p>But of course this is optional and has nothing to do with making Debian work on a Thinkpad ;-)</p>
 <h4 id="getting-wifi-firmware">Getting WiFi firmware</h4>
 <p>After installing the basic stuff and rebooting to my new debian installation, I installed the WiFi firmware.
 First I modified <b>/etc/apt/sources.list</b> to also use the <i>contrib</i> and <i>non-free</i> repositories, so the entries looked like this:</p>
@@ -134,33 +132,29 @@ However, two things could not be configured with gpointing-device-settings:</p>
 <ol>
 <li>I want to be able to perform a <strong>click by tapping the touchpad</strong>. This should be configurable with gpointing-device-settings, but it didn't work anyway, so I had to do it at X.org configuration level.  
 I created the directory <strong>/etc/X11/xorg.conf.d/</strong> and within that directory a file called <strong>10-synaptics.conf</strong> with the following content:
-```text
-# adapted from https://wiki.archlinux.org/index.php/Touchpad_Synaptics
-Section "InputClass"
-    Identifier "touchpad catchall"
-    Driver "synaptics"
-    MatchIsTouchpad "on"
-    # this enables clicking by tapping:
-    Option "TapButton1" "1" 
-EndSection
-```
-</li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># adapted from https://wiki.archlinux.org/index.php/Touchpad_Synaptics
+</span></span><span class="line"><span class="cl">Section &#34;InputClass&#34;
+</span></span><span class="line"><span class="cl">    Identifier &#34;touchpad catchall&#34;
+</span></span><span class="line"><span class="cl">    Driver &#34;synaptics&#34;
+</span></span><span class="line"><span class="cl">    MatchIsTouchpad &#34;on&#34;
+</span></span><span class="line"><span class="cl">    # this enables clicking by tapping:
+</span></span><span class="line"><span class="cl">    Option &#34;TapButton1&#34; &#34;1&#34; 
+</span></span><span class="line"><span class="cl">EndSection
+</span></span></code></pre></div></li>
 <li>I want to be able to <strong>scroll with the Trackpoint</strong> by holding down the middle mouse button and moving the nipple. Also I want to emulate the third mouse button by pressing the other two - this is just out of habit, it's not needed, because the middle mouse button works as well.  
 So I created a file name <strong>20-trackpoint.conf</strong> in the directory <strong>/etc/X11/xorg.conf.d/</strong> (see above), with the following content:
-```text
-# adapted from http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint#xorg.conf.d
-Section "InputClass"
-        Identifier      "Trackpoint Wheel Emulation"
-        MatchProduct    "TPPS/2 IBM TrackPoint"
-        MatchDevicePath "/dev/input/event*"
-        Option          "EmulateWheel"          "true"
-        Option          "EmulateWheelButton"    "2"
-        Option          "Emulate3Buttons"       "true"
-        Option          "XAxisMapping"          "6 7"
-        Option          "YAxisMapping"          "4 5"
-EndSection
-```
-</li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># adapted from http://www.thinkwiki.org/wiki/How_to_configure_the_TrackPoint#xorg.conf.d
+</span></span><span class="line"><span class="cl">Section &#34;InputClass&#34;
+</span></span><span class="line"><span class="cl">        Identifier      &#34;Trackpoint Wheel Emulation&#34;
+</span></span><span class="line"><span class="cl">        MatchProduct    &#34;TPPS/2 IBM TrackPoint&#34;
+</span></span><span class="line"><span class="cl">        MatchDevicePath &#34;/dev/input/event*&#34;
+</span></span><span class="line"><span class="cl">        Option          &#34;EmulateWheel&#34;          &#34;true&#34;
+</span></span><span class="line"><span class="cl">        Option          &#34;EmulateWheelButton&#34;    &#34;2&#34;
+</span></span><span class="line"><span class="cl">        Option          &#34;Emulate3Buttons&#34;       &#34;true&#34;
+</span></span><span class="line"><span class="cl">        Option          &#34;XAxisMapping&#34;          &#34;6 7&#34;
+</span></span><span class="line"><span class="cl">        Option          &#34;YAxisMapping&#34;          &#34;4 5&#34;
+</span></span><span class="line"><span class="cl">EndSection
+</span></span></code></pre></div></li>
 </ol>
 <h4 id="special-keys">Special Keys</h4>
 <p>The Thinkpad has a lot of special keys (or key-combinations), e.g. to configure the brightness, the volume, &hellip;<br>
