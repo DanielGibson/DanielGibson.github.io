@@ -707,8 +707,7 @@ Of course you can use a different domain, like yourcompany.lan, but I think that
 a real domain you have, like vpn.yourcompany.com (and then maybe git.vpn.yourcompany.com), but to
 be honest I'm not completely sure how that would be set up properly.
 
-We'll install  and configure it to only listen
-on wg0 and to answer queries for `*.example.lan`.
+We'll install and configure it to only listen on wg0 and to answer queries for `*.example.lan`.
 
 Install the dnsmasq package:  
 `# apt install dnsmasq`
@@ -940,7 +939,8 @@ That's done with:
 `# systemctl edit nginx.service`  
 which will open a text editor (with lots of stuff that's commented out) that allows you to
 specify additional rules that overwrite the ones in the system nginx.service
-(at `/usr/lib/systemd/system/nginx.service`). All that's needed here are the following lines:
+(at `/usr/lib/systemd/system/nginx.service`; the override rules are saved in 
+`/etc/systemd/system/nginx.service.d/override.conf`). All that's needed here are the following lines:
 
 ```
 # tell systemd to start this service (nginx) after wg0 is up
@@ -1041,8 +1041,9 @@ and [the ArchWiki's dma page](https://wiki.archlinux.org/title/Dma).
 > [the Google documentation for that](https://support.google.com/accounts/answer/185833?hl=en)
 > or [this tutorial from Mailreach](https://help.mailreach.co/en/article/how-to-connect-a-gmail-google-workspace-account-to-mailreach-with-an-app-password-ulwj00/)
 > (though note that Google UI has changed slightly since it was created, to get to the 
->  screen to create an App Password you currently need to click *Manage your Google Account
-> -> Security -> How you sign in to Google -> 2-Step Verification* and select "App Passwords" there).  
+>  screen to create an App Password you currently need to click, in your normal mail view,
+>  the *user button on the upper right -> Manage your Google Account -> Security 
+>  -> How you sign in to Google -> 2-Step Verification* and select "App Passwords" there).  
 > Also potentially useful: 
 > [This article](https://pawait.africa/blog/googleworkspace/how-to-set-up-a-no-reply-email-with-a-custom-rejection-message-in-google-workspace/)
 > on turning a Google-hosted E-Mail address into a No-Reply address that rejects mails sent to it.
@@ -1077,8 +1078,9 @@ The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail is
 
 # Setting up Forgejo for git hosting
 
-> **NOTE:** Forgejo is a fork of Gitea, and at least as of release 1.19.3 they're very similar, so
-> these instructions should work for both (if you replace "forgejo" with "gitea" in paths etc).
+> **NOTE:** [Forgejo](https://forgejo.org/) is a fork of [Gitea](https://gitea.io/), and at least
+> as of release 1.19.3 they're very similar, so these instructions should work for both
+> (if you replace "forgejo" with "gitea" in paths etc).
 > Also, if you run into problems, searching your favorite search engine for `your problem "gitea"`
 > will probably give you more results than `your problem "forgejo"`, so it's worth trying. 
 > Similarly, if the [Forgejo Documentation](https://forgejo.org/docs/latest/) doesn't answer your
@@ -1702,22 +1704,26 @@ fi
 backupallthethings 2>&1 | tee /root/backup/backuplog.txt
 
 if [ $NUM_ERRORS != 0 ]; then
-  echo "$NUM_ERRORS errors during backup!"
+    echo "$NUM_ERRORS errors during backup!"
 
-  # if the list of mail recipients isn't emtpy,
-  # send them a mail about the error
-  if [ ${#WARN_MAIL_RECP[@]} != 0 ]; then
-    # (yes, the following three lines are all for the subject line and could
-    #  be one long line, I split them up so they'd fit in the blogs width...)
-    echo -n "Subject: WARNING: $NUM_ERRORS errors" > /tmp/backuperrmail.txt
-    echo -n " happened when trying to" >> /tmp/backuperrmail.txt
-    echo -e " backup $(hostname)!\n" >> /tmp/backuperrmail.txt
+    # if the list of mail recipients isn't emtpy,
+    # send them a mail about the error
+    if [ ${#WARN_MAIL_RECP[@]} != 0 ]; then
+        # Note: this redirects everything printed within {  }
+        #   to backuperrmail.txt
+        {
+          echo -n "Subject: WARNING: $NUM_ERRORS errors "
+          echo "happened when trying to backup $(hostname)!\n"
 
-    echo -e "Please see log below for details\n" >> /tmp/backuperrmail.txt
-    cat /root/backup/backuplog.txt >> /tmp/backuperrmail.txt
-    sendmail "${WARN_MAIL_RECP[@]}" < /tmp/backuperrmail.txt
-  fi
+          echo -e "Please see log below for details\n"
+          cat /root/backup/backuplog.txt
+        } > /tmp/backuperrmail.txt
+
+        sendmail "${WARN_MAIL_RECP[@]}" < /tmp/backuperrmail.txt
+    fi
 fi
+
+exit $NUM_ERRORS
 
 ```
 
@@ -1733,6 +1739,9 @@ bigger git repos):
 If the manual run worked, create a cronjob so it runs every night, by creating a file
 `/etc/cron.d/my_backup` with the following contents:
 ```
+# prevent cron from sending mails about this script
+# the script sends mails itself when there's a problem
+MAILTO=""
 # every night at 05:03, do a backup
 3 5 * * * root  /root/backup/backup.sh
 ```
@@ -1815,77 +1824,6 @@ Alternatively, **if you're certain that your remote backup repo is (currently) i
 you could do a proper sync that deletes files that only exist locally (or even delete the local
 backup and copy everything again).
 
-
-# TODO: basic monitoring
-
-.. finish that script and run it every 10 minutes or whatever ..
-
-```bash
-#!/bin/bash
-
-create_report() {
-
-    HAD_WARNING=0
-
-    NUM_CPU_CORES=$(grep -c "cpu MHz" /proc/cpuinfo)
-
-    read a1 a5 avg15min rest <<< "$(cat /proc/loadavg)"
-
-    AVG_PER_CORE=$(bc -l <<< "$avg15min / $NUM_CPU_CORES")
-
-    #echo "avg per core: $AVG_PER_CORE"
-
-    if [ $(bc -l <<< "$AVG_PER_CORE > 0.95") = "1" ]; then
-        HAD_WARNING=1
-        echo "High load in last 15 minutes: $AVG_PER_CORE per core!"
-        echo "Details from top:"
-        top -b -n 1 -o "%CPU" -c -w 512 | head -n 20
-        echo # add empty line
-    fi
-
-    # /proc/meminfo has values in KB, convert to MB
-    MEM_AVAILABLE_KB=$(grep "MemAvailable:" /proc/meminfo | grep -o "[0-9]*")
-    MEM_AVAILABLE=$(( MEM_AVAILABLE_KB / 1000 ))
-
-    # TODO: adjust this to your server - ours has 16GB of RAM,
-    #  so if it runs below 900MB that's probably not good, but
-    #  if yours only has 2GB or so, you'll want a lower limit
-    if [ "$MEM_AVAILABLE" -lt 900 ]; then
-        HAD_WARNING=1
-        echo -e "low on main memory, only $MEM_AVAILABLE MB left!\nfree -m:"
-        free -m
-        echo "Biggest offenders:"
-        #ps aux --sort=-%mem | head
-        top -b -n 1 -o "%MEM" -c -w 512 | head -n 20
-        echo # add empty line
-    fi
-
-    DISKUSE_PERC=$(df --output=pcent / | tail -n 1 | grep -o "[0-9]*")
-
-    # echo "$DISKUSE_PERC percent of root partition is used"
-
-    if [ "$DISKUSE_PERC" -gt 85 ]; then
-        HAD_WARNING=1
-        echo "Disk is getting full, already $DISKUSE_PERC percent used!"
-        lsblk -e 7 -T -o NAME,TYPE,FSTYPE,MOUNTPOINT,SIZE,FSSIZE,FSAVAIL,FSUSE%
-        echo -e "\nBiggest offenders:"
-        du -h --max-depth=6 -x / | sort -h -r | head -n 20
-        echo # add empty line
-    fi
-
-    # TODO: what else could I check?
-    #       some way to check for random bad errors? logs?
-
-}
-
-create_report > /tmp/report.txt
-if [ $HAD_WARNING = 1 ]; then
-    # TODO: send email, if we haven't already sent one at the last check
-    echo "Alert!"
-fi
-
-```
-
 # Keeping the server updated
 
 You should try to keep your server up-to-date, especially the parts that are facing the public
@@ -1958,6 +1896,184 @@ For further information on unattended-upgrades, see the articles in the
 [Debian Wiki](https://wiki.debian.org/UnattendedUpgrades) and
 [Ubuntu Wiki](https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package)
 and [this blogpost](https://haydenjames.io/how-to-enable-unattended-upgrades-on-ubuntu-debian/).
+
+# Some basic monitoring
+
+It's useful to get an E-Mail if your server's CPU is unusually loaded or the main
+memory is (almost) full or the hard disk is running out of space, so you can investigate those
+issues, hopefully before they make the server unusable.
+
+I haven't found a good existing solution for this ([Nagios](https://www.nagios.org/) etc are
+for complex systems consisting of big networks with many servers and thus seemed like complete
+overkill for a single server), so I decided to write a simple bash script to do this myself.
+
+This is the result, save as `/root/scripts/monitoring.sh`:
+
+```bash
+#!/bin/bash
+
+# who gets an email for new warnings?
+WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
+# NOTE: if you don't want any emails sent, use an empty list,
+# like in the next line
+#WARN_MAIL_RECP=()
+
+# NOTE: adjust this to your server - ours has 16GB of RAM
+#  and no swap, so if it runs below 900MB that's probably not good,
+#  but if yours only has 2GB or so, you'll want a lower limit
+LOW_MEM_WARNING_THRESHOLD=900
+
+NUM_NEW_WARNINGS=0
+NEW_CPU_WARNING=0
+NEW_MEM_WARNING=0
+NEW_DISK_WARNING=0
+
+create_report() {
+    
+    echo "Running monitoring script at $(date +'%F %R:%S')"
+
+    NUM_CPU_CORES=$(grep -c "cpu MHz" /proc/cpuinfo)
+
+    read -r _ _ avg15min rest <<< "$(cat /proc/loadavg)"
+
+    AVG_PER_CORE=$(bc -l <<< "$avg15min / $NUM_CPU_CORES")
+
+    if [ $(bc -l <<< "$AVG_PER_CORE > 0.95") = "1" ]; then
+        NEW_CPU_WARNING=1
+        echo "High load in last 15 minutes: $AVG_PER_CORE per core!"
+        echo "Details from top:"
+        top -b -n 1 -o "%CPU" -c -w 512 | head -n 20
+        echo # add empty line
+    fi
+
+    # /proc/meminfo has values in KB, convert to MB
+    MEM_AVAILABLE_KB=$(grep "MemAvailable:" /proc/meminfo | grep -o "[0-9]*")
+    MEM_AVAILABLE=$(( MEM_AVAILABLE_KB / 1000 ))
+
+    if [ "$MEM_AVAILABLE" -lt $LOW_MEM_WARNING_THRESHOLD ]; then
+        NEW_MEM_WARNING=1
+        echo "low on main memory, only $MEM_AVAILABLE MB left!"
+        echo "free -m:"
+        free -m
+        echo "Biggest offenders:"
+        #ps aux --sort=-%mem | head
+        top -b -n 1 -o "%MEM" -c -w 512 | head -n 20
+        echo # add empty line
+    fi
+
+    DISKUSE_PERC=$(df --output=pcent / | tail -n 1 | grep -o "[0-9]*")
+
+    if [ "$DISKUSE_PERC" -gt 85 ]; then
+        NEW_DISK_WARNING=1
+        echo "Disk is getting full, already $DISKUSE_PERC percent used!"
+        lsblk -e 7 -T -o NAME,TYPE,FSTYPE,MOUNTPOINT,SIZE,FSSIZE,FSAVAIL,FSUSE%
+        echo -e "\nBiggest offenders:"
+        du -h --max-depth=6 -x / | sort -h -r | head -n 20
+        echo # add empty line
+    fi
+
+    # TODO: what else could I check? some way to check for random errors? logs?
+    
+    NUM_NEW_WARNINGS=$((NEW_CPU_WARNING + NEW_MEM_WARNING + NEW_DISK_WARNING))
+}
+
+send_alert_mail() {
+    echo "Sending an alert mail"
+
+    {
+      echo -n "Subject: Alert: $NUM_NEW_WARNINGS "
+      echo -e "warnings while monitoring $(hostname)!\n"
+      
+      echo -e "Please see log below for details\n"
+      cat /root/monitorlog.txt
+    } > /tmp/monitormail.txt
+    sendmail "${WARN_MAIL_RECP[@]}" < /tmp/monitormail.txt
+    
+    {
+      echo "# this file is used by monitor.sh"
+      echo "# to check which warnings are new"
+      # unix timestamp from now (seconds since Epoch)
+      echo "LAST_MAILTIME=$(date +'%s')"
+      echo "LAST_CPU_WARNING=$NEW_CPU_WARNING"
+      echo "LAST_MEM_WARNING=$NEW_MEM_WARNING"
+      echo "LAST_DISK_WARNING=$NEW_DISK_WARNING"
+    } > /tmp/lastmonitormailstate.sh
+}
+
+## actual execution of this script starts here:
+
+create_report 2>&1 | tee /root/monitorlog.txt
+
+if [ $NUM_NEW_WARNINGS != 0 ]; then
+    echo "Alert! $NUM_NEW_WARNINGS new Warnings!"
+    
+    {
+      echo "# this file is used by monitor.sh"
+      echo "# to see for how long the system has been in a \"bad\" state"
+      echo "LAST_BAD_CHECK_TIME=$(date +'%s')"
+    } > /tmp/lastmonitorbadcheck.sh
+    
+    if [ ${#WARN_MAIL_RECP[@]} != 0 ]; then
+        if [ ! -f /tmp/lastmonitormailstate.sh ]; then
+            # no monitoring alert mail sent yet (since last reboot),
+            # just send one now
+            send_alert_mail
+        else
+            # we already sent a warning, only send a new one if there  
+            # are new warnings or the old one was sent too long ago (>12h)
+        
+            # source lastmonitormailstate.sh to get LAST_* with
+            # the state from last time we sent an alert mail
+            . /tmp/lastmonitormailstate.sh
+        
+            NOW_TIME=$(date +'%s')
+            SECONDS_SINCE_LAST_MAIL=$((NOW_TIME - LAST_MAILTIME))
+            
+            # 12h * 60min * 60sec = 43200 sec
+            if [ $SECONDS_SINCE_LAST_MAIL -gt 43200 ] \
+              || [ $NEW_CPU_WARNING -gt $LAST_CPU_WARNING ] \
+              || [ $NEW_MEM_WARNING -gt $LAST_MEM_WARNING ] \
+              || [ $NEW_DISK_WARNING -gt $LAST_DISK_WARNING ]
+            then
+                send_alert_mail
+            fi
+        fi
+    fi # WARN_MAIL_RECP not empty
+
+elif [ -f /tmp/lastmonitorbadcheck.sh ]; then
+    # there were no warnings, but lastmonitorbadcheck.sh exists,
+    # so there were warnings before. if the last bad check was
+    # long enough ago, delete lastmonitorbadcheck.sh
+    # so if a new warning (that's probably unrelated to the old one)
+    # happens, a new mail is sent
+    
+    . /tmp/lastmonitorbadcheck.sh
+    
+    NOW_TIME=$(date +'%s')
+    SECONDS_SINCE_LAST_MAIL=$((NOW_TIME - LAST_BAD_CHECK_TIME))
+    # 60min*60sec = 3600sec
+    if [ $SECONDS_SINCE_LAST_MAIL -gt 3600 ]; then
+        rm /tmp/lastmonitorbadcheck.sh
+    fi
+fi
+
+exit $NUM_NEW_WARNINGS
+
+```
+
+make the script executable:  
+`# chmod 755 /root/scripts/monitoring.sh`
+
+Create a cronjob to run the monitoring script every 10 minutes, by creating a file
+`/etc/cron.d/my_monitoring` with the following contents:
+```
+# prevent cron from sending mails about this script
+# the script sends mails itself when there's a problem
+MAILTO=""
+# run the monitoring script every 10 minutes
+*/10 * * * * root  /root/scripts/monitoring.sh
+```
+
 
 # Bonus: OpenProject
 
@@ -2038,9 +2154,9 @@ removing the `#` at the beginning of the line.
 Thank you for reading this, I hope you found it helpful!
 
 Thanks to [my employer](https://www.masterbrainbytes.com/) for letting me turn the documentation
-for setting up our server into a proper blog post!
+for setting up our server into a proper blog post.
 
-Thanks to [Yamagi](https://www.yamagi.org//) for proofreading this and answering my stupid questions
+Thanks to [Yamagi](https://www.yamagi.org/) for proofreading this and answering my stupid questions
 about server administration :-)
 
 <!-- Below: Footnotes -->
