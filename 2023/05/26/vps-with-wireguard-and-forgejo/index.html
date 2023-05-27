@@ -117,6 +117,7 @@ a public Forgejo instance, or just a Wireguard server without Forgejo on it)." /
     <li><a href="#setting-up-dma-as-sendmail-implementation">Setting up dma as sendmail implementation</a>
       <ul>
         <li><a href="#testing-the-sendmail-command">Testing the sendmail command</a></li>
+        <li><a href="#redirect-local-mails-for-root-to-your-mail-account">Redirect local mails for root to your mail account</a></li>
       </ul>
     </li>
     <li><a href="#setting-up-forgejo-for-git-hosting">Setting up Forgejo for git hosting</a>
@@ -215,8 +216,9 @@ from the standard distro packages (and thus can be easily updated) and are known
 <em>(arguably I could also hide SSH behind Wireguard, but I&rsquo;d like to be able to get on the server
 with SSH directly even if Wireguard should fail for some reason. I&rsquo;ll make SSH public-key-auth-only,
 so I don&rsquo;t have to worry about bruteforcing attacks on the user passwords)</em>.</li>
-<li>=&gt; We don&rsquo;t have to worry that Forgejo might have a vulnerability that allows unauthenticated users
-to run code (Gitlab <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22205">had such an issue a few years back</a>),
+<li>This means that we don&rsquo;t have to worry that Forgejo might have a vulnerability that allows
+unauthenticated users to run code (Gitlab
+<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22205">had such an issue a few years back</a>),
 because only our team can access it at all, so if we forget to update Forgejo for a while,
 we&rsquo;ll still be safe<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.</li>
 <li>We can use plain HTTP (instead of HTTPS), because all connections to Forgejo go through the
@@ -1032,10 +1034,6 @@ another group than <code>mail</code> (maybe <code>root root</code>), change the 
 <p>For further information see the <a href="https://manpages.debian.org/testing/dma/sendmail.8.en.html">dma manpage</a>
 and <a href="https://wiki.archlinux.org/title/Dma">the ArchWiki&rsquo;s dma page</a>.</p>
 <blockquote>
-<p><strong>TODO:</strong> /etc/aliases !</p>
-</blockquote>
-<p>.</p>
-<blockquote>
 <p><strong>NOTE:</strong> In case the E-Mail account you want to use is from <strong>GMail</strong> (or <del>Google Apps</del>
 <del>G Suite</del> Google Workspace), setting this up is a bit more painful, as by default Google
 doesn&rsquo;t support standard SMTP login anymore, but only OAuth2 based login (which is not supported
@@ -1070,6 +1068,23 @@ Your Server.
 </code></pre><p>and then send the mail with:<br>
 <code>$ /usr/sbin/sendmail name@example.com name2@example.com &lt; mailtext.txt</code></p>
 <p>The log files <code>/var/log/mail.err</code> and <code>/var/log/mail.log</code> help debugging mail issues.</p>
+<h2 id="redirect-local-mails-for-root-to-your-mail-account">Redirect local mails for root to your mail account</h2>
+<p>Some services like sending mails with information (esp. detected problems) to the local account of
+the <strong>root</strong> user. When you log in via SSH, you might be told that there are new mails and you can
+read them with the <code>mail</code> tool. As it is, that&rsquo;s not overly useful, as you probably won&rsquo;t regularly
+log into your server once it&rsquo;s set up.</p>
+<p>Thankfully (due to dma supporting it), it&rsquo;s super easy to redirect those mails to a real mail account:
+Just create a file
+<code>/etc/aliases</code> with the following line:<br>
+<code>root: name@example.com</code><br>
+or, if multiple people should get those mails:<br>
+<code>root: name@example.com, othername@example.com</code></p>
+<p>This is even <strong>useful for mails from your own scripts</strong> (usually to indicate problems, see the backup
+and the monitoring scripts below): You can just tell them to send mails to <code>root</code>, and then
+<strong>configure who will actually get them</strong> (for example you and coworkers who administrate the server)
+in this <strong>one central place</strong>, instead of hardcoding several E-Mail addresses all over the system.</p>
+<p>You can test this as shown in the previous section, but with <code>root</code> as E-Mail address:<br>
+<code>$ /usr/sbin/sendmail root &lt; mailtext.txt</code></p>
 <h1 id="setting-up-forgejo-for-git-hosting">Setting up Forgejo for git hosting</h1>
 <blockquote>
 <p><strong>NOTE:</strong> <a href="https://forgejo.org/">Forgejo</a> is a fork of <a href="https://gitea.io/">Gitea</a>, and at least
@@ -1080,7 +1095,7 @@ will probably give you more results than <code>your problem &quot;forgejo&quot;<
 Similarly, if the <a href="https://forgejo.org/docs/latest/">Forgejo Documentation</a> doesn&rsquo;t answer your
 questions, check out the <a href="https://docs.gitea.io/en-us/">Gitea Documentation</a>.<br>
 See <a href="https://forgejo.org/faq/">The Forgejo FAQ</a> for more information about the project and why they forked.</p>
-<p>By the way, these Forgejo installation instructions are partly based on the
+<p>By the way, these Forgejo installation instructions roughly follow the
 <a href="https://docs.gitea.io/en-us/installation/install-from-binary/">Gitea Installation from Binary documentation</a>
 (at time of writing, Forgejo doesn&rsquo;t have installation instructions yet).</p>
 </blockquote>
@@ -1132,8 +1147,8 @@ Download it to the correct location:<br>
 <del>Otherwise it <em>should</em> work as it is.</del></p>
 <blockquote>
 <p><strong>NOTE:</strong> For Forgejo 1.19.x, make sure that <code>forgejo.service</code> sets <code>Type=simple</code>, <em>not</em> <code>Type=notify</code>!
-<em>(There forgejo.service currently available in their main branch sets <code>Type=notify</code>, which only
-works with the current development code, not release 1.19.3,
+<em>(The forgejo.service currently available in their main branch sets <code>Type=notify</code>, which only
+works with the current 1.20 development code, not release 1.19.3,
 <a href="https://codeberg.org/forgejo/forgejo/issues/777">see this bugreport</a>).</em></p>
 </blockquote>
 <p>Now enable and start the Forgejo service, so you can go on with the installation:<br>
@@ -1239,7 +1254,7 @@ below the <code>[server]</code> section:
 </span></span><span class="line"><span class="cl"><span class="na">PULL</span>    <span class="o">=</span> <span class="s">3000 ; Git pull from internal repositories timeout seconds</span>
 </span></span><span class="line"><span class="cl"><span class="na">GC</span>      <span class="o">=</span> <span class="s">600  ; Git repository GC timeout seconds</span>
 </span></span></code></pre></div>I increased all timeouts to factor 10 (by adding a 0 at the end); probably not all these timeouts
-need to be increased (and if, then maybe not this much).. use your own judgement, this worked for me ;-)</li>
+need to be increased (and if, then maybe not this much)&hellip; use your own judgement, this worked for me ;-)</li>
 <li>By default LFS files are stored in the filesystem, in <code>/var/lib/forgejo/data/lfs</code>.
 In the <code>[lfs]</code> section you can change the <code>PATH = ...</code> line to store elsewhere, but you can also
 configure Forgejo to store the files in an S3-like Object-Storage. More information on that in the
@@ -1478,14 +1493,17 @@ The following (saved in <code>/root/backup/backup.sh</code>) should be a good st
 (if you want to use that, uncomment the <code>#backupopenproject</code> line in <code>backupallthethings()</code>)<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>.
 It also checks if each command succeded, and if anything goes wrong sends you an E-Mail with further
 information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
-<p>Remember to adjust the <code>export RESTIC_REPOSITORY=&quot;...&quot;</code> and <code>WARN_MAIL_RECP=(...)</code> lines!</p>
+<p>Remember to adjust the <code>export RESTIC_REPOSITORY=&quot;...&quot;</code> line, and <em>maybe</em> <code>WARN_MAIL_RECP=(...)</code>.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
 </span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">RESTIC_REPOSITORY</span><span class="o">=</span><span class="s2">&#34;TODO_YOUR_RESTIC_REPO&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">RESTIC_PASSWORD_FILE</span><span class="o">=</span>/root/backup/.restic-pw.txt
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># who will get an e-mail if some part of the backup has an error?</span>
-</span></span><span class="line"><span class="cl"><span class="nv">WARN_MAIL_RECP</span><span class="o">=(</span><span class="s2">&#34;foo@bar.example&#34;</span> <span class="s2">&#34;fu@fara.example&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">WARN_MAIL_RECP</span><span class="o">=(</span><span class="s2">&#34;root&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># for a custom list (instead of &#34;everyone who roots mails are</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># redirected to in /etc/aliases), instead use:</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=(&#34;foo@bar.example&#34; &#34;fu@fara.example&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># NOTE: if you don&#39;t want any emails sent, use an empty list, like this:</span>
 </span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=()</span>
 </span></span><span class="line"><span class="cl">
@@ -1756,15 +1774,18 @@ happen with <code>dma</code>, using an external SMTP server)</p>
 <h2 id="apticron-send-mail-if-updates-are-available">apticron - send mail if updates are available</h2>
 <p>Install apticron (the version for systems using systemd):<br>
 <code># apt install apticron-systemd</code></p>
-<p>Configure it by copying its default config to <code>/etc/apticron/</code>:<br>
-<code># cp /usr/lib/apticron/apticron.conf /etc/apticron/</code></p>
-<p>Open <code>/etc/apticron/apticron.conf</code> in a text editor to adjust it to your needs.
-You should change <code>EMAIL=&quot;root&quot;</code> to <code>EMAIL=&quot;yourname@example.com&quot;</code> (use your mail address,
+<p>By default it sends mails to <code>root</code>, which, if you have followed
+<a href="#redirect-local-mails-for-root-to-your-mail-account">the instructions above</a>,
+are automatically forwarded to you and/or other people administrating this server.</p>
+<p>If you want to <strong>customize</strong> this, copy apticron&rsquo;s default config to <code>/etc/apticron/</code>:<br>
+<code># cp /usr/lib/apticron/apticron.conf /etc/apticron/</code><br>
+and open <code>/etc/apticron/apticron.conf</code> in a text editor to adjust it to your needs.
+You may want to change <code>EMAIL=&quot;root&quot;</code> to <code>EMAIL=&quot;yourname@example.com&quot;</code> (use your mail address,
 of course), so the mails about updates go to your real E-Mail account where you can see them.
 Take a look at the other options in the config (they&rsquo;re all described in comments); I personally
 didn&rsquo;t change any of them, though the <code>CUSTOM_SUBJECT</code> option probably is useful to make filtering
 those mails easier.</p>
-<p>If you want to specify the exactl time this runs, run<br>
+<p>If you want to <strong>specify the exact time</strong> this runs, run<br>
 <code># systemctl edit apticron.timer</code><br>
 and edit it accordingly - see the unattended-upgrades footnote<sup id="fnref:14"><a href="#fn:14" class="footnote-ref" role="doc-noteref">14</a></sup> for an example.</p>
 <h2 id="unattended-upgrades-install-security-updates-automatically">unattended-upgrades - install security updates automatically</h2>
@@ -1777,8 +1798,10 @@ you also need to install <code>update-notifier-common</code><sup id="fnref:15"><
 <code># dpkg-reconfigure --priority=low unattended-upgrades</code> (select <code>&lt;Yes&gt;</code>)</p>
 <p>Edit (as root) <code>/etc/apt/apt.conf.d/50unattended-upgrades</code> for further configuration:</p>
 <ul>
-<li>Find the line <code>//Unattended-Upgrade::Mail &quot;&quot;;</code>, uncomment it and set your mail address
-to receive reports: <code>Unattended-Upgrade::Mail &quot;yourname@example.com&quot;;</code></li>
+<li>Find the line <code>//Unattended-Upgrade::Mail &quot;&quot;;</code>, uncomment it and set the <code>root</code> as E-Mail address
+so all admins receive reports: <code>Unattended-Upgrade::Mail &quot;root&quot;;</code><br>
+<em>(or, if you haven&rsquo;t <a href="#redirect-local-mails-for-root-to-your-mail-account">set up /etc/aliases</a>,
+use your proper mail address: <code>Unattended-Upgrade::Mail &quot;yourname@example.com&quot;;</code>)</em></li>
 <li>Below it, change <code>//Unattended-Upgrade::MailReport &quot;on-change&quot;;</code> to
 <code>Unattended-Upgrade::MailReport &quot;on-change&quot;;</code> (or possibly <code>&quot;only-on-error&quot;</code> if you prefer that)</li>
 <li>To enable automatic reboots, replace the line <code>//Unattended-Upgrade::Automatic-Reboot &quot;false&quot;;</code>
@@ -1813,7 +1836,10 @@ overkill for a single server), so I decided to write a simple bash script to do 
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
 </span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="c1"># who gets an email for new warnings?</span>
-</span></span><span class="line"><span class="cl"><span class="nv">WARN_MAIL_RECP</span><span class="o">=(</span><span class="s2">&#34;foo@bar.example&#34;</span> <span class="s2">&#34;fu@fara.example&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">WARN_MAIL_RECP</span><span class="o">=(</span><span class="s2">&#34;root&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># for a custom list (instead of &#34;everyone who roots mails are</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># redirected to in /etc/aliases), instead use:</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=(&#34;foo@bar.example&#34; &#34;fu@fara.example&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># NOTE: if you don&#39;t want any emails sent, use an empty list,</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># like in the next line</span>
 </span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=()</span>
@@ -1967,7 +1993,16 @@ overkill for a single server), so I decided to write a simple bash script to do 
 MAILTO=&#34;&#34;
 # run the monitoring script every 10 minutes
 */10 * * * * root  /root/scripts/monitoring.sh
-</code></pre><h1 id="bonus-openproject">Bonus: OpenProject</h1>
+</code></pre><blockquote>
+<p><strong>NOTE:</strong> If you&rsquo;re using a &ldquo;real&rdquo;/dedicated server (instead of a virtual machine/VPS),
+you should probably also use and
+<a href="https://manpages.ubuntu.com/manpages/jammy/man5/smartd.conf.5.html">configure</a> <code>smartd</code> from the
+<code>smartmontools</code> package to get E-Mails about
+<a href="https://en.wikipedia.org/w/index.php?title=Self-Monitoring,_Analysis_and_Reporting_Technology">SMART</a>
+disk warnings/errors, and possibly something that checks the server&rsquo;s temperature sensors
+(for example by scripting something based on <code>lm_sensors</code>)</p>
+</blockquote>
+<h1 id="bonus-openproject">Bonus: OpenProject</h1>
 <p>I&rsquo;ll keep this short(ish), I just thought I&rsquo;d mention it as I installed it on our server because we
 wanted to try it out.</p>
 <p>Before the actual installation, add an entry for <code>openproject.example.lan</code> to <code>/etc/hosts</code>
