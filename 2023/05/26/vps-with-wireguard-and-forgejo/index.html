@@ -1502,7 +1502,7 @@ information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
 </span></span><span class="line"><span class="cl"><span class="c1"># who will get an e-mail if some part of the backup has an error?</span>
 </span></span><span class="line"><span class="cl"><span class="nv">WARN_MAIL_RECP</span><span class="o">=(</span><span class="s2">&#34;root&#34;</span><span class="o">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># for a custom list (instead of &#34;everyone who roots mails are</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># redirected to in /etc/aliases), instead use:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># redirected to in /etc/aliases&#34;), instead use:</span>
 </span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=(&#34;foo@bar.example&#34; &#34;fu@fara.example&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># NOTE: if you don&#39;t want any emails sent, use an empty list, like this:</span>
 </span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=()</span>
@@ -1838,7 +1838,7 @@ overkill for a single server), so I decided to write a simple bash script to do 
 </span></span><span class="line"><span class="cl"><span class="c1"># who gets an email for new warnings?</span>
 </span></span><span class="line"><span class="cl"><span class="nv">WARN_MAIL_RECP</span><span class="o">=(</span><span class="s2">&#34;root&#34;</span><span class="o">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># for a custom list (instead of &#34;everyone who roots mails are</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># redirected to in /etc/aliases), instead use:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># redirected to in /etc/aliases&#34;), instead use:</span>
 </span></span><span class="line"><span class="cl"><span class="c1">#WARN_MAIL_RECP=(&#34;foo@bar.example&#34; &#34;fu@fara.example&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># NOTE: if you don&#39;t want any emails sent, use an empty list,</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># like in the next line</span>
@@ -2113,11 +2113,11 @@ or the Linux kernels network stack have unknown security vulnerabilities that an
 exploit to get onto your server. It&rsquo;s also possible that your hosters infrastructure gets
 compromised and attackers get access to the servers (via hypervisor for VPS, or remote consoles
 for dedicated servers, or even physically by breaking in).<br>
-And of course it&rsquo;s possible (I&rsquo;d even say more likely than the scenarios mentioned before) that
-someone hacks <em>your</em> PC and gets access to the server and/or your git repos that way.<br>
+And of course it&rsquo;s possible (I&rsquo;d even say more likely than some of the scenarios mentioned before)
+that someone hacks <em>your</em> PC and gets access to the server and/or your git repos that way.<br>
 Anyway, if you follow this guide (and hopefully keep at least the Linux kernel, WireGuard and
 OpenSSH up to date), your data will be <em>a lot</em> safer than it would be if you exposed webservices
-(instead of just WireGuard) to the internet.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+(instead of just WireGuard and SSH) to the internet.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:4">
 <p>I&rsquo;ve never done this, but it might be possible to give a client some more
