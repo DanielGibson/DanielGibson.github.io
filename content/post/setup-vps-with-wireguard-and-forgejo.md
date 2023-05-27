@@ -476,7 +476,10 @@ This Howto uses plain [ip(6)tables](https://en.wikipedia.org/wiki/Iptables), so 
 I suggest putting the firewall scripts into `/root/scripts/`, so create that directory.
 
 Create one script called `firewall-flush.sh` in that directory that removes all firewall rules
-and allows all connections:
+and allows all connections:  
+<a href="/downloads/firewall-flush.sh" download>Download firewall-flush.sh</a>
+
+<details> <summary>Click to show the script</summary>
 
 ```bash
 #!/bin/sh
@@ -505,14 +508,17 @@ ip6tables -t mangle -F
 
 # reset ip6tables INPUT policy to ACCEPT
 ip6tables -P INPUT ACCEPT
+
 ```
+</details>
 
 Then create a second script `firewall.sh` with the actual firewall rules
 (see the comments in the scripts for a little explanation of what it does).  
 **Note** that you might have to modify the `WAN` network device name. It's the network device
 connected to the internet - it might be called `eth0`, but names like `enp5s0` or similar
 are also common. Just adjust the `WAN="eth0"` line accordingly[^devname].  
-`firewall.sh`:
+`firewall.sh`: <a href="/downloads/firewall.sh" download>Download firewall.sh</a>
+<details><summary>Click to show the script</summary>
 
 ```bash
 #!/bin/sh
@@ -617,7 +623,10 @@ ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 133 -j ACCEPT # router so
 ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 134 -j ACCEPT # router advertisement
 ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 135 -j ACCEPT # neighbor solicitation
 ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 136 -j ACCEPT # neighbor advertisement
+
 ```
+
+</details>
 
 Make both scripts executable:  
 `# chmod 755 /root/scripts/firewall*`
@@ -1589,6 +1598,10 @@ information, and stores a log in `/root/backup/backuplog.txt`.
 
 Remember to adjust the `export RESTIC_REPOSITORY="..."` line, and *maybe* `WARN_MAIL_RECP=(...)`.
 
+<a href="/downloads/backup.sh" download>Download backup.sh</a>
+
+<details> <summary>Click to show the script</summary>
+
 ```bash
 #!/bin/bash
 
@@ -1772,6 +1785,8 @@ fi
 exit $NUM_ERRORS
 
 ```
+
+</details>
 
 After saving this script at `/root/backup/backup.sh`, make it executable (for root):  
 `# chmod 700 /root/backup/backup.sh`
@@ -1961,7 +1976,10 @@ overkill for a single server), so I decided to write a simple bash script to do 
 It needs `bc`, so install it:  
 `# apt install bc`
 
-This is the result, save as `/root/scripts/monitoring.sh`:
+This is the result, save as `/root/scripts/monitoring.sh`:  
+<a href="/downloads/monitoring.sh" download>Download monitoring.sh</a>
+
+<details> <summary>Click to show the script</summary>
 
 ```bash
 #!/bin/bash
@@ -2117,6 +2135,8 @@ fi
 exit $NUM_NEW_WARNINGS
 
 ```
+
+</details>
 
 make the script executable:  
 `# chmod 755 /root/scripts/monitoring.sh`
