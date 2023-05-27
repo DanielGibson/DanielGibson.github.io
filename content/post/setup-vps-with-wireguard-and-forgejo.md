@@ -1081,6 +1081,28 @@ and then send the mail with:
 
 The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail issues.
 
+## Redirect local mails for root to your mail account
+
+Some services like sending mails with information (esp. detected problems) to the local account of
+the **root** user. When you log in via SSH, you might be told that there are new mails and you can
+read them with the `mail` tool. As it is, that's not overly useful, as you probably won't regularly
+log into your server once it's set up.
+
+Thankfully (due to dma supporting it), it's super easy to redirect those mails to a real mail account:
+Just create a file
+`/etc/aliases` with the following line:  
+`root: name@example.com`  
+or, if multiple people should get those mails:  
+`root: name@example.com, othername@example.com`  
+
+This is even **useful for mails from your own scripts** (usually to indicate problems, see the backup
+and the monitoring scripts below): You can just tell them to send mails to `root`, and then
+**configure who will actually get them** (for example you and coworkers who administrate the server)
+in this **one central place**, instead of hardcoding several E-Mail addresses all over the system.
+
+You can test this as shown in the previous section, but with `root` as E-Mail address:  
+`$ /usr/sbin/sendmail root < mailtext.txt`
+
 # Setting up Forgejo for git hosting
 
 > **NOTE:** [Forgejo](https://forgejo.org/) is a fork of [Gitea](https://gitea.io/), and at least
@@ -1092,7 +1114,7 @@ The log files `/var/log/mail.err` and `/var/log/mail.log` help debugging mail is
 > questions, check out the [Gitea Documentation](https://docs.gitea.io/en-us/).  
 > See [The Forgejo FAQ](https://forgejo.org/faq/) for more information about the project and why they forked.
 >
-> By the way, these Forgejo installation instructions are partly based on the
+> By the way, these Forgejo installation instructions roughly follow the
 > [Gitea Installation from Binary documentation](https://docs.gitea.io/en-us/installation/install-from-binary/)
 > (at time of writing, Forgejo doesn't have installation instructions yet).
 
@@ -1165,8 +1187,8 @@ If you're *not* using sqlite, but MySQL or MariaDB or PostgreSQL, you'll have to
 ~~Otherwise it *should* work as it is.~~
 
 > **NOTE:** For Forgejo 1.19.x, make sure that `forgejo.service` sets `Type=simple`, *not* `Type=notify`!
-> *(There forgejo.service currently available in their main branch sets `Type=notify`, which only
-> works with the current development code, not release 1.19.3, 
+> *(The forgejo.service currently available in their main branch sets `Type=notify`, which only
+> works with the current 1.20 development code, not release 1.19.3, 
 > [see this bugreport](https://codeberg.org/forgejo/forgejo/issues/777)).*
 
 
@@ -1565,7 +1587,7 @@ The following (saved in `/root/backup/backup.sh`) should be a good start: It bac
 It also checks if each command succeded, and if anything goes wrong sends you an E-Mail with further
 information, and stores a log in `/root/backup/backuplog.txt`.
 
-Remember to adjust the `export RESTIC_REPOSITORY="..."` and `WARN_MAIL_RECP=(...)` lines!
+Remember to adjust the `export RESTIC_REPOSITORY="..."` line, and *maybe* `WARN_MAIL_RECP=(...)`.
 
 ```bash
 #!/bin/bash
@@ -1574,7 +1596,10 @@ export RESTIC_REPOSITORY="TODO_YOUR_RESTIC_REPO"
 export RESTIC_PASSWORD_FILE=/root/backup/.restic-pw.txt
 
 # who will get an e-mail if some part of the backup has an error?
-WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
+WARN_MAIL_RECP=("root")
+# for a custom list (instead of "everyone who roots mails are
+# redirected to in /etc/aliases"), instead use:
+#WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
 # NOTE: if you don't want any emails sent, use an empty list, like this:
 #WARN_MAIL_RECP=()
 
@@ -1868,17 +1893,20 @@ If that does *not* print something like `/usr/bin/mailx`, install it with:
 Install apticron (the version for systems using systemd):  
 `# apt install apticron-systemd`
 
-Configure it by copying its default config to `/etc/apticron/`:  
-`# cp /usr/lib/apticron/apticron.conf /etc/apticron/`
+By default it sends mails to `root`, which, if you have followed
+[the instructions above](#redirect-local-mails-for-root-to-your-mail-account),
+are automatically forwarded to you and/or other people administrating this server.
 
-Open `/etc/apticron/apticron.conf` in a text editor to adjust it to your needs.
-You should change `EMAIL="root"` to `EMAIL="yourname@example.com"` (use your mail address,
+If you want to **customize** this, copy apticron's default config to `/etc/apticron/`:  
+`# cp /usr/lib/apticron/apticron.conf /etc/apticron/`  
+and open `/etc/apticron/apticron.conf` in a text editor to adjust it to your needs.
+You may want to change `EMAIL="root"` to `EMAIL="yourname@example.com"` (use your mail address,
 of course), so the mails about updates go to your real E-Mail account where you can see them.
 Take a look at the other options in the config (they're all described in comments); I personally
 didn't change any of them, though the `CUSTOM_SUBJECT` option probably is useful to make filtering
 those mails easier.
 
-If you want to specify the exactl time this runs, run  
+If you want to **specify the exact time** this runs, run  
 `# systemctl edit apticron.timer`  
 and edit it accordingly - see the unattended-upgrades footnote[^upgradetime] for an example.
 
@@ -1895,8 +1923,10 @@ Apparently it must be enabled by reconfiguring it:
 `# dpkg-reconfigure --priority=low unattended-upgrades` (select `<Yes>`)
 
 Edit (as root) `/etc/apt/apt.conf.d/50unattended-upgrades` for further configuration:
-* Find the line `//Unattended-Upgrade::Mail "";`, uncomment it and set your mail address
-  to receive reports: `Unattended-Upgrade::Mail "yourname@example.com";`
+* Find the line `//Unattended-Upgrade::Mail "";`, uncomment it and set the `root` as E-Mail address
+  so all admins receive reports: `Unattended-Upgrade::Mail "root";`  
+  *(or, if you haven't [set up /etc/aliases](#redirect-local-mails-for-root-to-your-mail-account),
+    use your proper mail address: `Unattended-Upgrade::Mail "yourname@example.com";`)*
 * Below it, change `//Unattended-Upgrade::MailReport "on-change";` to
   `Unattended-Upgrade::MailReport "on-change";` (or possibly `"only-on-error"` if you prefer that)
 * To enable automatic reboots, replace the line `//Unattended-Upgrade::Automatic-Reboot "false";`
@@ -1937,7 +1967,10 @@ This is the result, save as `/root/scripts/monitoring.sh`:
 #!/bin/bash
 
 # who gets an email for new warnings?
-WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
+WARN_MAIL_RECP=("root")
+# for a custom list (instead of "everyone who roots mails are
+# redirected to in /etc/aliases"), instead use:
+#WARN_MAIL_RECP=("foo@bar.example" "fu@fara.example")
 # NOTE: if you don't want any emails sent, use an empty list,
 # like in the next line
 #WARN_MAIL_RECP=()
@@ -2099,10 +2132,12 @@ MAILTO=""
 ```
 
 > **NOTE:** If you're using a "real"/dedicated server (instead of a virtual machine/VPS),
-> you should probably also use and configure `smartd` from `smartmontools` to get E-Mails about
+> you should probably also use and
+> [configure](https://manpages.ubuntu.com/manpages/jammy/man5/smartd.conf.5.html) `smartd` from the
+> `smartmontools` package to get E-Mails about
 > [SMART](https://en.wikipedia.org/w/index.php?title=Self-Monitoring,_Analysis_and_Reporting_Technology)
 > disk warnings/errors, and possibly something that checks the server's temperature sensors
-> (for example by scripting something based on lm_sensors)
+> (for example by scripting something based on `lm_sensors`)
 
 # Bonus: OpenProject
 
@@ -2225,11 +2260,11 @@ about server administration :-)
     exploit to get onto your server. It's also possible that your hosters infrastructure gets
     compromised and attackers get access to the servers (via hypervisor for VPS, or remote consoles
     for dedicated servers, or even physically by breaking in).  
-    And of course it's possible (I'd even say more likely than the scenarios mentioned before) that
-    someone hacks *your* PC and gets access to the server and/or your git repos that way.  
+    And of course it's possible (I'd even say more likely than some of the scenarios mentioned before)
+    that someone hacks *your* PC and gets access to the server and/or your git repos that way.  
     Anyway, if you follow this guide (and hopefully keep at least the Linux kernel, WireGuard and
     OpenSSH up to date), your data will be *a lot* safer than it would be if you exposed webservices
-    (instead of just WireGuard) to the internet.  
+    (instead of just WireGuard and SSH) to the internet.  
 
 [^clientsubnet]: I've never done this, but it might be possible to give a client some more
     IPs with a different subnet mask, but that's not useful for this usecase and you'd still have to
