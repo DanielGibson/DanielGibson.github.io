@@ -1,11 +1,11 @@
 +++
-date = "2023-05-16T20:20:20+02:00"
+date = "2023-05-26T20:20:20+02:00"
 title = "How to set up a Linux server to host git with LFS behind a VPN"
 slug = "vps-with-wireguard-and-forgejo"
 tags = [ "linux", "wireguard", "VPN", "git", "LFS", "gamedev", "server", "VPS" ]
 draft = true
 toc = true
-# ghcommentid = 13
+ghcommentid = 13
 +++
 
 <!-- # How to set up a Linux server to host git with LFS behind a VPN -->
@@ -75,8 +75,9 @@ behind a [Wireguard](https://www.wireguard.com/) VPN, so:
    *(arguably I could also hide SSH behind Wireguard, but I'd like to be able to get on the server
     with SSH directly even if Wireguard should fail for some reason. I'll make SSH public-key-auth-only,
     so I don't have to worry about bruteforcing attacks on the user passwords)*.
-2. => We don't have to worry that Forgejo might have a vulnerability that allows unauthenticated users
-   to run code (Gitlab [had such an issue a few years back](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22205)),
+2. This means that we don't have to worry that Forgejo might have a vulnerability that allows
+   unauthenticated users to run code (Gitlab 
+   [had such an issue a few years back](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22205)),
    because only our team can access it at all, so if we forget to update Forgejo for a while,
    we'll still be safe[^security].
 3. We can use plain HTTP (instead of HTTPS), because all connections to Forgejo go through the
@@ -693,6 +694,11 @@ Contabo provides a command that can be executed to enable IPv6 *(but this is Con
 other hosters also disable IPv6 by default and you run into the same problem, refer to their documentation!):*  
 `# enable_ipv6`
 
+> **NOTE:** If your hoster offers VNC access to your server (which gives you access to a terminal
+> even if you can't reach the server through SSH anymore) and enables it by default (like Contabo does),
+> now that your firewall is working without locking you out is a good time to disable the VNC access,
+> so no one can try to break into your server through that.
+
 # Setting up dnsmasq as DNS server for a local domain
 
 This step will set up [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html) for the local
@@ -954,8 +960,7 @@ After=wg-quick@wg0.service
 Save and exit the editor (if it's GNU nano, press Ctrl-X, then type `y` for "yes I want to save"
 and press enter to confirm the preselected filename).  
 With this change, if you reboot, nginx should (still) work.
-If you need to, you can edit this again with the same command (`# systemctl edit nginx.service`).  
-
+If you need to, you can edit this again with the same command (`# systemctl edit nginx.service`). 
 
 Now if you open a browser on a desktop PC connected to the server with WireGuard (that
 has the DNS server configured as described in the previous chapter), you should be able to open
@@ -1106,11 +1111,21 @@ Make sure `git` and `git-lfs` are installed:
 
 Create a user `git` on the system. Forgejo will run as that user, and when accessing git through ssh
 (which is the default), this user is part of the URL *(for example in 
-`git clone git@git.example.lan:YourOrg/YourRepo.git` the `git` before the `@` is the user you'll create now).*
+`git clone git@git.example.lan:YourOrg/YourRepo.git` the `git` before the `@` is the user you'll create now).*  
+On **Debian, Ubuntu** and their derivates that's done with:
 
 ```
 # adduser --system --shell /bin/bash --gecos 'Git Version Control' \
   --group --disabled-password --home /home/git  git
+```
+
+On **Linux distributions not based on Debian/Ubuntu** (this should at least work with Red Hat derivates
+like Fedora, CentOS etc - *feel free to leave a comment about other distros!*), run this instead:  
+```
+# groupadd --system git
+
+# adduser --system --shell /bin/bash --comment 'Git Version Control' \
+   --gid git --home-dir /home/git --create-home git
 ```
 
 ## Create directories Forgejo will use
@@ -1147,7 +1162,13 @@ Download it to the correct location:
 
 If you're *not* using sqlite, but MySQL or MariaDB or PostgreSQL, you'll have to edit that file
 (`/etc/systemd/system/forgejo.service`) and uncomment the corresponding `Wants=` and `After=` lines.
-Otherwise it should work as it is.
+~~Otherwise it *should* work as it is.~~
+
+> **NOTE:** For Forgejo 1.19.x, make sure that `forgejo.service` sets `Type=simple`, *not* `Type=notify`!
+> *(There forgejo.service currently available in their main branch sets `Type=notify`, which only
+> works with the current development code, not release 1.19.3, 
+> [see this bugreport](https://codeberg.org/forgejo/forgejo/issues/777)).*
+
 
 Now enable and start the Forgejo service, so you can go on with the installation:  
 `# systemctl enable forgejo.service`  
@@ -1262,7 +1283,7 @@ I recommend the following changes (in the order of where I put them in the app.i
   GC      = 600  ; Git repository GC timeout seconds
   ```
   I increased all timeouts to factor 10 (by adding a 0 at the end); probably not all these timeouts
-  need to be increased (and if, then maybe not this much).. use your own judgement, this worked for me ;-)
+  need to be increased (and if, then maybe not this much)... use your own judgement, this worked for me ;-)
 * By default LFS files are stored in the filesystem, in `/var/lib/forgejo/data/lfs`.
   In the `[lfs]` section you can change the `PATH = ...` line to store elsewhere, but you can also
   configure Forgejo to store the files in an S3-like Object-Storage. More information on that in the
@@ -1740,7 +1761,7 @@ If the manual run worked, create a cronjob so it runs every night, by creating a
 `/etc/cron.d/my_backup` with the following contents:
 ```
 # prevent cron from sending mails about this script
-# the script sends mails itself when there's a problem
+# the script sends mails itself if something went wrong
 MAILTO=""
 # every night at 05:03, do a backup
 3 5 * * * root  /root/backup/backup.sh
@@ -1907,6 +1928,9 @@ I haven't found a good existing solution for this ([Nagios](https://www.nagios.o
 for complex systems consisting of big networks with many servers and thus seemed like complete
 overkill for a single server), so I decided to write a simple bash script to do this myself.
 
+It needs `bc`, so install it:  
+`# apt install bc`
+
 This is the result, save as `/root/scripts/monitoring.sh`:
 
 ```bash
@@ -2068,12 +2092,17 @@ Create a cronjob to run the monitoring script every 10 minutes, by creating a fi
 `/etc/cron.d/my_monitoring` with the following contents:
 ```
 # prevent cron from sending mails about this script
-# the script sends mails itself when there's a problem
+# the script sends mails itself if it detected a problem
 MAILTO=""
 # run the monitoring script every 10 minutes
 */10 * * * * root  /root/scripts/monitoring.sh
 ```
 
+> **NOTE:** If you're using a "real"/dedicated server (instead of a virtual machine/VPS),
+> you should probably also use and configure `smartd` from `smartmontools` to get E-Mails about
+> [SMART](https://en.wikipedia.org/w/index.php?title=Self-Monitoring,_Analysis_and_Reporting_Technology)
+> disk warnings/errors, and possibly something that checks the server's temperature sensors
+> (for example by scripting something based on lm_sensors)
 
 # Bonus: OpenProject
 
@@ -2273,7 +2302,10 @@ about server administration :-)
 [^REST]: You could run restic's [rest-server](https://github.com/restic/rest-server)
     (in `--append-only` mode) on a backupserver at home (or in your office), and make that
     backupserver connect to your WireGuard VPN, so it can be easily reached from the git server.
-    And "backupserver" could just be a Raspberry Pi with with a big USB harddrive.
+    And "backupserver" could just be a Raspberry Pi[^RPi] with with a big USB harddrive.
+
+[^RPi]: Yeah yeah, I know... I'm sure they'll eventually be available at normal prices again.  
+    Or maybe you already got one, or try a Banana Pi or RockPi or whatever.
 
 [^robocopy]: If you're using Windows and don't have Git Bash installed, you can *probably* use
     robocopy, like this (**untested!**; assuming `X:` is your mounted restic repo and `D:` is you backup disk):  
@@ -2294,7 +2326,7 @@ about server administration :-)
 
     Debian on the other hand doesn't even have a package with that name.
 
-[^upgradetime]: According to  [the Debian Wiki](https://wiki.debian.org/UnattendedUpgrades#Modifying_download_and_upgrade_schedules_.28on_systemd.29)
+[^upgradetime]: According to [the Debian Wiki](https://wiki.debian.org/UnattendedUpgrades#Modifying_download_and_upgrade_schedules_.28on_systemd.29)
     updates are downloaded by the systemd `apt-daily.timer` and installed (upgrade) by the
     `apt-daily-upgrade.timer`, and apparently by default they happen at 6am or 6pm with a randomized
     delay of 12h.. I think this means they happen pretty much randomly, the download part maybe even
