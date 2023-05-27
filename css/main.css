@@ -42,6 +42,11 @@ code {
   border-radius: 3px;
 }
 
+details summary {
+  cursor: pointer;
+  
+}
+
 .wrapper {
   overflow: hidden;
   position: relative;

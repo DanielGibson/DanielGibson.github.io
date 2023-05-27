@@ -543,7 +543,9 @@ This Howto uses plain <a href="https://en.wikipedia.org/wiki/Iptables">ip(6)tabl
 <code># systemctl disable ufw.service</code></p>
 <p>I suggest putting the firewall scripts into <code>/root/scripts/</code>, so create that directory.</p>
 <p>Create one script called <code>firewall-flush.sh</code> in that directory that removes all firewall rules
-and allows all connections:</p>
+and allows all connections:<br>
+<a href="../../../../downloads/firewall-flush.sh" download>Download firewall-flush.sh</a></p>
+<details> <summary>Click to show the script</summary>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/sh
 </span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="c1"># This script resets ip(6)tables so all connections are allowed again</span>
@@ -570,12 +572,14 @@ and allows all connections:</p>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># reset ip6tables INPUT policy to ACCEPT</span>
 </span></span><span class="line"><span class="cl">ip6tables -P INPUT ACCEPT
-</span></span></code></pre></div><p>Then create a second script <code>firewall.sh</code> with the actual firewall rules
+</span></span></code></pre></div></details>
+<p>Then create a second script <code>firewall.sh</code> with the actual firewall rules
 (see the comments in the scripts for a little explanation of what it does).<br>
 <strong>Note</strong> that you might have to modify the <code>WAN</code> network device name. It&rsquo;s the network device
 connected to the internet - it might be called <code>eth0</code>, but names like <code>enp5s0</code> or similar
 are also common. Just adjust the <code>WAN=&quot;eth0&quot;</code> line accordingly<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>.<br>
-<code>firewall.sh</code>:</p>
+<code>firewall.sh</code>: <a href="../../../../downloads/firewall.sh" download>Download firewall.sh</a></p>
+<details><summary>Click to show the script</summary>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/sh
 </span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="c1"># Daniels little firewall script</span>
@@ -678,7 +682,8 @@ are also common. Just adjust the <code>WAN=&quot;eth0&quot;</code> line accordin
 </span></span><span class="line"><span class="cl">ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type <span class="m">134</span> -j ACCEPT <span class="c1"># router advertisement</span>
 </span></span><span class="line"><span class="cl">ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type <span class="m">135</span> -j ACCEPT <span class="c1"># neighbor solicitation</span>
 </span></span><span class="line"><span class="cl">ip6tables -A INPUT -p ipv6-icmp -m icmp6 --icmpv6-type <span class="m">136</span> -j ACCEPT <span class="c1"># neighbor advertisement</span>
-</span></span></code></pre></div><p>Make both scripts executable:<br>
+</span></span></code></pre></div></details>
+<p>Make both scripts executable:<br>
 <code># chmod 755 /root/scripts/firewall*</code></p>
 <p>The safest way to test the firewall script is like this (executed in <code>/root/scripts/</code>):<br>
 <code># ./firewall.sh ; sleep 60 ; ./firewall-flush.sh</code><br>
@@ -1494,6 +1499,8 @@ The following (saved in <code>/root/backup/backup.sh</code>) should be a good st
 It also checks if each command succeded, and if anything goes wrong sends you an E-Mail with further
 information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
 <p>Remember to adjust the <code>export RESTIC_REPOSITORY=&quot;...&quot;</code> line, and <em>maybe</em> <code>WARN_MAIL_RECP=(...)</code>.</p>
+<p><a href="../../../../downloads/backup.sh" download>Download backup.sh</a></p>
+<details> <summary>Click to show the script</summary>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
 </span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">RESTIC_REPOSITORY</span><span class="o">=</span><span class="s2">&#34;TODO_YOUR_RESTIC_REPO&#34;</span>
@@ -1674,7 +1681,8 @@ information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
 </span></span><span class="line"><span class="cl"><span class="k">fi</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="nb">exit</span> <span class="nv">$NUM_ERRORS</span>
-</span></span></code></pre></div><p>After saving this script at <code>/root/backup/backup.sh</code>, make it executable (for root):<br>
+</span></span></code></pre></div></details>
+<p>After saving this script at <code>/root/backup/backup.sh</code>, make it executable (for root):<br>
 <code># chmod 700 /root/backup/backup.sh</code></p>
 <p>Run it once to make sure it works (might take a while, especially if you&rsquo;ve already imported
 bigger git repos):<br>
@@ -1832,7 +1840,9 @@ for complex systems consisting of big networks with many servers and thus seemed
 overkill for a single server), so I decided to write a simple bash script to do this myself.</p>
 <p>It needs <code>bc</code>, so install it:<br>
 <code># apt install bc</code></p>
-<p>This is the result, save as <code>/root/scripts/monitoring.sh</code>:</p>
+<p>This is the result, save as <code>/root/scripts/monitoring.sh</code>:<br>
+<a href="../../../../downloads/monitoring.sh" download>Download monitoring.sh</a></p>
+<details> <summary>Click to show the script</summary>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
 </span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="c1"># who gets an email for new warnings?</span>
@@ -1984,7 +1994,8 @@ overkill for a single server), so I decided to write a simple bash script to do 
 </span></span><span class="line"><span class="cl"><span class="k">fi</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="nb">exit</span> <span class="nv">$NUM_NEW_WARNINGS</span>
-</span></span></code></pre></div><p>make the script executable:<br>
+</span></span></code></pre></div></details>
+<p>make the script executable:<br>
 <code># chmod 755 /root/scripts/monitoring.sh</code></p>
 <p>Create a cronjob to run the monitoring script every 10 minutes, by creating a file
 <code>/etc/cron.d/my_monitoring</code> with the following contents:</p>
