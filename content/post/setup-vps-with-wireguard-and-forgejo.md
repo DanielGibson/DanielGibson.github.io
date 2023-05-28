@@ -1,9 +1,9 @@
 +++
-date = "2023-05-26T20:20:20+02:00"
+date = "2023-05-28T02:30:20+02:00"
 title = "How to set up a Linux server to host git with LFS behind a VPN"
-slug = "vps-with-wireguard-and-forgejo"
+slug = "server-with-wireguard-and-forgejo"
 tags = [ "linux", "wireguard", "VPN", "git", "LFS", "gamedev", "server", "VPS" ]
-draft = true
+draft = false
 toc = true
 ghcommentid = 13
 +++
@@ -12,12 +12,18 @@ ghcommentid = 13
 
 This Howto explains how to set up a Linux server that runs [SSH](https://www.openssh.com/),
 [WireGuard VPN](https://www.wireguard.com/), [Forgejo](https://forgejo.org/) (a fork of
-[Gitea](https://gitea.io), a web-based git forge, kinda like self-hosted Github) and a minimal
-[DNS server](https://thekelleys.org.uk/dnsmasq/doc.html) so we can have an internal domain for pretty URLs.
-We'll also set up automated backups and some basic self-monitoring.  
-To follow it **you'll need (very) basic Linux commandline knowledge**, i.e. you should be able to navigate
-the file system in a terminal, use SSH and edit textfiles with a terminal-based text editor (like nano,
-joe or vim, whatever you prefer).  
+[Gitea](https://gitea.io), a web-based git forge, kinda like self-hosted Github) behind a local
+[nginx](https://nginx.org) reverse proxy and a minimal [DNS server](https://thekelleys.org.uk/dnsmasq/doc.html)
+so we can have an internal domain for pretty URLs.
+It also shows how to set up a [minimal MTA/mail forwarder](https://github.com/corecode/dma) so the
+server can send mails, an [iptables](https://en.wikipedia.org/wiki/Iptables) +
+[SSHGuard](https://www.sshguard.net/)-based firewall, automated backups and some basic self-monitoring.
+As a bonus there's a short section that outlines how to set up
+[OpenProject](https://www.openproject.org/) in this environment.
+
+To follow this Howto **you'll need (very) basic Linux commandline knowledge**, i.e. you should be
+able to navigate the file system in a terminal, use SSH and edit textfiles with a terminal-based 
+text editor (like nano, joe or vim, whatever you prefer).  
 It will assume that you're using **Ubuntu Server 22.04**, but it should be the same for other
 (systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
 You'll also need full **root privileges** on the system.
@@ -348,7 +354,7 @@ must be told about the new client first.
 
 ### ... on macOS
 
-No idea, I don't have a mac :-p
+No idea, I don't have a Mac :-p
 
 There seems to be a WireGuard App in the [App Store](https://apps.apple.com/de/app/wireguard/id1451685025?mt=12)
 and looking at [this tutorial](https://docs.oakhost.net/tutorials/wireguard-macos-server-vpn/#configuring-the-client)
@@ -720,7 +726,7 @@ ports for different services) - then you could access them with `http://172.30.0
 Of course you can use a different domain, like yourcompany.lan, but I think that using the nonexistant
 .lan top-level-domain is a good idea for this purpose[^dotlan]. Alternatively you could use a subdomain of
 a real domain you have, like vpn.yourcompany.com (and then maybe git.vpn.yourcompany.com), but to
-be honest I'm not completely sure how that would be set up properly.
+be honest I'm not completely sure how that would be set up properly[^properdomain].
 
 We'll install and configure it to only listen on wg0 and to answer queries for `*.example.lan`.
 
@@ -855,7 +861,7 @@ configure it once and leave it configured, by entering the following command in 
 
 As this explicitly sets the DNS server only for `*.example.lan`, it shouldn't hurt much 
 that the server isn't reachable when the WireGuard connection is down - it just means that the DNS
-request will timeout and fail in that case. .
+request will timeout and fail in that case.  
 
 > **NOTE:** If you want to remove the rule again, entering  
 > `Get-DnsClientNrptRule` in an (Administrator) PowerShell will list rules
@@ -997,7 +1003,7 @@ As mentioned before, this uses plain HTTP, no HTTPS encryption, because:
 > and their [blog post on using Let's Encrypt](https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/)
 > (if you want to use free Let's Encrypt SSL certificates) and 
 > [this Howto](https://www.howtoforge.com/how-to-install-gitea-on-ubuntu-22-04/)
-> on installing Gitea with Nginx and Let's Encrypt SSL.
+> on installing Gitea with nginx and Let's Encrypt SSL.
 
 # Setting up dma as sendmail implementation
 
@@ -1178,8 +1184,8 @@ then it shouldn't modify it anymore.*
 When using sqlite as Forgejos database, nothing needs to be done here.
 
 If you need a more powerful database, you can use MySQL/MariaDB or PostgreSQL (apparently sqlite
-is good enough for at least 10 users, but might even suffice for more[^sqlite] - and I read it's not
-too hard to migrate the database from sqlite to something else later).
+is good enough for at least 10 users, but might even suffice for more[^sqlite]. I heard that it's
+possible to migrate the database from sqlite to something else later, though it isn't guaranteed to work).
 
 See [Forgejos Database Preparation guide](https://forgejo.org/docs/latest/admin/database-preparation/)
 for setup instructions.
@@ -1283,7 +1289,7 @@ I recommend the following changes (in the order of where I put them in the app.i
   [server]
   ...
   ```
-  Similar restrictions restrictions exist for attachments to issues/pull requests, configured
+  Similar restrictions exist for attachments to issues/pull requests, configured
   in the [`[attachment]` sections](https://forgejo.org/docs/latest/admin/config-cheat-sheet/#issue-and-pull-request-attachments-attachment)
   `MAX_SIZE` (default 4MB) and `MAX_FILES` (default 5) settings.
 * In the `[server]` section add a line `HTTP_ADDR = 127.0.0.1` to ensure that Forgejo **only
@@ -2313,6 +2319,23 @@ about server administration :-)
     Do **not** use **.local**, it's [reserved for multicast DNS / zeroconf (avahi, bonjour)](https://en.wikipedia.org/wiki/.local)
     and using it as a TLD for normal DNS just causes headaches (will need explicit configuration on
     many clients to work, because by default they assume that it's mDNS-only).
+
+[^properdomain]: I *think* that it would be possible to set up `vpn.yourcompany.com` as a local
+    domain in exactly the same way `example.lan` is set up here.  
+    Furthermore, I've been told that using Let's Encrypt (to get an TLS/SSL/HTTPS certificate) for
+    such a local subdomain of a proper domain you own is possible when using the
+    [DNS-01 challenge](https://letsencrypt.org/docs/challenge-types/#dns-01-challenge)
+    (which however may not work well with all DNS providers).
+
+    I thought about setting up a public NS record for `vpn.yourcompany.com` that points to
+    an A record (maybe `vpnns.yourcompany.com`) with IP `172.30.0.1` as the DNS server
+    for that subdomain *(if that worked reliably, it'd mean that you didn't have to explicitly
+    configure the clients to use the custom DNS server for `vpn.yourcompany.com`)*,
+    **but** that wouldn't work reliably, because both public DNS servers and your
+    local DNS cache (in your PC or your internet router) might drop replies that return local IPs,
+    to prevent [DNS rebinding attacks](https://en.wikipedia.org/wiki/DNS_rebinding).
+    For example, dnsmasq's `--stop-dns-rebind` option does just that (and dnsmasq is used in many 
+    internet routers, including cheap ones for endusers).
 
 [^customtldworkaround]: In **Firefox** you can fix this issue by opening `about:config` (enter that in
     the URL bar), and then in the search field enter `browser.fixup.domainsuffixwhitelist.lan`, select
