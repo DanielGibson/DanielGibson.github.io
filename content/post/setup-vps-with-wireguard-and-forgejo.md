@@ -1127,7 +1127,8 @@ You can test this as shown in the previous section, but with `root` as E-Mail ad
 > will probably give you more results than `your problem "forgejo"`, so it's worth trying. 
 > Similarly, if the [Forgejo Documentation](https://forgejo.org/docs/latest/) doesn't answer your
 > questions, check out the [Gitea Documentation](https://docs.gitea.io/en-us/).  
-> See [The Forgejo FAQ](https://forgejo.org/faq/) for more information about the project and why they forked.
+> See [The Forgejo FAQ](https://forgejo.org/faq/) for more information about the project and why
+> they forked[^forgejo_gitea]
 >
 > By the way, these Forgejo installation instructions roughly follow the
 > [Gitea Installation from Binary documentation](https://docs.gitea.io/en-us/installation/install-from-binary/)
@@ -2277,9 +2278,9 @@ about server administration :-)
     backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
     get destroyed.
 
-[^sqlite]: At least that's what one of the developers told me in the Forgejo chatroom.
-    Apparently even https://try.gitea.io/ uses sqlite, so it might be fine even with lots of repos
-    and users.
+[^sqlite]: At least that's what one of the Gitea developers told me in the Forgejo chatroom.
+    He said even https://try.gitea.io/ uses sqlite, so it looks like it might be fine even with lots
+    of repos and users.
 
 [^security]: At least "reasonably safe". There is no total security. It's possible that OpenSSH, WireGuard
     or the Linux kernels network stack have unknown security vulnerabilities that an attacker could
@@ -2350,6 +2351,9 @@ about server administration :-)
     `git.example.lan/` instead of just `git.example.lan` - that's easier to type than
     `http://git.example.lan` (though once the browser knows the URL you should get the version with
     http:// anyway through autocompletion).
+
+[^forgejo_gitea]: Despite their disagreements, the Gitea and Forgejo teams still talk to each other
+    and share code, so the whole situation seems to be more mature then some other open-source "dramas".
 
 [^sowhat]: ... so what!
 
