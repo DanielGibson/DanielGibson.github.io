@@ -921,7 +921,7 @@ will listen at port 3000/tcp, instead of the standard http port 80/tcp, and <a h
 (at least for the purposes documented in this tutorial, you won&rsquo;t need the additional features
 provided by the full nginx package)</p>
 <p>The Debian/Ubuntu configuration of nginx (maybe other distros do the same) splits up the site-specific
-nginx-configuration into one little config per site; they&rsquo;re configured in <code>/etc/nginx/sizes-available/*.conf</code>,
+nginx-configuration into one little config per site; they&rsquo;re configured in <code>/etc/nginx/sites-available/*.conf</code>,
 to actually enable a site, its config is symlinked to <code>/etc/nginx/sites-enabled/</code>.</p>
 <p>By default, only <code>/etc/nginx/sites-available/default</code> exists (and is enabled), it shows the
 static page from <code>/var/www/html/index.nginx-debian.html</code> (or index.htm or index.html in the same directory).
@@ -1249,7 +1249,7 @@ listens on localhost</strong> and is not reachable from the outside at all, exce
 <li>By default <strong>LFS data uploads expire</strong> after 20 minutes - this can be too short for big files,
 slow connections or slow LFS storage (git-lfs seems to automatically restart the upload then -
 which means that it can take forever and use lots of traffic)..<br>
-If you&rsquo;re going to use LFS with big uploads, increase thus limit, by adding a line
+If you&rsquo;re going to use LFS with big uploads, increase this limit, by adding a line
 <code>LFS_HTTP_AUTH_EXPIRY = 180m</code> (for 180 minutes) to the <code>[server]</code> section.</li>
 <li>Similarly there are timeouts for all kinds of git operations, that can be too short.<br>
 I ran into the problem that a migration of a big repository from our old Gitlab server timed out
