@@ -1109,7 +1109,8 @@ Also, if you run into problems, searching your favorite search engine for <code>
 will probably give you more results than <code>your problem &quot;forgejo&quot;</code>, so it&rsquo;s worth trying.
 Similarly, if the <a href="https://forgejo.org/docs/latest/">Forgejo Documentation</a> doesn&rsquo;t answer your
 questions, check out the <a href="https://docs.gitea.io/en-us/">Gitea Documentation</a>.<br>
-See <a href="https://forgejo.org/faq/">The Forgejo FAQ</a> for more information about the project and why they forked.</p>
+See <a href="https://forgejo.org/faq/">The Forgejo FAQ</a> for more information about the project and why
+they forked<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup></p>
 <p>By the way, these Forgejo installation instructions roughly follow the
 <a href="https://docs.gitea.io/en-us/installation/install-from-binary/">Gitea Installation from Binary documentation</a>
 (at time of writing, Forgejo doesn&rsquo;t have installation instructions yet).</p>
@@ -1205,7 +1206,7 @@ even more so if you disabled self-registration.</li>
 <p>Once you&rsquo;re done configuring, click <code>Install Forgejo</code> and a few seconds later you should be
 on the dashboard (if you created an administrator account) or at the login/register screen, where you
 can create an account to then get to the dashboard.</p>
-<p>So far, so good<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>, but we&rsquo;re not quite done yet - some manual configuration in the app.ini is needed!</p>
+<p>So far, so good<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>, but we&rsquo;re not quite done yet - some manual configuration in the app.ini is needed!</p>
 <h2 id="further-configuration-in-forgejos-app-ini">Further configuration in Forgejos app.ini</h2>
 <p>Stop the forgejo service:<br>
 <code># systemctl stop forgejo.service</code></p>
@@ -1329,7 +1330,7 @@ Forgejo (and Gitea) supports storing them in an (<a href="https://aws.amazon.com
 to host the LFS files in an object storage instead of renting a bigger server.</p>
 <p>While Amazon S3 itself is way too expensive, there are open source solutions (like <a href="https://min.io/">MinIO</a>
 or <a href="https://ceph.io/">Ceph</a>) that implement S3&rsquo;s protocol, and providers that use those to offer S3-like
-object storage for much more affordable prices, starting at around $10/month for 1TB<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>.</p>
+object storage for much more affordable prices, starting at around $10/month for 1TB<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>.</p>
 <p>To use such an object storage, the <code>[lfs]</code> section in <code>/etc/forgejo/app.ini</code> would look kinda like this
 (<a href="https://forgejo.org/docs/latest/admin/config-cheat-sheet/#lfs-lfs">see also documentation</a>):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[lfs]</span>
@@ -1505,7 +1506,7 @@ I can live with it.. just keep it in mind when browsing snapshots (e.g. after <c
 <p>Backing up should be done with a script that can be called automatically once a day or so.
 The following (saved in <code>/root/backup/backup.sh</code>) should be a good start: It backs up the forgejo data,
 <code>/etc/</code> and <code>/root/</code> and optionally an <a href="https://www.openproject.org/">OpenProject</a> installation
-(if you want to use that, uncomment the <code>#backupopenproject</code> line in <code>backupallthethings()</code>)<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>.
+(if you want to use that, uncomment the <code>#backupopenproject</code> line in <code>backupallthethings()</code>)<sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup>.
 It also checks if each command succeded, and if anything goes wrong sends you an E-Mail with further
 information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
 <p>Remember to adjust the <code>export RESTIC_REPOSITORY=&quot;...&quot;</code> line, and <em>maybe</em> <code>WARN_MAIL_RECP=(...)</code>.</p>
@@ -1750,7 +1751,7 @@ a week or so in a cronjob.</li>
 keep in mind that, if the ransomware gains root access, it can also access your backup storage, and
 could <strong>destroy your backup</strong> (unless you&rsquo;re using some kind of append-only remote storage, where
 existing data can&rsquo;t be modified or deleted - at least restics
-<a href="https://github.com/restic/rest-server">rest-server</a> supports that mode with <code>--append-only</code>)<sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup>.</p>
+<a href="https://github.com/restic/rest-server">rest-server</a> supports that mode with <code>--append-only</code>)<sup id="fnref:14"><a href="#fn:14" class="footnote-ref" role="doc-noteref">14</a></sup>.</p>
 <p>To prevent that (or generally for an <strong>additional level of redundancy</strong>), you could <strong>mirror your backup
 storage</strong>, for example locally on an USB drive (you can mount the backup storage locally with
 <a href="https://rclone.org/commands/rclone_mount/">Rclone</a>). As restic never modifies existing files in the
@@ -1762,7 +1763,7 @@ sure that existing files aren&rsquo;t overwritten, so even if a file has been sc
 server, you won&rsquo;t get that broken version in your local backup as long as you&rsquo;ve copied the a good
 version of that file to your local backup before. <em>(This assumes that your <code>cp</code> supports <code>-n</code> - at
 least the cp versions of Linux, FreeBSD, Git Bash for Windows and macOS support it; alternatively
-see<sup id="fnref:14"><a href="#fn:14" class="footnote-ref" role="doc-noteref">14</a></sup> for robocopy on Windows.)</em></p>
+see<sup id="fnref:15"><a href="#fn:15" class="footnote-ref" role="doc-noteref">15</a></sup> for robocopy on Windows.)</em></p>
 <p>It&rsquo;s probably a good idea to call <code>restic check --read-data</code> on your local copy of the backup repo,
 to make sure that it&rsquo;s consistent (<code>--read-data</code> actually reads all files and checks their checksums,
 so it might take a while - but will be a lot faster with a local copy of the backup than with
@@ -1805,12 +1806,12 @@ didn&rsquo;t change any of them, though the <code>CUSTOM_SUBJECT</code> option p
 those mails easier.</p>
 <p>If you want to <strong>specify the exact time</strong> this runs, run<br>
 <code># systemctl edit apticron.timer</code><br>
-and edit it accordingly - see the unattended-upgrades footnote<sup id="fnref:15"><a href="#fn:15" class="footnote-ref" role="doc-noteref">15</a></sup> for an example.</p>
+and edit it accordingly - see the unattended-upgrades footnote<sup id="fnref:16"><a href="#fn:16" class="footnote-ref" role="doc-noteref">16</a></sup> for an example.</p>
 <h2 id="unattended-upgrades-install-security-updates-automatically">unattended-upgrades - install security updates automatically</h2>
 <p>Install unattended-upgrades:<br>
 <code># apt install unattended-upgrades</code></p>
 <p>On Ubuntu (but not Debian), if you want to enable automatic reboots (when needed by the update),
-you also need to install <code>update-notifier-common</code><sup id="fnref:16"><a href="#fn:16" class="footnote-ref" role="doc-noteref">16</a></sup>:<br>
+you also need to install <code>update-notifier-common</code><sup id="fnref:17"><a href="#fn:17" class="footnote-ref" role="doc-noteref">17</a></sup>:<br>
 <code># apt install update-notifier-common</code></p>
 <p>Apparently it must be enabled by reconfiguring it:<br>
 <code># dpkg-reconfigure --priority=low unattended-upgrades</code> (select <code>&lt;Yes&gt;</code>)</p>
@@ -1828,7 +1829,7 @@ with <code>Unattended-Upgrade::Automatic-Reboot &quot;true&quot;;</code></li>
 immediately after installing an update that needs it), you can set:<br>
 <code>Unattended-Upgrade::Automatic-Reboot-Time &quot;02:00&quot;;</code><br>
 (that would be for 2am) - might make more sense to modify the systemd timers that control when
-updates are installed and leave this commented out<sup id="fnref1:15"><a href="#fn:15" class="footnote-ref" role="doc-noteref">15</a></sup>.</li>
+updates are installed and leave this commented out<sup id="fnref1:16"><a href="#fn:16" class="footnote-ref" role="doc-noteref">16</a></sup>.</li>
 </ul>
 <blockquote>
 <p><strong>NOTE:</strong> If you don&rsquo;t want unattended-upgrades to reboot your system, but want to get a mail
@@ -2124,9 +2125,9 @@ backed up servers, so if a fire breaks out, it burns well and both the servers a
 get destroyed.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:2">
-<p>At least that&rsquo;s what one of the developers told me in the Forgejo chatroom.
-Apparently even <a href="https://try.gitea.io/">https://try.gitea.io/</a> uses sqlite, so it might be fine even with lots of repos
-and users.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>At least that&rsquo;s what one of the Gitea developers told me in the Forgejo chatroom.
+He said even <a href="https://try.gitea.io/">https://try.gitea.io/</a> uses sqlite, so it looks like it might be fine even with lots
+of repos and users.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:3">
 <p>At least &ldquo;reasonably safe&rdquo;. There is no total security. It&rsquo;s possible that OpenSSH, WireGuard
@@ -2205,9 +2206,13 @@ have to press Ctrl-K before typing, or type <code>? </code> before your search t
 http:// anyway through autocompletion).&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:10">
-<p>&hellip; so what!&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Despite their disagreements, the Gitea and Forgejo teams still talk to each other
+and share code, so the whole situation seems to be more mature then some other open-source &ldquo;dramas&rdquo;.&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:11">
+<p>&hellip; so what!&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:12">
 <p>Some examples for comparison:</p>
 <ul>
 <li><a href="https://aws.amazon.com/s3/pricing/">Amazon S3</a> $21/month for 1TB of storage, $90/TB for
@@ -2223,8 +2228,8 @@ future, but in the two weeks or so that I&rsquo;ve (occasionally) done tests, it
 1TB of traffic, each additional TB of storage costs $5/month, each additional TB of traffic
 costs $10/month</li>
 </ul>
-&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:12">
+&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:13">
 <p>Even if you&rsquo;re not using OpenProject, it shows how to backup PostgreSQL databases, which
 might come in handy elsewhere. <strong>NOTE:</strong> It might be useful to additionally/manually run
 <code># su -l postgres -c &quot;pg_basebackup -D /tmp/postgres-base/ -R&quot;</code> once to get a base backup that
@@ -2233,15 +2238,15 @@ archive and store that in /root/ somewhere so it&rsquo;s backed up with the regu
 I <em>think</em> that such a base backup together with the normal SQL dumps from the daily backup make
 restoring the PostgreSQL server relatively easy, but TBH I haven&rsquo;t tried it myself yet and
 the pg_basebackup manpage unfortunately doesn&rsquo;t document how this is done..<br>
-<strong>TODO:</strong> how do I restore a pg_basebackup?&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<strong>TODO:</strong> how do I restore a pg_basebackup?&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:13">
+<li id="fn:14">
 <p>You could run restic&rsquo;s <a href="https://github.com/restic/rest-server">rest-server</a>
 (in <code>--append-only</code> mode) on a backupserver at home (or in your office), and make that
 backupserver connect to your WireGuard VPN, so it can be easily reached from the git server.
-And &ldquo;backupserver&rdquo; could just be a Raspberry Pi<sup id="fnref:17"><a href="#fn:17" class="footnote-ref" role="doc-noteref">17</a></sup> with with a big USB harddrive.&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+And &ldquo;backupserver&rdquo; could just be a Raspberry Pi<sup id="fnref:18"><a href="#fn:18" class="footnote-ref" role="doc-noteref">18</a></sup> with with a big USB harddrive.&#160;<a href="#fnref:14" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:14">
+<li id="fn:15">
 <p>If you&rsquo;re using Windows and don&rsquo;t have Git Bash installed, you can <em>probably</em> use
 robocopy, like this (<strong>untested!</strong>; assuming <code>X:</code> is your mounted restic repo and <code>D:</code> is you backup disk):<br>
 <code>&gt; robocopy X:\ D:\restic-backup\ /XC /XN /XO</code></p>
@@ -2253,8 +2258,8 @@ the destination, but have the same timestamp</li>
 <li>=&gt; those three options together should hopefully make sure that only files that don&rsquo;t exist
 on your backup disk at all are copied from the restic repository</li>
 </ul>
-&#160;<a href="#fnref:14" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:15">
+&#160;<a href="#fnref:15" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:16">
 <p>According to <a href="https://wiki.debian.org/UnattendedUpgrades#Modifying_download_and_upgrade_schedules_.28on_systemd.29">the Debian Wiki</a>
 updates are downloaded by the systemd <code>apt-daily.timer</code> and installed (upgrade) by the
 <code>apt-daily-upgrade.timer</code>, and apparently by default they happen at 6am or 6pm with a randomized
@@ -2277,8 +2282,8 @@ with scheduled backups or people who want to use the server for work, I used thi
 </span></span><span class="line"><span class="cl"><span class="c"># Overwrite the randomized delay set by default,</span>
 </span></span><span class="line"><span class="cl"><span class="c"># so it happens exactly at that time</span>
 </span></span><span class="line"><span class="cl"><span class="na">RandomizedDelaySec</span><span class="o">=</span><span class="s">0</span>
-</span></span></code></pre></div>&#160;<a href="#fnref:15" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:15" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:16">
+</span></span></code></pre></div>&#160;<a href="#fnref:16" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:16" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:17">
 <p>At least that&rsquo;s what the
 <a href="https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package">Ubuntu Wiki on Automatic Security Updates</a>
 says:</p>
@@ -2287,11 +2292,11 @@ says:</p>
 Unattended-Upgrade::Automatic-Reboot &ldquo;true&rdquo;, but you also need to have the &ldquo;update-notifier-common&rdquo;
 package installed.</p>
 </blockquote>
-<p>Debian on the other hand doesn&rsquo;t even have a package with that name.&#160;<a href="#fnref:16" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Debian on the other hand doesn&rsquo;t even have a package with that name.&#160;<a href="#fnref:17" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:17">
+<li id="fn:18">
 <p>Yeah yeah, I know&hellip; I&rsquo;m sure they&rsquo;ll eventually be available at normal prices again.<br>
-Or maybe you already got one, or try a Banana Pi or RockPi or whatever.&#160;<a href="#fnref:17" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+Or maybe you already got one, or try a Banana Pi or RockPi or whatever.&#160;<a href="#fnref:18" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </div>
