@@ -906,7 +906,7 @@ Install it with:
 provided by the full nginx package)
 
 The Debian/Ubuntu configuration of nginx (maybe other distros do the same) splits up the site-specific
-nginx-configuration into one little config per site; they're configured in `/etc/nginx/sizes-available/*.conf`,
+nginx-configuration into one little config per site; they're configured in `/etc/nginx/sites-available/*.conf`,
 to actually enable a site, its config is symlinked to `/etc/nginx/sites-enabled/`.  
 
 By default, only `/etc/nginx/sites-available/default` exists (and is enabled), it shows the
@@ -1298,7 +1298,7 @@ I recommend the following changes (in the order of where I put them in the app.i
 * By default **LFS data uploads expire** after 20 minutes - this can be too short for big files,
   slow connections or slow LFS storage (git-lfs seems to automatically restart the upload then -
   which means that it can take forever and use lots of traffic)..  
-  If you're going to use LFS with big uploads, increase thus limit, by adding a line
+  If you're going to use LFS with big uploads, increase this limit, by adding a line
   `LFS_HTTP_AUTH_EXPIRY = 180m` (for 180 minutes) to the `[server]` section.
 * Similarly there are timeouts for all kinds of git operations, that can be too short.  
   I ran into the problem that a migration of a big repository from our old Gitlab server timed out
