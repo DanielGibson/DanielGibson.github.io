@@ -6,7 +6,34 @@
     <description>Recent content on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 26 Nov 2017 23:12:23 +0200</lastBuildDate><atom:link href="http://blog.gibson.sh/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 28 May 2023 02:30:20 +0200</lastBuildDate><atom:link href="http://blog.gibson.sh/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How to set up a Linux server to host git with LFS behind a VPN</title>
+      <link>http://blog.gibson.sh/2023/05/28/server-with-wireguard-and-forgejo/</link>
+      <pubDate>Sun, 28 May 2023 02:30:20 +0200</pubDate>
+      
+      <guid>http://blog.gibson.sh/2023/05/28/server-with-wireguard-and-forgejo/</guid>
+      <description>&lt;!-- # How to set up a Linux server to host git with LFS behind a VPN --&gt;
+&lt;p&gt;This Howto explains how to set up a Linux server that runs &lt;a href=&#34;https://www.openssh.com/&#34;&gt;SSH&lt;/a&gt;,
+&lt;a href=&#34;https://www.wireguard.com/&#34;&gt;WireGuard VPN&lt;/a&gt;, &lt;a href=&#34;https://forgejo.org/&#34;&gt;Forgejo&lt;/a&gt; (a fork of
+&lt;a href=&#34;https://gitea.io&#34;&gt;Gitea&lt;/a&gt;, a web-based git forge, kinda like self-hosted Github) behind a local
+&lt;a href=&#34;https://nginx.org&#34;&gt;nginx&lt;/a&gt; reverse proxy and a minimal &lt;a href=&#34;https://thekelleys.org.uk/dnsmasq/doc.html&#34;&gt;DNS server&lt;/a&gt;
+so we can have an internal domain for pretty URLs.
+It also shows how to set up a &lt;a href=&#34;https://github.com/corecode/dma&#34;&gt;minimal MTA/mail forwarder&lt;/a&gt; so the
+server can send mails, an &lt;a href=&#34;https://en.wikipedia.org/wiki/Iptables&#34;&gt;iptables&lt;/a&gt; +
+&lt;a href=&#34;https://www.sshguard.net/&#34;&gt;SSHGuard&lt;/a&gt;-based firewall, automated backups and some basic self-monitoring.
+As a bonus there&amp;rsquo;s a short section that outlines how to set up
+&lt;a href=&#34;https://www.openproject.org/&#34;&gt;OpenProject&lt;/a&gt; in this environment.&lt;/p&gt;
+&lt;p&gt;To follow this Howto &lt;strong&gt;you&amp;rsquo;ll need (very) basic Linux commandline knowledge&lt;/strong&gt;, i.e. you should be
+able to navigate the file system in a terminal, use SSH and edit textfiles with a terminal-based
+text editor (like nano, joe or vim, whatever you prefer).&lt;br&gt;
+It will assume that you&amp;rsquo;re using &lt;strong&gt;Ubuntu Server 22.04&lt;/strong&gt;, but it should be the same for other
+(systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
+You&amp;rsquo;ll also need full &lt;strong&gt;root privileges&lt;/strong&gt; on the system.&lt;/p&gt;
+&lt;p&gt;Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
+a public Forgejo instance, or just a Wireguard server without Forgejo on it).&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>How to create portable Linux binaries (even if you need a recent compiler)</title>
       <link>http://blog.gibson.sh/2017/11/26/creating-portable-linux-binaries/</link>

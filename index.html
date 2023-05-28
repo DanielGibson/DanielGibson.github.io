@@ -52,6 +52,42 @@
 
   <div class="archive">
     
+      <h2 class="archive-title">2023</h2>
+      
+        <article class="archive-item">
+          <a href="./2023/05/28/server-with-wireguard-and-forgejo/" class="archive-item-link">How to set up a Linux server to host git with LFS behind a VPN</a>
+          <span class="archive-item-date">
+            May 28, 2023
+          </span>
+          <div class="article-content">
+            <div class="summary">
+              
+                <!-- # How to set up a Linux server to host git with LFS behind a VPN -->
+<p>This Howto explains how to set up a Linux server that runs <a href="https://www.openssh.com/">SSH</a>,
+<a href="https://www.wireguard.com/">WireGuard VPN</a>, <a href="https://forgejo.org/">Forgejo</a> (a fork of
+<a href="https://gitea.io">Gitea</a>, a web-based git forge, kinda like self-hosted Github) behind a local
+<a href="https://nginx.org">nginx</a> reverse proxy and a minimal <a href="https://thekelleys.org.uk/dnsmasq/doc.html">DNS server</a>
+so we can have an internal domain for pretty URLs.
+It also shows how to set up a <a href="https://github.com/corecode/dma">minimal MTA/mail forwarder</a> so the
+server can send mails, an <a href="https://en.wikipedia.org/wiki/Iptables">iptables</a> +
+<a href="https://www.sshguard.net/">SSHGuard</a>-based firewall, automated backups and some basic self-monitoring.
+As a bonus there&rsquo;s a short section that outlines how to set up
+<a href="https://www.openproject.org/">OpenProject</a> in this environment.</p>
+<p>To follow this Howto <strong>you&rsquo;ll need (very) basic Linux commandline knowledge</strong>, i.e. you should be
+able to navigate the file system in a terminal, use SSH and edit textfiles with a terminal-based
+text editor (like nano, joe or vim, whatever you prefer).<br>
+It will assume that you&rsquo;re using <strong>Ubuntu Server 22.04</strong>, but it should be the same for other
+(systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
+You&rsquo;ll also need full <strong>root privileges</strong> on the system.</p>
+<p>Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
+a public Forgejo instance, or just a Wireguard server without Forgejo on it).</p>
+                <a href="./2023/05/28/server-with-wireguard-and-forgejo/"><i>Read More…</i></a>
+              
+            </div>
+          </div>
+        </article>
+      
+    
       <h2 class="archive-title">2017</h2>
       
         <article class="archive-item">
