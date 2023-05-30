@@ -409,8 +409,9 @@ Now you can tell WireGuard to reload the config:
 .. and now the clients should be able to connect (on Windows by clicking `Activate` for the tunnel,
 on Linux with `# wg-quick up wg0`).
 
-**Note** that clients can only communicate with the server, not with each other, at least without
-setting up ip forwarding on the server (which isn't done here).
+**Note** that clients can only communicate with the server, not with each other, and they don't
+access the internet through that tunnel, at least without setting up ip forwarding on the server
+(see footnote[^ipforward]).
 
 `PersistentKeepalive = 21` makes sure that a (possibly empty) network packet is sent at least every
 21 seconds to make sure that routers and firewalls between the client and the server don't assume
@@ -2296,6 +2297,33 @@ about server administration :-)
 [^clientsubnet]: I've never done this, but it might be possible to give a client some more
     IPs with a different subnet mask, but that's not useful for this usecase and you'd still have to
     make sure that there's no overlaps with IPs assigned to other clients.
+
+[^ipforward]: To enable IP forwarding, so VPN clients can talk to each other through the server,
+    you just need to add two lines to the `firewall.sh` script from
+    [the firewall chapter](#a-simple-firewall-with-iptables-and-sshguard), right before the
+    `# allow all connections on localhost (127.0.0.x)` line:  
+    ```
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    iptables -P FORWARD ACCEPT
+    ```
+    (note that this will remain enabled until you reboot or do the same with `echo 0`).
+
+    If clients should also be able to reach the (IPv4) internet through the VPN (instead of going
+    directly through their own internet connection), one more line must be added to `firewall.sh`
+    (right after the other two):  
+    `iptables -t nat -A POSTROUTING -o $WAN -j MASQUERADE`  
+    Adding the following line as well might help with connection problems:  
+    `iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu`  
+    Furthermore, the WireGuard config on the **client** must set `AllowedIPs = 0.0.0.0/0` instead of
+    `172.30.0.0/24`, so the traffic to the internet (and not just to our internal VPN network) gets
+    routed through the VPN tunnel.
+
+    If clients should only be able to reach the server and the internet through the VPN, but
+    shouldn't be able to talk to each other, add yet another line below the others:  
+    `iptables -A FORWARD -i $VPN -d 172.30.0.0/24 -j REJECT`  
+    *(Note: this does not affect connections to the server itself, because those go through INPUT
+    instead of FORWARD - and it doesn't affect connections to the internet, because it's limited to
+    connections/packets with destination `172.30.0.0/24`, i.e. the local VPN network)*
 
 [^why_iptables]: If you're wondering why I'm using iptables and not UFW or
     [nftables](https://netfilter.org/projects/nftables/), the answer is simple and boring:
