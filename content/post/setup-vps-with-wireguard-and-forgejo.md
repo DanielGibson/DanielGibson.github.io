@@ -1133,7 +1133,7 @@ You can test this as shown in the previous section, but with `root` as E-Mail ad
 >
 > By the way, these Forgejo installation instructions roughly follow the
 > [Gitea Installation from Binary documentation](https://docs.gitea.io/en-us/installation/install-from-binary/)
-> (at time of writing, Forgejo doesn't have installation instructions yet).
+> (at time of writing, Forgejo didn't have installation instructions yet[^forgejo_install]).
 
 ## Install Forgejo and git, create git user
 
@@ -1595,7 +1595,8 @@ makes backing up pretty fast and small.
 So each call to `restic backup` creates a new snapshot - IMHO this is a bit annoying, I'd like to
 do multiple successive calls for different services on the same server (and in between stop/restart
 those services) and still have them grouped in one logical snapshot, but it is what it is, and
-I can live with it.. just keep it in mind when browsing snapshots (e.g. after `restic mount`).
+I can live with it.. just keep it in mind when browsing or restoring snapshots (e.g. after
+`restic mount` or when using `restic restore`).
 
 Backing up should be done with a script that can be called automatically once a day or so.
 The following (saved in `/root/backup/backup.sh`) should be a good start: It backs up the forgejo data,
@@ -1840,7 +1841,7 @@ Some general restic tips:
   run `# source /etc/bash_completion.d/restic` to use it immediately).
 * `# restic snapshots --latest 10` shows the 10 most recent snapshots
 * `# restic mount /mnt` mounts the backup repository to `/mnt`, so you can browse the snapshots and
-  contained files there, and copy them to your server to restore a backup. **Note** that this command
+  contained files there, and copy them to your server to restore old versions. **Note** that this command
   might take some time until the mountpoint is usable, and it runs in the foreground - it will print
   something this once it's ready:
   ```
@@ -1848,6 +1849,12 @@ Some general restic tips:
   Use another terminal or tool to browse the contents of this folder. 
   When finished, quit with Ctrl-c here or umount the mountpoint.
   ```
+* **However**, while `restic mount` is super useful to just restore *some* files, it's *quite slow*
+  when restoring lots of files (or a whole snapshot).  
+  To **restore** a whole snapshots (or many files in general), use
+  [**restic restore**](https://manpages.ubuntu.com/manpages/kinetic/man1/restic-restore.1.html) instead.
+  The actual performance might depend on your server and the backup storage, but for me (with Google
+  Drive through Rclone) `restic restore` was about **25x** faster than `restic mount` + `cp -r`!
 * To prevent your backup storage from growing indefinitely over time, you can tell restic to delete
   old snapshots, for example `# restic forget --keep-within 1y` deletes snapshots that are older than
   a year. Apparently `restic forget` itself is pretty fast, but to actually delete the data you need
@@ -2251,6 +2258,9 @@ for setting up our server into a proper blog post.
 Thanks to [Yamagi](https://www.yamagi.org/) for proofreading this and answering my stupid questions
 about server administration :-)
 
+Thanks to the [Forgejo Matrix chatroom](https://matrix.to/#/#forgejo-chat:matrix.org), especially
+Earl Warren and 👾, for feedback on the article!
+
 <!-- Below: Footnotes -->
 
 [^hoster]: As a **server** we chose the [Contabo](https://contabo.com/) "Cloud VPS M" for €10.49/month,
@@ -2316,7 +2326,10 @@ about server administration :-)
     `iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu`  
     Furthermore, the WireGuard config on the **client** must set `AllowedIPs = 0.0.0.0/0` instead of
     `172.30.0.0/24`, so the traffic to the internet (and not just to our internal VPN network) gets
-    routed through the VPN tunnel.
+    routed through the VPN tunnel. On **Windows** it only worked for me if I **unchecked** the
+    `[ ] Block untunneled traffic (kill-switch)` setting, so `0.0.0.0/0` turned into `0.0.0.0/1,
+    128.0.0.1/1` which should be equivalent but apparently circumvents some special case hardcoded
+    for `0.0.0.0/0`.
 
     If clients should only be able to reach the server and the internet through the VPN, but
     shouldn't be able to talk to each other, add yet another line below the others:  
@@ -2382,6 +2395,9 @@ about server administration :-)
 
 [^forgejo_gitea]: Despite their disagreements, the Gitea and Forgejo teams still talk to each other
     and share code, so the whole situation seems to be more mature then some other open-source "dramas".
+
+[^forgejo_install]: [Now they do](https://forgejo.org/docs/v1.20/admin/installation/#installation-from-binary), 
+    based on this article :-)
 
 [^sowhat]: ... so what!
 
