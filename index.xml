@@ -31,7 +31,9 @@ It will assume that you&amp;rsquo;re using &lt;strong&gt;Ubuntu Server 22.04&lt;
 (systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
 You&amp;rsquo;ll also need full &lt;strong&gt;root privileges&lt;/strong&gt; on the system.&lt;/p&gt;
 &lt;p&gt;Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
-a public Forgejo instance, or just a Wireguard server without Forgejo on it).&lt;/p&gt;</description>
+a public Forgejo instance, or just a Wireguard server without Forgejo on it).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;UPDATE:&lt;/strong&gt; There was a bug in the backup and monitoring scripts (shouldn&amp;rsquo;t have used
+&lt;code&gt;bash_function | tee foolog.txt&lt;/code&gt;), so I updated them accordingly.&lt;/em&gt;&lt;/p&gt;</description>
     </item>
     
     <item>

@@ -27,7 +27,9 @@ It will assume that you&rsquo;re using Ubuntu Server 22.04, but it should be the
 (systemd-using) Debian-based Linux distributions, and reasonably similar when using other distributions.
 You&rsquo;ll also need full root privileges on the system.
 Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
-a public Forgejo instance, or just a Wireguard server without Forgejo on it)." />
+a public Forgejo instance, or just a Wireguard server without Forgejo on it).
+UPDATE: There was a bug in the backup and monitoring scripts (shouldn&rsquo;t have used
+bash_function | tee foolog.txt), so I updated them accordingly." />
 
 <meta name="twitter:creator" content="@Doomed_Daniel" />
 <meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
@@ -185,6 +187,8 @@ It will assume that you&rsquo;re using <strong>Ubuntu Server 22.04</strong>, but
 You&rsquo;ll also need full <strong>root privileges</strong> on the system.</p>
 <p>Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).</p>
+<p><em><strong>UPDATE:</strong> There was a bug in the backup and monitoring scripts (shouldn&rsquo;t have used
+<code>bash_function | tee foolog.txt</code>), so I updated them accordingly.</em></p>
 <p><strong>Note:</strong> You&rsquo;ll often need to enter commands in the shell. The following convention will be used:</p>
 <p><code>$ some_command --some argument</code><br>
 means: Enter &ldquo;some_command --some argument&rdquo; (without quotes) in a Linux terminal, <em>as <strong>normal user</strong></em>.</p>
@@ -1669,9 +1673,10 @@ information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
 </span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> -e /root/backup/backuplog.txt <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 </span></span><span class="line"><span class="cl">    mv /root/backup/backuplog.txt /root/backup/backuplog-old.txt
 </span></span><span class="line"><span class="cl"><span class="k">fi</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># run the backupallthetings() function. its output is both</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># printed to stdout and written into backuplog.txt</span>
-</span></span><span class="line"><span class="cl">backupallthethings 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> tee /root/backup/backuplog.txt
+</span></span><span class="line"><span class="cl"><span class="c1"># run the backupallthetings() function and write its output to backuplog.txt</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># NOTE: using | tee backuplog.txt here would break the script,</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#   $NUM_ERRORS isn&#39;t updated properly then!</span>
+</span></span><span class="line"><span class="cl">backupallthethings &gt; /root/backup/backuplog.txt 2&gt;<span class="p">&amp;</span><span class="m">1</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> <span class="nv">$NUM_ERRORS</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 </span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$NUM_ERRORS</span><span class="s2"> errors during backup!&#34;</span>
@@ -1738,7 +1743,8 @@ Use another terminal or tool to browse the contents of this folder.
 When finished, quit with Ctrl-c here or umount the mountpoint.
 </code></pre></li>
 <li><strong>However</strong>, while <code>restic mount</code> is super useful to just restore <em>some</em> files, it&rsquo;s <em>quite slow</em>
-when restoring lots of files (or a whole snapshot).<br>
+when restoring lots of files (or a whole snapshot),
+<a href="https://forum.restic.net/t/performance-differences-between-restic-dump-mount-restore/3878">see also</a>.<br>
 To <strong>restore</strong> a whole snapshots (or many files in general), use
 <a href="https://manpages.ubuntu.com/manpages/kinetic/man1/restic-restore.1.html"><strong>restic restore</strong></a> instead.
 The actual performance might depend on your server and the backup storage, but for me (with Google
@@ -1957,7 +1963,9 @@ overkill for a single server), so I decided to write a simple bash script to do 
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1">## actual execution of this script starts here:</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">create_report 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> tee /root/monitorlog.txt
+</span></span><span class="line"><span class="cl"><span class="c1"># NOTE: can&#39;t use | tee here, if I do, create_report is run</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#  in a new process and its modifications to the variables are lost</span>
+</span></span><span class="line"><span class="cl">create_report &gt; /root/monitorlog.txt 2&gt;<span class="p">&amp;</span><span class="m">1</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[</span> <span class="nv">$NUM_NEW_WARNINGS</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
 </span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;Alert! </span><span class="nv">$NUM_NEW_WARNINGS</span><span class="s2"> new Warnings!&#34;</span>

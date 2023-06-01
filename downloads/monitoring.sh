@@ -93,7 +93,9 @@ send_alert_mail() {
 
 ## actual execution of this script starts here:
 
-create_report 2>&1 | tee /root/monitorlog.txt
+# NOTE: can't use | tee here, if I do, create_report is run
+#  in a new process and its modifications to the variables are lost
+create_report > /root/monitorlog.txt 2>&1
 
 if [ $NUM_NEW_WARNINGS != 0 ]; then
     echo "Alert! $NUM_NEW_WARNINGS new Warnings!"
