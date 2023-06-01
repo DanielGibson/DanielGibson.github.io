@@ -153,9 +153,11 @@ backupallthethings() {
 if [ -e /root/backup/backuplog.txt ]; then
     mv /root/backup/backuplog.txt /root/backup/backuplog-old.txt
 fi
-# run the backupallthetings() function. its output is both
-# printed to stdout and written into backuplog.txt
-backupallthethings 2>&1 | tee /root/backup/backuplog.txt
+
+# run the backupallthetings() function and write its output to backuplog.txt
+# NOTE: using | tee backuplog.txt here would break the script,
+#   $NUM_ERRORS isn't updated properly then!
+backupallthethings > /root/backup/backuplog.txt 2>&1
 
 if [ $NUM_ERRORS != 0 ]; then
     echo "$NUM_ERRORS errors during backup!"

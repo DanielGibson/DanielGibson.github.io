@@ -31,6 +31,9 @@ You'll also need full **root privileges** on the system.
 Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).
 
+_**UPDATE:** There was a bug in the backup and monitoring scripts (shouldn't have used
+ `bash_function | tee foolog.txt`), so I updated them accordingly._
+
 <!--more-->
 
 **Note:** You'll often need to enter commands in the shell. The following convention will be used:
@@ -1767,9 +1770,10 @@ backupallthethings() {
 if [ -e /root/backup/backuplog.txt ]; then
     mv /root/backup/backuplog.txt /root/backup/backuplog-old.txt
 fi
-# run the backupallthetings() function. its output is both
-# printed to stdout and written into backuplog.txt
-backupallthethings 2>&1 | tee /root/backup/backuplog.txt
+# run the backupallthetings() function and write its output to backuplog.txt
+# NOTE: using | tee backuplog.txt here would break the script,
+#   $NUM_ERRORS isn't updated properly then!
+backupallthethings > /root/backup/backuplog.txt 2>&1
 
 if [ $NUM_ERRORS != 0 ]; then
     echo "$NUM_ERRORS errors during backup!"
@@ -1850,7 +1854,8 @@ Some general restic tips:
   When finished, quit with Ctrl-c here or umount the mountpoint.
   ```
 * **However**, while `restic mount` is super useful to just restore *some* files, it's *quite slow*
-  when restoring lots of files (or a whole snapshot).  
+  when restoring lots of files (or a whole snapshot), 
+  [see also](https://forum.restic.net/t/performance-differences-between-restic-dump-mount-restore/3878).  
   To **restore** a whole snapshots (or many files in general), use
   [**restic restore**](https://manpages.ubuntu.com/manpages/kinetic/man1/restic-restore.1.html) instead.
   The actual performance might depend on your server and the backup storage, but for me (with Google
@@ -2092,7 +2097,9 @@ send_alert_mail() {
 
 ## actual execution of this script starts here:
 
-create_report 2>&1 | tee /root/monitorlog.txt
+# NOTE: can't use | tee here, if I do, create_report is run
+#  in a new process and its modifications to the variables are lost
+create_report > /root/monitorlog.txt 2>&1
 
 if [ $NUM_NEW_WARNINGS != 0 ]; then
     echo "Alert! $NUM_NEW_WARNINGS new Warnings!"
