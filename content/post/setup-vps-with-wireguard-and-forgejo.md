@@ -1454,7 +1454,7 @@ to use.
 Restic creates **incremental backups** - each time it's run for a specific path, it creates a new
 **snapshot** for it (that can later be restored), but only saves the difference to the last snapshot,
 which is pretty **space-efficient** and **fast**. Furthermore, it **compresses** the backups
-(saves even more space) and **encrypts** them, so if someone gets access to wherever you store you
+(saves even more space) and **encrypts** them, so if someone gets access to wherever you store your
 backups (for example backup space provided by your hoster), they still can't access your data
 *(unless the attacker somehow managed to steal your password as well, but it's not stored with the
  backups, of course)*.
@@ -1910,7 +1910,7 @@ backup and copy everything again).
 You should try to keep your server up-to-date, especially the parts that are facing the public
 internet (the Linux kernel, SSH, WireGuard).
 
-There two major ways to achieve this: a service that sends you a mail when updates are available,
+There are two major ways to achieve this: a service that sends you a mail when updates are available,
 so you can run them manually (*apticron*) - or one that installs security-updates automatically 
 (and possibly reboots the system afterwards, if needed - *unattended-upgrades*). You can also use both,
 so security updates are installed automatically, and you get mails about normal updates to do them manually.
