@@ -60,7 +60,7 @@ offers that meet our requirements at a reasonable price - but we create games (a
 which means we don't only have code, but also *lots* of binary data (game assets like models and textures),
 even relatively small projects can easily have checkout sizes (*without history!*) of dozens of GB,
 bigger projects often use several hundreds of GB or more. Nowadays Git supports that reasonably well with
-[Git Large File Storage (LFS)](https://git-lfs.com/), and while several Git hosters generally support LFS,
+[Git Large File Storage (LFS)](https://git-lfs.com/)[^nolfs], and while several Git hosters generally support LFS,
 prices for data are a bit high: Gitlab's takes $60/month for packs of 10GB of storage and 20GB
 of traffic.. Githubs prices are a bit less ridiculous with "data packs" that cost $5/month
 for 50GB of data and 50GB of traffic, but if you have a 40GB repo you'll already need a second
@@ -175,6 +175,12 @@ characters from the start of the line as they comment it out!
 If there is no line with "PasswordAuthentication" yet, just add the `PasswordAuthentication no` line
 somewhere in the middle of the config, *before* any lines that start with "Match", like "Match user asfd".  
 Do the same to ensure that a `ChallengeResponseAuthentication no` line exists.
+
+> **NOTE:** While editing the servers `sshd_config`, you could also make another change that will
+> **make Git fetches faster** by allowing Git to use the
+> [Git (wire) protocol version 2](https://opensource.googleblog.com/2018/05/introducing-git-protocol-version-2.html).  
+> Search for a line that starts with **`AcceptEnv`** and add ` GIT_PROTOCOL` at the end.  
+> If no such line exists, just add a line `AcceptEnv GIT_PROTOCOL`.
 
 Save the file and restart the SSH server to make sure the changed config is loaded:  
 `# systemctl restart sshd`
@@ -1132,7 +1138,7 @@ You can test this as shown in the previous section, but with `root` as E-Mail ad
 > Similarly, if the [Forgejo Documentation](https://forgejo.org/docs/latest/) doesn't answer your
 > questions, check out the [Gitea Documentation](https://docs.gitea.io/en-us/).  
 > See [The Forgejo FAQ](https://forgejo.org/faq/) for more information about the project and why
-> they forked[^forgejo_gitea]
+> they forked[^forgejo_gitea].
 >
 > By the way, these Forgejo installation instructions roughly follow the
 > [Gitea Installation from Binary documentation](https://docs.gitea.io/en-us/installation/install-from-binary/)
@@ -1170,6 +1176,11 @@ like Fedora, CentOS etc - *feel free to leave a comment about other distros!*), 
    --gid git --home-dir /home/git --create-home git
 ```
 
+If you haven't already done it, you can configure the SSH daemon on your Git server to allow
+setting the `GIT_PROTOCOL` environment variable, which allows Git clients to use Git protocol
+version 2 which is more efficient.  
+See the *NOTE* in the [*Disable SSH login ...* section](#disable-ssh-login-with-password) above.
+
 ## Create directories Forgejo will use
 
 Now create the directories Forgejo will use and set access rights appropriately:
@@ -1206,9 +1217,10 @@ If you're *not* using sqlite, but MySQL or MariaDB or PostgreSQL, you'll have to
 (`/etc/systemd/system/forgejo.service`) and uncomment the corresponding `Wants=` and `After=` lines.
 ~~Otherwise it *should* work as it is.~~
 
-> **NOTE:** For Forgejo 1.19.x, make sure that `forgejo.service` sets `Type=simple`, *not* `Type=notify`!
-> *(The forgejo.service currently available in their main branch sets `Type=notify`, which only
-> works with the current 1.20 development code, not release 1.19.3, 
+> **NOTE:** For Forgejo 1.19.x, make sure that `forgejo.service` sets `Type=simple`, *not* `Type=notify`
+> and that the `WatchdogSec=30s` line either doesn't exist or is commented out by prepending a `#` to it.  
+> *(The forgejo.service currently available in their main branch sets `Type=notify`, and contains that
+> Watchdog line, both only work with the current 1.20 development code, not release 1.19.3, 
 > [see this bugreport](https://codeberg.org/forgejo/forgejo/issues/777)).*
 
 
@@ -2270,6 +2282,11 @@ Earl Warren and 👾, for feedback on the article!
 
 <!-- Below: Footnotes -->
 
+[^nolfs]: Though it seems like Git can be made to support big files reasonably well even without
+    LFS (it uses less disk space then, but clones can use more CPU time and main memory on
+    the server); I *might* write a separate blog-post on that, for now you can find some basic info
+    in [this Mastodon thread](https://mastodon.gamedev.place/@Doomed_Daniel/110528969618920973).
+
 [^hoster]: As a **server** we chose the [Contabo](https://contabo.com/) "Cloud VPS M" for €10.49/month,
     which has more CPU power and RAM than we need, a 400GB SSD, and supports snapshots (their "Storage VPS"
     line, that has even more storage but less CPU power and RAM, doesn't), which seems pretty useful to
@@ -2477,7 +2494,7 @@ Earl Warren and 👾, for feedback on the article!
     # /lib/systemd/system/apt-daily-upgrade.timer
     OnCalendar=
     # now we can specify the actual time
-    # (around 4pm, note that the backup starts shortly after 5am)
+    # (around 4am, note that the backup starts shortly after 5am)
     OnCalendar=03:55
     # Overwrite the randomized delay set by default,
     # so it happens exactly at that time
