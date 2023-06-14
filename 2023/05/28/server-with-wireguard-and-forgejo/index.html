@@ -300,6 +300,13 @@ characters from the start of the line as they comment it out!<br>
 If there is no line with &ldquo;PasswordAuthentication&rdquo; yet, just add the <code>PasswordAuthentication no</code> line
 somewhere in the middle of the config, <em>before</em> any lines that start with &ldquo;Match&rdquo;, like &ldquo;Match user asfd&rdquo;.<br>
 Do the same to ensure that a <code>ChallengeResponseAuthentication no</code> line exists.</p>
+<blockquote>
+<p><strong>NOTE:</strong> While editing the servers <code>sshd_config</code>, you could also make another change that will
+<strong>make Git fetches faster</strong> by allowing Git to use the
+<a href="https://opensource.googleblog.com/2018/05/introducing-git-protocol-version-2.html">Git (wire) protocol version 2</a>.<br>
+Search for a line that starts with <strong><code>AcceptEnv</code></strong> and add <code> GIT_PROTOCOL</code> at the end.<br>
+If no such line exists, just add a line <code>AcceptEnv GIT_PROTOCOL</code>.</p>
+</blockquote>
 <p>Save the file and restart the SSH server to make sure the changed config is loaded:<br>
 <code># systemctl restart sshd</code></p>
 <p>If that failed for some reason, <code>systemctl status sshd</code> should show some information on the cause.</p>
@@ -1115,7 +1122,7 @@ will probably give you more results than <code>your problem &quot;forgejo&quot;<
 Similarly, if the <a href="https://forgejo.org/docs/latest/">Forgejo Documentation</a> doesn&rsquo;t answer your
 questions, check out the <a href="https://docs.gitea.io/en-us/">Gitea Documentation</a>.<br>
 See <a href="https://forgejo.org/faq/">The Forgejo FAQ</a> for more information about the project and why
-they forked<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup></p>
+they forked<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>.</p>
 <p>By the way, these Forgejo installation instructions roughly follow the
 <a href="https://docs.gitea.io/en-us/installation/install-from-binary/">Gitea Installation from Binary documentation</a>
 (at time of writing, Forgejo didn&rsquo;t have installation instructions yet<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>).</p>
@@ -1141,7 +1148,11 @@ like Fedora, CentOS etc - <em>feel free to leave a comment about other distros!<
 
 # adduser --system --shell /bin/bash --comment &#39;Git Version Control&#39; \
    --gid git --home-dir /home/git --create-home git
-</code></pre><h2 id="create-directories-forgejo-will-use">Create directories Forgejo will use</h2>
+</code></pre><p>If you haven&rsquo;t already done it, you can configure the SSH daemon on your Git server to allow
+setting the <code>GIT_PROTOCOL</code> environment variable, which allows Git clients to use Git protocol
+version 2 which is more efficient.<br>
+See the <em>NOTE</em> in the <a href="#disable-ssh-login-with-password"><em>Disable SSH login &hellip;</em> section</a> above.</p>
+<h2 id="create-directories-forgejo-will-use">Create directories Forgejo will use</h2>
 <p>Now create the directories Forgejo will use and set access rights appropriately:</p>
 <p><code># mkdir /var/lib/forgejo</code><br>
 <code># chown git:git /var/lib/forgejo &amp;&amp; chmod 750 /var/lib/forgejo</code><br>
@@ -1167,9 +1178,10 @@ Download it to the correct location:<br>
 (<code>/etc/systemd/system/forgejo.service</code>) and uncomment the corresponding <code>Wants=</code> and <code>After=</code> lines.
 <del>Otherwise it <em>should</em> work as it is.</del></p>
 <blockquote>
-<p><strong>NOTE:</strong> For Forgejo 1.19.x, make sure that <code>forgejo.service</code> sets <code>Type=simple</code>, <em>not</em> <code>Type=notify</code>!
-<em>(The forgejo.service currently available in their main branch sets <code>Type=notify</code>, which only
-works with the current 1.20 development code, not release 1.19.3,
+<p><strong>NOTE:</strong> For Forgejo 1.19.x, make sure that <code>forgejo.service</code> sets <code>Type=simple</code>, <em>not</em> <code>Type=notify</code>
+and that the <code>WatchdogSec=30s</code> line either doesn&rsquo;t exist or is commented out by prepending a <code>#</code> to it.<br>
+<em>(The forgejo.service currently available in their main branch sets <code>Type=notify</code>, and contains that
+Watchdog line, both only work with the current 1.20 development code, not release 1.19.3,
 <a href="https://codeberg.org/forgejo/forgejo/issues/777">see this bugreport</a>).</em></p>
 </blockquote>
 <p>Now enable and start the Forgejo service, so you can go on with the installation:<br>
@@ -2325,7 +2337,7 @@ with scheduled backups or people who want to use the server for work, I used thi
 </span></span><span class="line"><span class="cl"><span class="c"># /lib/systemd/system/apt-daily-upgrade.timer</span>
 </span></span><span class="line"><span class="cl"><span class="na">OnCalendar</span><span class="o">=</span>
 </span></span><span class="line"><span class="cl"><span class="c"># now we can specify the actual time</span>
-</span></span><span class="line"><span class="cl"><span class="c"># (around 4pm, note that the backup starts shortly after 5am)</span>
+</span></span><span class="line"><span class="cl"><span class="c"># (around 4am, note that the backup starts shortly after 5am)</span>
 </span></span><span class="line"><span class="cl"><span class="na">OnCalendar</span><span class="o">=</span><span class="s">03:55</span>
 </span></span><span class="line"><span class="cl"><span class="c"># Overwrite the randomized delay set by default,</span>
 </span></span><span class="line"><span class="cl"><span class="c"># so it happens exactly at that time</span>
