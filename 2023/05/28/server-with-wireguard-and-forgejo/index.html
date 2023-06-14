@@ -207,18 +207,18 @@ offers that meet our requirements at a reasonable price - but we create games (a
 which means we don&rsquo;t only have code, but also <em>lots</em> of binary data (game assets like models and textures),
 even relatively small projects can easily have checkout sizes (<em>without history!</em>) of dozens of GB,
 bigger projects often use several hundreds of GB or more. Nowadays Git supports that reasonably well with
-<a href="https://git-lfs.com/">Git Large File Storage (LFS)</a>, and while several Git hosters generally support LFS,
+<a href="https://git-lfs.com/">Git Large File Storage (LFS)</a><sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, and while several Git hosters generally support LFS,
 prices for data are a bit high: Gitlab&rsquo;s takes $60/month for packs of 10GB of storage and 20GB
 of traffic.. Githubs prices are a bit less ridiculous with &ldquo;data packs&rdquo; that cost $5/month
 for 50GB of data and 50GB of traffic, but if you have a 40GB repo you&rsquo;ll already need a second
 data pack if you do more than one full clone per month.. this doesn&rsquo;t scale that well.<br>
 So self-hosting is a lot more attractive, as you can get a VPS (Virtual Private Server,
 basically a VM running &ldquo;in the cloud&rdquo;) with several hundreds of GB storage for &lt; €20/month,
-and S3-style &ldquo;object storage&rdquo; (that can be used for Git LFS data) for about €10 per 1TB per month<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+and S3-style &ldquo;object storage&rdquo; (that can be used for Git LFS data) for about €10 per 1TB per month<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
 <p>To <strong>host Git</strong> (and get a nice Github-ish frontend) we use <a href="https://forgejo.org/">Forgejo</a>, a fork
 of <a href="https://gitea.io/">Gitea</a>. It&rsquo;s written in Go and is just a single executable with few external
 dependencies (it needs a database, but supports <a href="https://sqlite.org/index.html">sqlite</a>, which should
-be good enough for up to at least 10 users<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>). It can store the LFS data directly in the filesystem
+be good enough for up to at least 10 users<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>). It can store the LFS data directly in the filesystem
 on the servers disk, but also supports storing it in S3-compatible (external) object storage.</p>
 <p>We work decentralized, most people at home, so the server needs to be accessible over the
 internet.<br>
@@ -234,7 +234,7 @@ so I don&rsquo;t have to worry about bruteforcing attacks on the user passwords)
 unauthenticated users to run code (Gitlab
 <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22205">had such an issue a few years back</a>),
 because only our team can access it at all, so if we forget to update Forgejo for a while,
-we&rsquo;ll still be safe<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.</li>
+we&rsquo;ll still be safe<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>.</li>
 <li>We can use plain HTTP (instead of HTTPS), because all connections to Forgejo go through the
 encrypted Wireguard tunnel, so we don&rsquo;t have to mess around with SSL certificates.</li>
 </ol>
@@ -498,14 +498,14 @@ add only one <code>[Peer]</code> section):</p>
 </span></span><span class="line"><span class="cl"><span class="c1">#       and that everyone has their own [Peer] section</span>
 </span></span></code></pre></div><p><strong>Note</strong> that, unlike <em>on</em> the client, <strong>AllowedIPs</strong> must have <strong><code>/32</code></strong> as subnet mask
 (meaning all bits are masked, i.e. it only refers to this one IP), because only
-traffic for that IP should be routed to that particular client<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>.</p>
+traffic for that IP should be routed to that particular client<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>.</p>
 <p>Now you can tell WireGuard to reload the config:<br>
 <code># wg syncconf wg0 &lt;(wg-quick strip wg0)</code></p>
 <p>.. and now the clients should be able to connect (on Windows by clicking <code>Activate</code> for the tunnel,
 on Linux with <code># wg-quick up wg0</code>).</p>
 <p><strong>Note</strong> that clients can only communicate with the server, not with each other, and they don&rsquo;t
 access the internet through that tunnel, at least without setting up ip forwarding on the server
-(see footnote<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>).</p>
+(see footnote<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>).</p>
 <p><code>PersistentKeepalive = 21</code> makes sure that a (possibly empty) network packet is sent at least every
 21 seconds to make sure that routers and firewalls between the client and the server don&rsquo;t assume
 the WireGuard connection is closed when there&rsquo;s no real traffic, see also
@@ -560,7 +560,7 @@ a good time to take one, so you can just restore it in case something goes wrong
 firewall rules we&rsquo;re about to create and you lock yourself out</em></p>
 </blockquote>
 <p>By default, Ubuntu ships the <a href="https://help.ubuntu.com/community/UFW">UFW</a> firewall.
-This Howto uses plain <a href="https://en.wikipedia.org/wiki/Iptables">ip(6)tables</a>, so disable ufw<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>:<br>
+This Howto uses plain <a href="https://en.wikipedia.org/wiki/Iptables">ip(6)tables</a>, so disable ufw<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>:<br>
 <code># systemctl stop ufw.service</code><br>
 <code># systemctl disable ufw.service</code></p>
 <p>I suggest putting the firewall scripts into <code>/root/scripts/</code>, so create that directory.</p>
@@ -599,7 +599,7 @@ and allows all connections:<br>
 (see the comments in the scripts for a little explanation of what it does).<br>
 <strong>Note</strong> that you might have to modify the <code>WAN</code> network device name. It&rsquo;s the network device
 connected to the internet - it might be called <code>eth0</code>, but names like <code>enp5s0</code> or similar
-are also common. Just adjust the <code>WAN=&quot;eth0&quot;</code> line accordingly<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>.<br>
+are also common. Just adjust the <code>WAN=&quot;eth0&quot;</code> line accordingly<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>.<br>
 <code>firewall.sh</code>: <a href="../../../../downloads/firewall.sh" download>Download firewall.sh</a></p>
 <details><summary>Click to show the script</summary>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/sh
@@ -781,9 +781,9 @@ so no one can try to break into your server through that.</p>
 ports for different services) - then you could access them with <code>http://172.30.0.1</code> or
 <code>http://172.30.0.1:3000</code> - but it&rsquo;s definitely nice to have.</p>
 <p>Of course you can use a different domain, like yourcompany.lan, but I think that using the nonexistant
-.lan top-level-domain is a good idea for this purpose<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>. Alternatively you could use a subdomain of
+.lan top-level-domain is a good idea for this purpose<sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup>. Alternatively you could use a subdomain of
 a real domain you have, like vpn.yourcompany.com (and then maybe git.vpn.yourcompany.com), but to
-be honest I&rsquo;m not completely sure how that would be set up properly<sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup>.</p>
+be honest I&rsquo;m not completely sure how that would be set up properly<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>.</p>
 <p>We&rsquo;ll install and configure it to only listen on wg0 and to answer queries for <code>*.example.lan</code>.</p>
 <p>Install the dnsmasq package:<br>
 <code># apt install dnsmasq</code></p>
@@ -997,7 +997,7 @@ Forgejo isn&rsquo;t installed yet).<br>
 <strong>Note</strong> that you might have to actually type the whole URL including <code>http://</code> in the browser,
 because nowadays browsers only open URLs without protocol (<code>http://</code>) for known top level domains,
 otherwise they&rsquo;ll open a web search using &ldquo;git.example.lan&rdquo; or whatever you typed in as search
-query<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>..</p>
+query<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>..</p>
 <p>As mentioned before, this uses plain HTTP, no HTTPS encryption, because:</p>
 <ol>
 <li>That would be a PITA to set up for a custom/local domain (you&rsquo;d have to create your own pseudo-CA
@@ -1122,10 +1122,10 @@ will probably give you more results than <code>your problem &quot;forgejo&quot;<
 Similarly, if the <a href="https://forgejo.org/docs/latest/">Forgejo Documentation</a> doesn&rsquo;t answer your
 questions, check out the <a href="https://docs.gitea.io/en-us/">Gitea Documentation</a>.<br>
 See <a href="https://forgejo.org/faq/">The Forgejo FAQ</a> for more information about the project and why
-they forked<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup>.</p>
+they forked<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>.</p>
 <p>By the way, these Forgejo installation instructions roughly follow the
 <a href="https://docs.gitea.io/en-us/installation/install-from-binary/">Gitea Installation from Binary documentation</a>
-(at time of writing, Forgejo didn&rsquo;t have installation instructions yet<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>).</p>
+(at time of writing, Forgejo didn&rsquo;t have installation instructions yet<sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup>).</p>
 </blockquote>
 <h2 id="install-forgejo-and-git-create-git-user">Install Forgejo and git, create git user</h2>
 <p>First, download the Forgejo binary for your CPU architecture and maybe verify the GPG signature,
@@ -1165,7 +1165,7 @@ then it shouldn&rsquo;t modify it anymore.</em></p>
 <h2 id="optional-set-up-database">Optional: Set up database</h2>
 <p>When using sqlite as Forgejos database, nothing needs to be done here.</p>
 <p>If you need a more powerful database, you can use MySQL/MariaDB or PostgreSQL (apparently sqlite
-is good enough for at least 10 users, but might even suffice for more<sup id="fnref1:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>. I heard that it&rsquo;s
+is good enough for at least 10 users, but might even suffice for more<sup id="fnref1:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>. I heard that it&rsquo;s
 possible to migrate the database from sqlite to something else later, though it isn&rsquo;t guaranteed to work).</p>
 <p>See <a href="https://forgejo.org/docs/latest/admin/database-preparation/">Forgejos Database Preparation guide</a>
 for setup instructions.</p>
@@ -1223,7 +1223,7 @@ even more so if you disabled self-registration.</li>
 <p>Once you&rsquo;re done configuring, click <code>Install Forgejo</code> and a few seconds later you should be
 on the dashboard (if you created an administrator account) or at the login/register screen, where you
 can create an account to then get to the dashboard.</p>
-<p>So far, so good<sup id="fnref:13"><a href="#fn:13" class="footnote-ref" role="doc-noteref">13</a></sup>, but we&rsquo;re not quite done yet - some manual configuration in the app.ini is needed!</p>
+<p>So far, so good<sup id="fnref:14"><a href="#fn:14" class="footnote-ref" role="doc-noteref">14</a></sup>, but we&rsquo;re not quite done yet - some manual configuration in the app.ini is needed!</p>
 <h2 id="further-configuration-in-forgejos-app-ini">Further configuration in Forgejos app.ini</h2>
 <p>Stop the forgejo service:<br>
 <code># systemctl stop forgejo.service</code></p>
@@ -1347,7 +1347,7 @@ Forgejo (and Gitea) supports storing them in an (<a href="https://aws.amazon.com
 to host the LFS files in an object storage instead of renting a bigger server.</p>
 <p>While Amazon S3 itself is way too expensive, there are open source solutions (like <a href="https://min.io/">MinIO</a>
 or <a href="https://ceph.io/">Ceph</a>) that implement S3&rsquo;s protocol, and providers that use those to offer S3-like
-object storage for much more affordable prices, starting at around $10/month for 1TB<sup id="fnref:14"><a href="#fn:14" class="footnote-ref" role="doc-noteref">14</a></sup>.</p>
+object storage for much more affordable prices, starting at around $10/month for 1TB<sup id="fnref:15"><a href="#fn:15" class="footnote-ref" role="doc-noteref">15</a></sup>.</p>
 <p>To use such an object storage, the <code>[lfs]</code> section in <code>/etc/forgejo/app.ini</code> would look kinda like this
 (<a href="https://forgejo.org/docs/latest/admin/config-cheat-sheet/#lfs-lfs">see also documentation</a>):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[lfs]</span>
@@ -1524,7 +1524,7 @@ I can live with it.. just keep it in mind when browsing or restoring snapshots (
 <p>Backing up should be done with a script that can be called automatically once a day or so.
 The following (saved in <code>/root/backup/backup.sh</code>) should be a good start: It backs up the forgejo data,
 <code>/etc/</code> and <code>/root/</code> and optionally an <a href="https://www.openproject.org/">OpenProject</a> installation
-(if you want to use that, uncomment the <code>#backupopenproject</code> line in <code>backupallthethings()</code>)<sup id="fnref:15"><a href="#fn:15" class="footnote-ref" role="doc-noteref">15</a></sup>.
+(if you want to use that, uncomment the <code>#backupopenproject</code> line in <code>backupallthethings()</code>)<sup id="fnref:16"><a href="#fn:16" class="footnote-ref" role="doc-noteref">16</a></sup>.
 It also checks if each command succeded, and if anything goes wrong sends you an E-Mail with further
 information, and stores a log in <code>/root/backup/backuplog.txt</code>.</p>
 <p>Remember to adjust the <code>export RESTIC_REPOSITORY=&quot;...&quot;</code> line, and <em>maybe</em> <code>WARN_MAIL_RECP=(...)</code>.</p>
@@ -1777,7 +1777,7 @@ a week or so in a cronjob.</li>
 keep in mind that, if the ransomware gains root access, it can also access your backup storage, and
 could <strong>destroy your backup</strong> (unless you&rsquo;re using some kind of append-only remote storage, where
 existing data can&rsquo;t be modified or deleted - at least restics
-<a href="https://github.com/restic/rest-server">rest-server</a> supports that mode with <code>--append-only</code>)<sup id="fnref:16"><a href="#fn:16" class="footnote-ref" role="doc-noteref">16</a></sup>.</p>
+<a href="https://github.com/restic/rest-server">rest-server</a> supports that mode with <code>--append-only</code>)<sup id="fnref:17"><a href="#fn:17" class="footnote-ref" role="doc-noteref">17</a></sup>.</p>
 <p>To prevent that (or generally for an <strong>additional level of redundancy</strong>), you could <strong>mirror your backup
 storage</strong>, for example locally on an USB drive (you can mount the backup storage locally with
 <a href="https://rclone.org/commands/rclone_mount/">Rclone</a>). As restic never modifies existing files in the
@@ -1789,7 +1789,7 @@ sure that existing files aren&rsquo;t overwritten, so even if a file has been sc
 server, you won&rsquo;t get that broken version in your local backup as long as you&rsquo;ve copied the a good
 version of that file to your local backup before. <em>(This assumes that your <code>cp</code> supports <code>-n</code> - at
 least the cp versions of Linux, FreeBSD, Git Bash for Windows and macOS support it; alternatively
-see<sup id="fnref:17"><a href="#fn:17" class="footnote-ref" role="doc-noteref">17</a></sup> for robocopy on Windows.)</em></p>
+see<sup id="fnref:18"><a href="#fn:18" class="footnote-ref" role="doc-noteref">18</a></sup> for robocopy on Windows.)</em></p>
 <p>It&rsquo;s probably a good idea to call <code>restic check --read-data</code> on your local copy of the backup repo,
 to make sure that it&rsquo;s consistent (<code>--read-data</code> actually reads all files and checks their checksums,
 so it might take a while - but will be a lot faster with a local copy of the backup than with
@@ -1832,12 +1832,12 @@ didn&rsquo;t change any of them, though the <code>CUSTOM_SUBJECT</code> option p
 those mails easier.</p>
 <p>If you want to <strong>specify the exact time</strong> this runs, run<br>
 <code># systemctl edit apticron.timer</code><br>
-and edit it accordingly - see the unattended-upgrades footnote<sup id="fnref:18"><a href="#fn:18" class="footnote-ref" role="doc-noteref">18</a></sup> for an example.</p>
+and edit it accordingly - see the unattended-upgrades footnote<sup id="fnref:19"><a href="#fn:19" class="footnote-ref" role="doc-noteref">19</a></sup> for an example.</p>
 <h2 id="unattended-upgrades-install-security-updates-automatically">unattended-upgrades - install security updates automatically</h2>
 <p>Install unattended-upgrades:<br>
 <code># apt install unattended-upgrades</code></p>
 <p>On Ubuntu (but not Debian), if you want to enable automatic reboots (when needed by the update),
-you also need to install <code>update-notifier-common</code><sup id="fnref:19"><a href="#fn:19" class="footnote-ref" role="doc-noteref">19</a></sup>:<br>
+you also need to install <code>update-notifier-common</code><sup id="fnref:20"><a href="#fn:20" class="footnote-ref" role="doc-noteref">20</a></sup>:<br>
 <code># apt install update-notifier-common</code></p>
 <p>Apparently it must be enabled by reconfiguring it:<br>
 <code># dpkg-reconfigure --priority=low unattended-upgrades</code> (select <code>&lt;Yes&gt;</code>)</p>
@@ -1855,7 +1855,7 @@ with <code>Unattended-Upgrade::Automatic-Reboot &quot;true&quot;;</code></li>
 immediately after installing an update that needs it), you can set:<br>
 <code>Unattended-Upgrade::Automatic-Reboot-Time &quot;02:00&quot;;</code><br>
 (that would be for 2am) - might make more sense to modify the systemd timers that control when
-updates are installed and leave this commented out<sup id="fnref1:18"><a href="#fn:18" class="footnote-ref" role="doc-noteref">18</a></sup>.</li>
+updates are installed and leave this commented out<sup id="fnref1:19"><a href="#fn:19" class="footnote-ref" role="doc-noteref">19</a></sup>.</li>
 </ul>
 <blockquote>
 <p><strong>NOTE:</strong> If you don&rsquo;t want unattended-upgrades to reboot your system, but want to get a mail
@@ -2128,6 +2128,12 @@ Earl Warren and 👾, for feedback on the article!</p>
 <hr>
 <ol>
 <li id="fn:1">
+<p>Though it seems like Git can be made to support big files reasonably well even without
+LFS (it uses less disk space then, but clones can use more CPU time and main memory on
+the server); I <em>might</em> write a separate blog-post on that, for now you can find some basic info
+in <a href="https://mastodon.gamedev.place/@Doomed_Daniel/110528969618920973">this Mastodon thread</a>.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
 <p>As a <strong>server</strong> we chose the <a href="https://contabo.com/">Contabo</a> &ldquo;Cloud VPS M&rdquo; for €10.49/month,
 which has more CPU power and RAM than we need, a 400GB SSD, and supports snapshots (their &ldquo;Storage VPS&rdquo;
 line, that has even more storage but less CPU power and RAM, doesn&rsquo;t), which seems pretty useful to
@@ -2152,14 +2158,14 @@ I can absolutely <strong>not</strong> recommend OVH, as their customers had to l
 <a href="https://blocksandfiles.com/2023/03/23/ovh-cloud-must-pay-damages-for-lost-backup-data/">the hard way</a>
 that OVH data centers are built out of wood and backups are stored in the same building as the
 backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
-get destroyed.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:2">
-<p>At least that&rsquo;s what one of the Gitea developers told me in the Forgejo chatroom.
-He said even <a href="https://try.gitea.io/">https://try.gitea.io/</a> uses sqlite, so it looks like it might be fine even with lots
-of repos and users.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+get destroyed.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:3">
+<p>At least that&rsquo;s what one of the Gitea developers told me in the Forgejo chatroom.
+He said even <a href="https://try.gitea.io/">https://try.gitea.io/</a> uses sqlite, so it looks like it might be fine even with lots
+of repos and users.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
 <p>At least &ldquo;reasonably safe&rdquo;. There is no total security. It&rsquo;s possible that OpenSSH, WireGuard
 or the Linux kernels network stack have unknown security vulnerabilities that an attacker could
 exploit to get onto your server. It&rsquo;s also possible that your hosters infrastructure gets
@@ -2169,14 +2175,14 @@ And of course it&rsquo;s possible (I&rsquo;d even say more likely than some of t
 that someone hacks <em>your</em> PC and gets access to the server and/or your git repos that way.<br>
 Anyway, if you follow this guide (and hopefully keep at least the Linux kernel, WireGuard and
 OpenSSH up to date), your data will be <em>a lot</em> safer than it would be if you exposed webservices
-(instead of just WireGuard and SSH) to the internet.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:4">
-<p>I&rsquo;ve never done this, but it might be possible to give a client some more
-IPs with a different subnet mask, but that&rsquo;s not useful for this usecase and you&rsquo;d still have to
-make sure that there&rsquo;s no overlaps with IPs assigned to other clients.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+(instead of just WireGuard and SSH) to the internet.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:5">
+<p>I&rsquo;ve never done this, but it might be possible to give a client some more
+IPs with a different subnet mask, but that&rsquo;s not useful for this usecase and you&rsquo;d still have to
+make sure that there&rsquo;s no overlaps with IPs assigned to other clients.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
 <p>To enable IP forwarding, so VPN clients can talk to each other through the server,
 you just need to add two lines to the <code>firewall.sh</code> script from
 <a href="#a-simple-firewall-with-iptables-and-sshguard">the firewall chapter</a>, right before the
@@ -2200,22 +2206,22 @@ shouldn&rsquo;t be able to talk to each other, add yet another line below the ot
 <code>iptables -A FORWARD -i $VPN -d 172.30.0.0/24 -j REJECT</code><br>
 <em>(Note: this does not affect connections to the server itself, because those go through INPUT
 instead of FORWARD - and it doesn&rsquo;t affect connections to the internet, because it&rsquo;s limited to
-connections/packets with destination <code>172.30.0.0/24</code>, i.e. the local VPN network)</em>&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+connections/packets with destination <code>172.30.0.0/24</code>, i.e. the local VPN network)</em>&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:6">
+<li id="fn:7">
 <p>If you&rsquo;re wondering why I&rsquo;m using iptables and not UFW or
 <a href="https://netfilter.org/projects/nftables/">nftables</a>, the answer is simple and boring:
 I&rsquo;m not familiar with UFW or nftables, but I&rsquo;m familiar with iptables, so using iptables
 was easiest for me <code>¯\_(ツ)_/¯</code>. If you&rsquo;re more familiar with an alternative, feel free to
-use that to create equivalent rules.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+use that to create equivalent rules.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:7">
+<li id="fn:8">
 <p>If you&rsquo;re not sure what the network device on your server is called, run <code>$ ip address</code>
 in the terminal. It will list all network devices (including loopback <code>lo</code> and your WireGuard
 device <code>wg0</code> if it&rsquo;s currently up). The device with the public internet IP that you&rsquo;re also
-using to connect to the server via SSH/WireGuard is the one you need.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+using to connect to the server via SSH/WireGuard is the one you need.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:8">
+<li id="fn:9">
 <p>Sometimes using a custom top level domain (TLD) is discouraged, because (unlike a few years back)
 nowadays, with enough money, one can register arbitrary TLDs that don&rsquo;t exist yet.<br>
 However, .lan is relatively widely used for this purpose, for example by OpenWRT, and
@@ -2227,9 +2233,9 @@ used on private internal networks (&hellip;) for this purpose: .intranet, .inter
 .home, <strong>.lan</strong>&rdquo;</em></a>).<br>
 Do <strong>not</strong> use <strong>.local</strong>, it&rsquo;s <a href="https://en.wikipedia.org/wiki/.local">reserved for multicast DNS / zeroconf (avahi, bonjour)</a>
 and using it as a TLD for normal DNS just causes headaches (will need explicit configuration on
-many clients to work, because by default they assume that it&rsquo;s mDNS-only).&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+many clients to work, because by default they assume that it&rsquo;s mDNS-only).&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:9">
+<li id="fn:10">
 <p>I <em>think</em> that it would be possible to set up <code>vpn.yourcompany.com</code> as a local
 domain in exactly the same way <code>example.lan</code> is set up here.<br>
 Furthermore, I&rsquo;ve been told that using Let&rsquo;s Encrypt (to get an TLS/SSL/HTTPS certificate) for
@@ -2244,9 +2250,9 @@ configure the clients to use the custom DNS server for <code>vpn.yourcompany.com
 local DNS cache (in your PC or your internet router) might drop replies that return local IPs,
 to prevent <a href="https://en.wikipedia.org/wiki/DNS_rebinding">DNS rebinding attacks</a>.
 For example, dnsmasq&rsquo;s <code>--stop-dns-rebind</code> option does just that (and dnsmasq is used in many
-internet routers, including cheap ones for endusers).&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+internet routers, including cheap ones for endusers).&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:10">
+<li id="fn:11">
 <p>In <strong>Firefox</strong> you can fix this issue by opening <code>about:config</code> (enter that in
 the URL bar), and then in the search field enter <code>browser.fixup.domainsuffixwhitelist.lan</code>, select
 <code>Boolean</code> and press the <code>[+]</code> button on the right to add the setting, make sure it&rsquo;s set to <code>true</code>.<br>
@@ -2259,20 +2265,20 @@ have to press Ctrl-K before typing, or type <code>? </code> before your search t
 <code>? why are computers so horrible</code>). Alternatively, it helps if you add a slash, like
 <code>git.example.lan/</code> instead of just <code>git.example.lan</code> - that&rsquo;s easier to type than
 <code>http://git.example.lan</code> (though once the browser knows the URL you should get the version with
-http:// anyway through autocompletion).&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:11">
-<p>Despite their disagreements, the Gitea and Forgejo teams still talk to each other
-and share code, so the whole situation seems to be more mature then some other open-source &ldquo;dramas&rdquo;.&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+http:// anyway through autocompletion).&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:12">
-<p><a href="https://forgejo.org/docs/v1.20/admin/installation/#installation-from-binary">Now they do</a>,
-based on this article :-)&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Despite their disagreements, the Gitea and Forgejo teams still talk to each other
+and share code, so the whole situation seems to be more mature then some other open-source &ldquo;dramas&rdquo;.&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:13">
-<p>&hellip; so what!&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p><a href="https://forgejo.org/docs/v1.20/admin/installation/#installation-from-binary">Now they do</a>,
+based on this article :-)&#160;<a href="#fnref:13" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:14">
+<p>&hellip; so what!&#160;<a href="#fnref:14" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:15">
 <p>Some examples for comparison:</p>
 <ul>
 <li><a href="https://aws.amazon.com/s3/pricing/">Amazon S3</a> $21/month for 1TB of storage, $90/TB for
@@ -2288,8 +2294,8 @@ future, but in the two weeks or so that I&rsquo;ve (occasionally) done tests, it
 1TB of traffic, each additional TB of storage costs $5/month, each additional TB of traffic
 costs $10/month</li>
 </ul>
-&#160;<a href="#fnref:14" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:15">
+&#160;<a href="#fnref:15" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:16">
 <p>Even if you&rsquo;re not using OpenProject, it shows how to backup PostgreSQL databases, which
 might come in handy elsewhere. <strong>NOTE:</strong> It might be useful to additionally/manually run
 <code># su -l postgres -c &quot;pg_basebackup -D /tmp/postgres-base/ -R&quot;</code> once to get a base backup that
@@ -2298,15 +2304,15 @@ archive and store that in /root/ somewhere so it&rsquo;s backed up with the regu
 I <em>think</em> that such a base backup together with the normal SQL dumps from the daily backup make
 restoring the PostgreSQL server relatively easy, but TBH I haven&rsquo;t tried it myself yet and
 the pg_basebackup manpage unfortunately doesn&rsquo;t document how this is done..<br>
-<strong>TODO:</strong> how do I restore a pg_basebackup?&#160;<a href="#fnref:15" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<strong>TODO:</strong> how do I restore a pg_basebackup?&#160;<a href="#fnref:16" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:16">
+<li id="fn:17">
 <p>You could run restic&rsquo;s <a href="https://github.com/restic/rest-server">rest-server</a>
 (in <code>--append-only</code> mode) on a backupserver at home (or in your office), and make that
 backupserver connect to your WireGuard VPN, so it can be easily reached from the git server.
-And &ldquo;backupserver&rdquo; could just be a Raspberry Pi<sup id="fnref:20"><a href="#fn:20" class="footnote-ref" role="doc-noteref">20</a></sup> with with a big USB harddrive.&#160;<a href="#fnref:16" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+And &ldquo;backupserver&rdquo; could just be a Raspberry Pi<sup id="fnref:21"><a href="#fn:21" class="footnote-ref" role="doc-noteref">21</a></sup> with with a big USB harddrive.&#160;<a href="#fnref:17" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:17">
+<li id="fn:18">
 <p>If you&rsquo;re using Windows and don&rsquo;t have Git Bash installed, you can <em>probably</em> use
 robocopy, like this (<strong>untested!</strong>; assuming <code>X:</code> is your mounted restic repo and <code>D:</code> is you backup disk):<br>
 <code>&gt; robocopy X:\ D:\restic-backup\ /XC /XN /XO</code></p>
@@ -2318,8 +2324,8 @@ the destination, but have the same timestamp</li>
 <li>=&gt; those three options together should hopefully make sure that only files that don&rsquo;t exist
 on your backup disk at all are copied from the restic repository</li>
 </ul>
-&#160;<a href="#fnref:17" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:18">
+&#160;<a href="#fnref:18" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:19">
 <p>According to <a href="https://wiki.debian.org/UnattendedUpgrades#Modifying_download_and_upgrade_schedules_.28on_systemd.29">the Debian Wiki</a>
 updates are downloaded by the systemd <code>apt-daily.timer</code> and installed (upgrade) by the
 <code>apt-daily-upgrade.timer</code>, and apparently by default they happen at 6am or 6pm with a randomized
@@ -2342,8 +2348,8 @@ with scheduled backups or people who want to use the server for work, I used thi
 </span></span><span class="line"><span class="cl"><span class="c"># Overwrite the randomized delay set by default,</span>
 </span></span><span class="line"><span class="cl"><span class="c"># so it happens exactly at that time</span>
 </span></span><span class="line"><span class="cl"><span class="na">RandomizedDelaySec</span><span class="o">=</span><span class="s">0</span>
-</span></span></code></pre></div>&#160;<a href="#fnref:18" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:18" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
-<li id="fn:19">
+</span></span></code></pre></div>&#160;<a href="#fnref:19" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:19" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
+<li id="fn:20">
 <p>At least that&rsquo;s what the
 <a href="https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package">Ubuntu Wiki on Automatic Security Updates</a>
 says:</p>
@@ -2352,11 +2358,11 @@ says:</p>
 Unattended-Upgrade::Automatic-Reboot &ldquo;true&rdquo;, but you also need to have the &ldquo;update-notifier-common&rdquo;
 package installed.</p>
 </blockquote>
-<p>Debian on the other hand doesn&rsquo;t even have a package with that name.&#160;<a href="#fnref:19" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>Debian on the other hand doesn&rsquo;t even have a package with that name.&#160;<a href="#fnref:20" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:20">
+<li id="fn:21">
 <p>Yeah yeah, I know&hellip; I&rsquo;m sure they&rsquo;ll eventually be available at normal prices again.<br>
-Or maybe you already got one, or try a Banana Pi or RockPi or whatever.&#160;<a href="#fnref:20" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+Or maybe you already got one, or try a Banana Pi or RockPi or whatever.&#160;<a href="#fnref:21" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </div>
