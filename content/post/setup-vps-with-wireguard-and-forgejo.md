@@ -32,7 +32,10 @@ Hopefully this Howto is also useful if you only want to do some of these things 
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).
 
 _**UPDATE:** There was a bug in the backup and monitoring scripts (shouldn't have used
- `bash_function | tee foolog.txt`), so I updated them accordingly._
+ `bash_function | tee foolog.txt`), so I updated them accordingly._  
+**UPDATE 2:** Added something about configuring 
+[`[git] HOME_PATH` in Forgejo's `app.ini`](#further-configuration-in-forgejos-appini), which works
+around [a Forgejo bug that prevents blobless clones](https://codeberg.org/forgejo/forgejo/issues/869).
 
 <!--more-->
 
@@ -1338,6 +1341,22 @@ I recommend the following changes (in the order of where I put them in the app.i
   ```
   I increased all timeouts to factor 10 (by adding a 0 at the end); probably not all these timeouts
   need to be increased (and if, then maybe not this much)... use your own judgement, this worked for me ;-)
+* As Forgejo is the only service running under the `git` user, it makes sense if it uses
+  `/home/git/.gitconfig` instead of its default of `/var/lib/forgejo/data/home/.gitconfig`,
+  which also [is currently buggy](https://codeberg.org/forgejo/forgejo/issues/869).
+  This also allows to use `git config --global foo.bar 123` *as `git` user* to modify git settings
+  on the server.  
+  Add the following section to app.ini:
+  ```ini
+  ;; use the .gitconfig in the git users homedir, makes customization easier
+  ;; also works around https://codeberg.org/forgejo/forgejo/issues/869
+  [git]
+  HOME_PATH = /home/git
+  ```
+  **and** copy the .gitconfig that has already been written to the other directory to `/home/git/`
+  and make sure that it belongs to the `git` user and group:  
+  `# cp /var/lib/forgejo/data/home/.gitconfig /home/git/`  
+  `# chown git:git /home/git/.gitconfig`
 * By default LFS files are stored in the filesystem, in `/var/lib/forgejo/data/lfs`.
   In the `[lfs]` section you can change the `PATH = ...` line to store elsewhere, but you can also
   configure Forgejo to store the files in an S3-like Object-Storage. More information on that in the
