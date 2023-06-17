@@ -29,7 +29,10 @@ You&rsquo;ll also need full root privileges on the system.
 Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).
 UPDATE: There was a bug in the backup and monitoring scripts (shouldn&rsquo;t have used
-bash_function | tee foolog.txt), so I updated them accordingly." />
+bash_function | tee foolog.txt), so I updated them accordingly.
+UPDATE 2: Added something about configuring
+[git] HOME_PATH in Forgejo&rsquo;s app.ini, which works
+around a Forgejo bug that prevents blobless clones." />
 
 <meta name="twitter:creator" content="@Doomed_Daniel" />
 <meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
@@ -188,7 +191,10 @@ You&rsquo;ll also need full <strong>root privileges</strong> on the system.</p>
 <p>Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).</p>
 <p><em><strong>UPDATE:</strong> There was a bug in the backup and monitoring scripts (shouldn&rsquo;t have used
-<code>bash_function | tee foolog.txt</code>), so I updated them accordingly.</em></p>
+<code>bash_function | tee foolog.txt</code>), so I updated them accordingly.</em><br>
+<strong>UPDATE 2:</strong> Added something about configuring
+<a href="#further-configuration-in-forgejos-appini"><code>[git] HOME_PATH</code> in Forgejo&rsquo;s <code>app.ini</code></a>, which works
+around <a href="https://codeberg.org/forgejo/forgejo/issues/869">a Forgejo bug that prevents blobless clones</a>.</p>
 <p><strong>Note:</strong> You&rsquo;ll often need to enter commands in the shell. The following convention will be used:</p>
 <p><code>$ some_command --some argument</code><br>
 means: Enter &ldquo;some_command --some argument&rdquo; (without quotes) in a Linux terminal, <em>as <strong>normal user</strong></em>.</p>
@@ -1288,6 +1294,20 @@ below the <code>[server]</code> section:
 </span></span><span class="line"><span class="cl"><span class="na">GC</span>      <span class="o">=</span> <span class="s">600  ; Git repository GC timeout seconds</span>
 </span></span></code></pre></div>I increased all timeouts to factor 10 (by adding a 0 at the end); probably not all these timeouts
 need to be increased (and if, then maybe not this much)&hellip; use your own judgement, this worked for me ;-)</li>
+<li>As Forgejo is the only service running under the <code>git</code> user, it makes sense if it uses
+<code>/home/git/.gitconfig</code> instead of its default of <code>/var/lib/forgejo/data/home/.gitconfig</code>,
+which also <a href="https://codeberg.org/forgejo/forgejo/issues/869">is currently buggy</a>.
+This also allows to use <code>git config --global foo.bar 123</code> <em>as <code>git</code> user</em> to modify git settings
+on the server.<br>
+Add the following section to app.ini:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1">;; use the .gitconfig in the git users homedir, makes customization easier</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;; also works around https://codeberg.org/forgejo/forgejo/issues/869</span>
+</span></span><span class="line"><span class="cl"><span class="k">[git]</span>
+</span></span><span class="line"><span class="cl"><span class="na">HOME_PATH</span> <span class="o">=</span> <span class="s">/home/git</span>
+</span></span></code></pre></div><strong>and</strong> copy the .gitconfig that has already been written to the other directory to <code>/home/git/</code>
+and make sure that it belongs to the <code>git</code> user and group:<br>
+<code># cp /var/lib/forgejo/data/home/.gitconfig /home/git/</code><br>
+<code># chown git:git /home/git/.gitconfig</code></li>
 <li>By default LFS files are stored in the filesystem, in <code>/var/lib/forgejo/data/lfs</code>.
 In the <code>[lfs]</code> section you can change the <code>PATH = ...</code> line to store elsewhere, but you can also
 configure Forgejo to store the files in an S3-like Object-Storage. More information on that in the

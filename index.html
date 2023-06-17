@@ -82,7 +82,10 @@ You&rsquo;ll also need full <strong>root privileges</strong> on the system.</p>
 <p>Hopefully this Howto is also useful if you only want to do some of these things (maybe set up
 a public Forgejo instance, or just a Wireguard server without Forgejo on it).</p>
 <p><em><strong>UPDATE:</strong> There was a bug in the backup and monitoring scripts (shouldn&rsquo;t have used
-<code>bash_function | tee foolog.txt</code>), so I updated them accordingly.</em></p>
+<code>bash_function | tee foolog.txt</code>), so I updated them accordingly.</em><br>
+<strong>UPDATE 2:</strong> Added something about configuring
+<a href="#further-configuration-in-forgejos-appini"><code>[git] HOME_PATH</code> in Forgejo&rsquo;s <code>app.ini</code></a>, which works
+around <a href="https://codeberg.org/forgejo/forgejo/issues/869">a Forgejo bug that prevents blobless clones</a>.</p>
                 <a href="./2023/05/28/server-with-wireguard-and-forgejo/"><i>Read More…</i></a>
               
             </div>
