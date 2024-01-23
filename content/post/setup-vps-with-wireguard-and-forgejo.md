@@ -35,7 +35,8 @@ _**UPDATE:** There was a bug in the backup and monitoring scripts (shouldn't hav
  `bash_function | tee foolog.txt`), so I updated them accordingly._  
 **UPDATE 2:** Added something about configuring 
 [`[git] HOME_PATH` in Forgejo's `app.ini`](#further-configuration-in-forgejos-appini), which works
-around [a Forgejo bug that prevents blobless clones](https://codeberg.org/forgejo/forgejo/issues/869).
+around [a Forgejo bug that prevents blobless clones](https://codeberg.org/forgejo/forgejo/issues/869).  
+**UPDATE 3:** Some small changes, and added a section about [denying Git users SSH access unless they're coming through the Wireguard VPN](#enforce-that-git-user-can-only-use-ssh-through-wireguard).
 
 <!--more-->
 
@@ -1194,9 +1195,13 @@ Now create the directories Forgejo will use and set access rights appropriately:
 
 `# mkdir /etc/forgejo`  
 `# chown root:git /etc/forgejo && chmod 770 /etc/forgejo`  
-*This is the directory Forgejos config, called `app.ini`, is stored in. Initially it needs to
-be writable by Forgejo, but after the installation you can make it read-only for Forgejo because
-then it shouldn't modify it anymore.*
+*This is the directory Forgejos config, called `app.ini`, is stored in. It needs to be writable by
+forgejo at least during the installation, and while Forgejo shouldn't add files after the installation
+is done and won't modify the `app.ini` during normal operation, it might modify the `app.ini` on updates
+(i.e. when first running a new version). So if, like suggested in some tutorials (and here as well,
+in an earlier version of the article), you make the directory and `app.ini` read-only for the git user
+after installation, keep in mind to make it writable again when doing an update - or just keep `app.ini`
+writable.*
 
 ## Optional: Set up database
 
@@ -1275,9 +1280,13 @@ So far, so good[^sowhat], but we're not quite done yet - some manual configurati
 Stop the forgejo service:  
 `# systemctl stop forgejo.service`
 
-While at it, make `/etc/forgejo/` and the `app.ini` read-only for the git user (Forgejo doesn't 
-write to it after the initial configuration):  
-`# chmod 750 /etc/forgejo && chmod 640 /etc/forgejo/app.ini`
+While at it, you could make `/etc/forgejo/` read-only for the git user (Forgejo shouldn't add any
+files after the initial configuration):  
+`# chmod 750 /etc/forgejo`  
+For the same reason you could make the app.ini read-only, like:  
+`# chmod 640 /etc/forgejo/app.ini`  
+*But note that Forgejo might still modify the app.ini later, especially when running a new version
+for the first time, which might add new options!*
 
 Now (as root) edit `/etc/forgejo/app.ini`
 
@@ -1376,6 +1385,39 @@ When you're done editing the app.ini, save it and start the forgejo service agai
 You can test sending a mail by clicking the user button on the upper right of the Forgejo page
 ("Profile and Settings"), then `Site Administration`, then `Configuration` and under
 `Mailer Configuration` type in your mail address and click `Send Testing Email`.
+
+## Enforce that git user can only use SSH through Wireguard
+
+While the Forgejo web-frontend can only be reached through Wireguard, accessing the Git repositories
+with SSH is still allowed from any IP (but of course secured through SSH public key authentication).
+
+If you fear that one of your users might accidentally expose their SSH private key (for example by
+uploading the configuration part of their $HOME directory to Github[^uploading-dotfiles]),
+as an additional safety-measure you could disallow the `git` user to login through SSH from any IP
+that's not in your Wireguard VPN. Other users can still log in from any IP, so make sure that *you*
+and other people with administrative access to the server don't publish your private key :-p
+
+> **NOTE:** If your server supports taking a snapshot, doing this now might be a good idea,
+> in case something goes wrong with the SSH configuration and you can't log in anymore.
+
+This is done by editing `/etc/ssh/sshd_config` (as root), and adding the following lines at
+the end of the file:
+
+```sh
+# only allow git user to login from wireguard VPN network (172.30.0.X)
+# by denying access from all IPs ("*") except for those ("!172.30.0.0/24")
+Match Address !172.30.0.0/24,*
+  DenyUsers git
+```
+
+If you're using a different network than 172.30.0.X for Wireguard, change the `Match Address` line accordingly.
+
+Now tell the sshd service to reload its configuration:  
+`# systemctl reload sshd`  
+and make sure that it went well:  
+`# systemctl status sshd`  
+(check the output for errors complaining about invalid configuration)
+
 
 ## General hints for using Forgejo
 
@@ -1896,7 +1938,7 @@ Some general restic tips:
   a year. Apparently `restic forget` itself is pretty fast, but to actually delete the data you need
   to call `# restic prune` afterwards which deletes unreferenced objects from the backup repository
   and might take a while (while `prune` is running you can't create new backups). After pruning, you
-  should run `# restic check` to make that the repository isn't damaged. See also
+  should run `# restic check` to make sure that the repository isn't damaged. See also
   [the restic docs on forget](https://restic.readthedocs.io/en/stable/060_forget.html) and
   [on check](https://restic.readthedocs.io/en/stable/045_working_with_repos.html#checking-integrity-and-consistency).  
   You may want to run `forget` and `prune` every once in a while, either manually or maybe once
@@ -2003,9 +2045,13 @@ Edit (as root) `/etc/apt/apt.conf.d/50unattended-upgrades` for further configura
   (that would be for 2am) - might make more sense to modify the systemd timers that control when
   updates are installed and leave this commented out[^upgradetime].
 
-> **NOTE:** If you don't want unattended-upgrades to reboot your system, but want to get a mail
-> telling you to reboot instead, that unfortunately isn't supported out of the box, but you
-> can write a custom script that checks if `/var/run/reboot-required` exists and
+> **NOTE:** Unlike an earlier version of this article (and some sources on the internet) claimed,
+> unattended-upgrades **will** send you a mail if you disabled automatic reboots and the system needs
+> to reboot, at least on Ubuntu 22.04; maybe not if you set `"only-on-error` though (didn't test that).  
+> The mail will have a subject like *"[reboot required] unattended-upgrades result for yourmachine.example.com: SUCCESS"*.
+>
+> If you want to use `"only-on-error"` and it indeed doesn't send a mail when rebooting is required,
+> you could write a custom script that checks if `/var/run/reboot-required` exists and
 > [sends an E-Mail](#testing-the-sendmail-command).
 > See also [this post on Ask Ubuntu](https://askubuntu.com/a/540973).
 
@@ -2443,6 +2489,9 @@ Earl Warren and 👾, for feedback on the article!
     based on this article :-)
 
 [^sowhat]: ... so what!
+
+[^uploading-dotfiles]: No, this has not happened to me or any of my coworkers, but 
+  [apparently it *does* happen sometimes..](https://github.blog/2023-03-23-we-updated-our-rsa-ssh-host-key/)
 
 [^storageprovider]: Some examples for comparison:
     * [Amazon S3](https://aws.amazon.com/s3/pricing/) $21/month for 1TB of storage, $90/TB for
