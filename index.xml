@@ -36,7 +36,8 @@ a public Forgejo instance, or just a Wireguard server without Forgejo on it).&lt
 &lt;code&gt;bash_function | tee foolog.txt&lt;/code&gt;), so I updated them accordingly.&lt;/em&gt;&lt;br&gt;
 &lt;strong&gt;UPDATE 2:&lt;/strong&gt; Added something about configuring
 &lt;a href=&#34;#further-configuration-in-forgejos-appini&#34;&gt;&lt;code&gt;[git] HOME_PATH&lt;/code&gt; in Forgejo&amp;rsquo;s &lt;code&gt;app.ini&lt;/code&gt;&lt;/a&gt;, which works
-around &lt;a href=&#34;https://codeberg.org/forgejo/forgejo/issues/869&#34;&gt;a Forgejo bug that prevents blobless clones&lt;/a&gt;.&lt;/p&gt;</description>
+around &lt;a href=&#34;https://codeberg.org/forgejo/forgejo/issues/869&#34;&gt;a Forgejo bug that prevents blobless clones&lt;/a&gt;.&lt;br&gt;
+&lt;strong&gt;UPDATE 3:&lt;/strong&gt; Some small changes, and added a section about &lt;a href=&#34;#enforce-that-git-user-can-only-use-ssh-through-wireguard&#34;&gt;denying Git users SSH access unless they&amp;rsquo;re coming through the Wireguard VPN&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
