@@ -33,7 +33,8 @@ bash_function | tee foolog.txt), so I updated them accordingly.
 UPDATE 2: Added something about configuring
 [git] HOME_PATH in Forgejo&rsquo;s app.ini, which works
 around a Forgejo bug that prevents blobless clones.
-UPDATE 3: Some small changes, and added a section about denying Git users SSH access unless they&rsquo;re coming through the Wireguard VPN." />
+UPDATE 3: Some small changes, and added a section about denying Git users SSH access unless they&rsquo;re coming through the Wireguard VPN.
+UPDATE 4: Replaced suggestions for using Hetzner or vultr with warnings about them." />
 
 <meta name="twitter:creator" content="@Doomed_Daniel" />
 <meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
@@ -197,7 +198,8 @@ a public Forgejo instance, or just a Wireguard server without Forgejo on it).</p
 <strong>UPDATE 2:</strong> Added something about configuring
 <a href="#further-configuration-in-forgejos-appini"><code>[git] HOME_PATH</code> in Forgejo&rsquo;s <code>app.ini</code></a>, which works
 around <a href="https://codeberg.org/forgejo/forgejo/issues/869">a Forgejo bug that prevents blobless clones</a>.<br>
-<strong>UPDATE 3:</strong> Some small changes, and added a section about <a href="#enforce-that-git-user-can-only-use-ssh-through-wireguard">denying Git users SSH access unless they&rsquo;re coming through the Wireguard VPN</a>.</p>
+<strong>UPDATE 3:</strong> Some small changes, and added a section about <a href="#enforce-that-git-user-can-only-use-ssh-through-wireguard">denying Git users SSH access unless they&rsquo;re coming through the Wireguard VPN</a>.<br>
+<strong>UPDATE 4:</strong> Replaced suggestions for using Hetzner or vultr with <a href="#fn:2">warnings about them</a>.</p>
 <p><strong>Note:</strong> You&rsquo;ll often need to enter commands in the shell. The following convention will be used:</p>
 <p><code>$ some_command --some argument</code><br>
 means: Enter &ldquo;some_command --some argument&rdquo; (without quotes) in a Linux terminal, <em>as <strong>normal user</strong></em>.</p>
@@ -285,7 +287,7 @@ This will create <code>/path/to/keyfile</code> (private key) and <code>/path/to/
 <h2 id="enabling-your-public-ssh-key-on-the-server">Enabling your public SSH key on the server</h2>
 <p>Of course you need to tell the server your SSH public key so it can use it to authenticate your
 connections. To do this, <strong>on the server</strong> edit the file <code>$HOME/.ssh/authorized_keys</code> (create it if
-it doesn&rsquo;t exist) and add a line with the contents or the public key file from your local machine
+it doesn&rsquo;t exist) and add a line with the contents of the public key file from your local machine
 (<code>$HOME/.ssh/id_rsa.pub</code> or <code>/path/to/keyfile.pub</code>).</p>
 <p>Verify that this works by logging out of the server and logging in again (if you&rsquo;re using an SSH
 key specific to this server, remember to pass the <code>-i /path/to/key</code> option to SSH).
@@ -2207,17 +2209,20 @@ more than 3TB storage their available VPSs stop scaling and we&rsquo;ll have to 
 their Object Storage offerings..<br>
 Either way this is <em>not</em> an endorsement for Contabo, we haven&rsquo;t used them for long enough to judge
 the overall quality of their service, and this Howto should work with any Linux server (VPS or dedicated).
-FWIW, the performance of the VPS itself has been fine so far.<br>
-Some other low-cost hosters I have at least a little (positive) experience with include
-<a href="https://www.hetzner.com/">Hetzner</a> (they offer dedicated servers for &lt; €50/month)
-and <a href="https://www.vultr.com/">vultr</a> (they also offer cheap S3-compatible Object Storage, but
-I don&rsquo;t know if their performance is better than Contabos..).<br>
-I can absolutely <strong>not</strong> recommend OVH, as their customers had to learn
+FWIW, the performance of the VPS itself has been fine so far.</p>
+<p><strong>Update - <em>WARNINGS</em></strong> <em>about some hosters:</em></p>
+<ul>
+<li>Do <em>not</em> use <em>Hetzner</em>, they <a href="https://woem.men/notes/9ragjwecxwul3nis">shut down customer accounts without valid reason</a>, sometimes they <a href="https://ursal.zone/@Ursalzona/112259839960115911">even refuse to give <em>any</em> reason and do it without a prior warning</a>!<br>
+Furthermore, <a href="https://ipleak.net/?q=afd.de">they host right-wing extremists</a>.</li>
+<li><em>vultr</em> is fishy, they apparently wanted to <a href="https://www.reddit.com/r/selfhosted/comments/1bouuv7/comment/kwtc3nb/">use all your data for whatever they want</a> (like AI training, presumably).<br>
+But at least they eventually backed off and <a href="https://www.vultr.com/news/a-note-about-vultrs-terms-of-service/">removed the questionable clause from their terms of service</a>.</li>
+<li>I can <em>not</em> recommend <em>OVH</em> either, as their customers had to learn
 <a href="https://blocksandfiles.com/2023/03/23/ovh-cloud-must-pay-damages-for-lost-backup-data/">the hard way</a>
 that OVH data centers are built out of wood and backups are stored in the same building as the
 backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
-get destroyed.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
+get destroyed.</li>
+</ul>
+&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></li>
 <li id="fn:3">
 <p>At least that&rsquo;s what one of the Gitea developers told me in the Forgejo chatroom.
 He said even <a href="https://try.gitea.io/">https://try.gitea.io/</a> uses sqlite, so it looks like it might be fine even with lots
