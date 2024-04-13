@@ -36,7 +36,8 @@ _**UPDATE:** There was a bug in the backup and monitoring scripts (shouldn't hav
 **UPDATE 2:** Added something about configuring 
 [`[git] HOME_PATH` in Forgejo's `app.ini`](#further-configuration-in-forgejos-appini), which works
 around [a Forgejo bug that prevents blobless clones](https://codeberg.org/forgejo/forgejo/issues/869).  
-**UPDATE 3:** Some small changes, and added a section about [denying Git users SSH access unless they're coming through the Wireguard VPN](#enforce-that-git-user-can-only-use-ssh-through-wireguard).
+**UPDATE 3:** Some small changes, and added a section about [denying Git users SSH access unless they're coming through the Wireguard VPN](#enforce-that-git-user-can-only-use-ssh-through-wireguard).  
+**UPDATE 4:** Replaced suggestions for using Hetzner or vultr with [warnings about them](#fn:2).
 
 <!--more-->
 
@@ -150,7 +151,7 @@ then `$ ssh example-host.com` will automatically set the username and the keyfil
 
 Of course you need to tell the server your SSH public key so it can use it to authenticate your
 connections. To do this, **on the server** edit the file `$HOME/.ssh/authorized_keys` (create it if
-it doesn't exist) and add a line with the contents or the public key file from your local machine
+it doesn't exist) and add a line with the contents of the public key file from your local machine
 (`$HOME/.ssh/id_rsa.pub` or `/path/to/keyfile.pub`).
 
 Verify that this works by logging out of the server and logging in again (if you're using an SSH
@@ -2367,12 +2368,14 @@ Earl Warren and 👾, for feedback on the article!
     their Object Storage offerings..  
     Either way this is *not* an endorsement for Contabo, we haven't used them for long enough to judge
     the overall quality of their service, and this Howto should work with any Linux server (VPS or dedicated).
-    FWIW, the performance of the VPS itself has been fine so far.  
-    Some other low-cost hosters I have at least a little (positive) experience with include
-    [Hetzner](https://www.hetzner.com/) (they offer dedicated servers for < €50/month)
-    and [vultr](https://www.vultr.com/) (they also offer cheap S3-compatible Object Storage, but 
-    I don't know if their performance is better than Contabos..).  
-    I can absolutely **not** recommend OVH, as their customers had to learn 
+    FWIW, the performance of the VPS itself has been fine so far.
+
+    **Update - _WARNINGS_** _about some hosters:_
+    - Do *not* use *Hetzner*, they [shut down customer accounts without valid reasons](https://woem.men/notes/9ragjwecxwul3nis), sometimes they [even refuse to give *any* reason and do it without a prior warning](https://ursal.zone/@Ursalzona/112259839960115911)!  
+    Furthermore, [they host right-wing extremists](https://ipleak.net/?q=afd.de).
+    - *vultr* is fishy, they apparently wanted to [use all your data for whatever they want](https://www.reddit.com/r/selfhosted/comments/1bouuv7/comment/kwtc3nb/) (like AI training, presumably).  
+    But at least they eventually backed off and [removed the questionable clause from their terms of service](https://www.vultr.com/news/a-note-about-vultrs-terms-of-service/).
+    - I can *not* recommend *OVH* either, as their customers had to learn 
     [the hard way](https://blocksandfiles.com/2023/03/23/ovh-cloud-must-pay-damages-for-lost-backup-data/)
     that OVH data centers are built out of wood and backups are stored in the same building as the
     backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
