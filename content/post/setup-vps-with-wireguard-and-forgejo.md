@@ -37,7 +37,7 @@ _**UPDATE:** There was a bug in the backup and monitoring scripts (shouldn't hav
 [`[git] HOME_PATH` in Forgejo's `app.ini`](#further-configuration-in-forgejos-appini), which works
 around [a Forgejo bug that prevents blobless clones](https://codeberg.org/forgejo/forgejo/issues/869).  
 **UPDATE 3:** Some small changes, and added a section about [denying Git users SSH access unless they're coming through the Wireguard VPN](#enforce-that-git-user-can-only-use-ssh-through-wireguard).  
-**UPDATE 4:** Replaced suggestions for using Hetzner or vultr with [warnings about them](#fn:2).
+**UPDATE 4:** Replaced suggestion for using Hetzner with a [warning about them](#fn:2).
 
 <!--more-->
 
@@ -2373,13 +2373,13 @@ Earl Warren and 👾, for feedback on the article!
     **Update - _WARNINGS_** _about some hosters:_
     - Do *not* use *Hetzner*, they [shut down customer accounts without valid reasons](https://woem.men/notes/9ragjwecxwul3nis), sometimes they [even refuse to give *any* reason and do it without a prior warning](https://ursal.zone/@Ursalzona/112259839960115911)!  
     Furthermore, [they host right-wing extremists](https://ipleak.net/?q=afd.de).
-    - *vultr* is fishy, they apparently wanted to [use all your data for whatever they want](https://www.reddit.com/r/selfhosted/comments/1bouuv7/comment/kwtc3nb/) (like AI training, presumably).  
-    But at least they eventually backed off and [removed the questionable clause from their terms of service](https://www.vultr.com/news/a-note-about-vultrs-terms-of-service/).
     - I can *not* recommend *OVH* either, as their customers had to learn 
     [the hard way](https://blocksandfiles.com/2023/03/23/ovh-cloud-must-pay-damages-for-lost-backup-data/)
     that OVH data centers are built out of wood and backups are stored in the same building as the
     backed up servers, so if a fire breaks out, it burns well and both the servers and the backups
     get destroyed.
+    - *vultr* seemed fishy, they seemingly wanted to [use all your data for whatever they want](https://www.reddit.com/r/selfhosted/comments/1bouuv7/comment/kwtc3nb/) (like AI training, presumably).  
+    But they eventually backed off and [removed the questionable clause from their terms of service](https://www.vultr.com/news/a-note-about-vultrs-terms-of-service/) - seems plausible that they indeed had no ill intentions.
 
 [^sqlite]: At least that's what one of the Gitea developers told me in the Forgejo chatroom.
     He said even https://try.gitea.io/ uses sqlite, so it looks like it might be fine even with lots
