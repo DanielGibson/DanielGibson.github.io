@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.108.0">
+
+
+<title>Introduction to Git Gui - ./gibson.sh --blog</title>
+<meta property="og:title" content="Introduction to Git Gui - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="In my experience, git gui is a very useful tool for committing changes to Git.
+It makes it very easy to review your own changes before committing them, and only committing the
+changes you actually want to commit, instead of all changes in a file.
+This helps avoid committing debug prints, temporary hacks used during debugging, TODO comments
+of things you just implemented and other things that can otherwise easily be committed accidentally." />
+
+<meta name="twitter:creator" content="@Doomed_Daniel" />
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
+
+<link rel="me" href="https://mastodon.gamedev.place/@Doomed_Daniel" />
+
+
+
+<link rel="stylesheet" href="../../../../css/main.css" media="all" />
+<link rel="stylesheet" href="../../../../css/fonts.css" />
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo" title="Home">
+    <img src="../../../../images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="../../../../">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+    <li><a href="https://mastodon.gamedev.place/@Doomed_Daniel">Mastodon</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">Introduction to Git Gui</h1>
+
+    
+    <span class="article-date">February 7, 2025</span>
+    
+
+    <br>
+    <div class="toc">
+      <b>Table of Contents:</b>
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#installing-git-gui">Installing Git Gui</a>
+      <ul>
+        <li><a href="#on-windows">On Windows</a></li>
+        <li><a href="#on-linux-and-similar-operating-systems">On Linux and similar operating systems</a></li>
+        <li><a href="#on-macos">On macOS</a></li>
+      </ul>
+    </li>
+    <li><a href="#git-gui-overview">Git Gui overview</a>
+      <ul>
+        <li><a href="#1-unstaged-changes">1 <em>Unstaged Changes</em></a></li>
+        <li><a href="#2-staged-changes">2 <em>Staged Changes</em></a></li>
+        <li><a href="#3-diff-view">3 <em>Diff View</em></a></li>
+        <li><a href="#4-commit-message">4 <em>Commit Message</em></a></li>
+      </ul>
+    </li>
+    <li><a href="#diff-view-details">Diff View details</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#bonus-how-to-make-the-diff-view-colorblind-friendly">Bonus: How to make the diff view colorblind friendly</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div class="article-content">
+      <p>In my experience, <code>git gui</code> is a very useful tool for committing changes to <a href="https://en.wikipedia.org/wiki/Git">Git</a>.<br>
+It makes it very easy to review your own changes before committing them, and only committing the
+changes you actually want to commit, instead of all changes in a file.</p>
+<p>This helps avoid committing debug prints, temporary hacks used during debugging, TODO comments
+of things you just implemented and other things that can otherwise easily be committed accidentally.</p>
+<p>Of course other similar tools exist, for example <a href="https://git-cola.github.io/">Git Cola</a>.
+I prefer Git Gui because it starts very quickly, is generally fast/responsive and often is already
+installed. Use whatever you want, but this article is about Git Gui ;)</p>
+<h1 id="installing-git-gui">Installing Git Gui</h1>
+<p>If you have git installed (if you don&rsquo;t, this article probably isn&rsquo;t very relevant for you :-p),
+chances are good you already have Git Gui.</p>
+<p>To check if you have it, open a terminal and enter <code>git gui</code>. If it&rsquo;s installed, a &ldquo;Git Gui&rdquo; window
+will open.<br>
+On Windows you can usually also open it through the context menu in the explorer,
+see below for a screenshot.</p>
+<p>If it&rsquo;s not installed, install it:</p>
+<h2 id="on-windows">On Windows</h2>
+<p>I have the regular Windows version of git from <a href="https://git-scm.com/downloads/win">https://git-scm.com/downloads/win</a> installed,
+and my Explorer context menu looks like this:</p>
+<p><img src="../../../../images/git-gui-win-contextmenu.png" alt="Windows Explorer context menu with Git Gui entry"></p>
+<p>So I can select &ldquo;Git GUI Here&rdquo; to open <em>git gui</em> for the project of the current folder.</p>
+<p>If you <strong>don&rsquo;t have this</strong>, install it. Either from the link above, or from <a href="https://gitforwindows.org/">https://gitforwindows.org/</a> - in
+the end both lead to the same downloads.
+The installers for Git for Windows contain Git GUI, though it could be that they only <em>optionally</em> install Git GUI (and the related <em>gitk</em> tool) and that the Shell integration (Explorer Context menu entries for &ldquo;Git Bash Here&rdquo; and &ldquo;Git GUI Here&rdquo;) is optional as well; in that case make sure all that is enabled in the installer.</p>
+<p>If you happen to be using Tortoise Git, it also uses standard Git for Windows under the hood and
+<a href="https://tortoisegit.org/docs/tortoisegit/tgit-intro-install.html#idm256">according to the documentation</a>
+requires you to install it first.<br>
+If you use some other GUI-based Git frontend, I don&rsquo;t know if it requires or comes with Git for Windows,
+but it should be possible to use Git for Windows incl. Git Gui and other Git tools in parallel.
+In the end they operate on the same local clone of a Git repository..</p>
+<h2 id="on-linux-and-similar-operating-systems">On Linux and similar operating systems</h2>
+<p>Your Linux (or BSD or whatever) distribution should come with a package manager that should provide
+a git gui package. Install that.<br>
+When using <a href="https://debian.org">debian</a> or one of its derivatives like <a href="https://ubuntu.com">Ubuntu</a>
+or <a href="https://linuxmint.com/">Linux Mint</a>, this can be done with:<br>
+<code>$ sudo apt install git-gui</code></p>
+<h2 id="on-macos">On macOS</h2>
+<p>If you use homebrew, you can install it with<br>
+<code>$ sudo brew install git-gui</code></p>
+<h1 id="git-gui-overview">Git Gui overview</h1>
+<p>When opened in a directory that&rsquo;s part of a checked out Git repository, Git Gui looks kinda like this:</p>
+<p><a href="../../../../images/git-gui-overview.png" title="Click for full size"><img src="../../../../images/git-gui-overview.png" alt="the Git Gui window" width=800></a><br>
+(Note: This and the following screenshots are from Linux, but Git GUI looks and behaves the same. Also note that usually the diff view uses red and green for removed and added lines, I patched mine to use red and blue because I&rsquo;m red-green colorblind.)<br>
+I have added those big red numbers, they&rsquo;re not actually there.</p>
+<h2 id="1-unstaged-changes">1 <em>Unstaged Changes</em></h2>
+<p>This is the list of files with <em>Unstaged Changes</em>. Those are changes that have been made but are not part of any commit (not even the one you&rsquo;re currently creating).<br>
+Adding changes to the commit you&rsquo;re currently working on is called &ldquo;staging changes&rdquo;.</p>
+<ul>
+<li>The little <strong>blue</strong> file icons left of the filenames indicate files that are <em>already known to git</em></li>
+<li>The <strong>white</strong> (blank) file icons are for <em>new</em> files that are not yet handled by git at all.</li>
+<li>Little file icons with a <strong>question mark</strong> indicate files that have been in git (up to the last commit) but are now missing, i.e. have been <em>deleted</em> (I deleted <code>AF.*</code> for demonstration purposes).</li>
+</ul>
+<p>If you <strong>click</strong> one of those <strong>file icons</strong> in the <em>Unstaged Changes</em> list, <em>all changes in the file will be staged</em> (or in case of removed files, the fact that it&rsquo;s removed is staged, or for new files it gets added to git).</p>
+<p>You can also select multiple files from the list (as usual, with click+Ctrl or click+Shift) and then click the <code>Commit</code> <strong>menu</strong> and there <code>Stage To Commit</code> (or press Ctrl-T).</p>
+<h2 id="2-staged-changes">2 <em>Staged Changes</em></h2>
+<p>This is the list of files with <em>Staged Changes</em>. Those are changes that will be part of the commit you&rsquo;re currently creating (unless you unstage them again).</p>
+<ul>
+<li>File icons with a <strong>green checkmark</strong> indicate files that <em>have changes</em></li>
+<li>File icons with a <strong>red x</strong> indicate files that are removed (i.e. you <em>staged</em> a file with a questionmark icon in the Unstaged Changes list - without that the fact that the file is removed would not be committed!)</li>
+<li>A <strong>white/blank</strong> file icon indicates new files that are being added to git with the currently edited commit</li>
+</ul>
+<p>If you <strong>click</strong> one of the <strong>file icons</strong> in the <em>Staged Changes</em> list, <em>all changes in the file will be unstaged</em>, which means it will just turn up in the &ldquo;Unstaged Changes&rdquo; list again.</p>
+<p>Again, you can select multiple files, click the <code>Commit</code> <strong>menu</strong> and this time <code>Unstage From Commit</code> (or press Ctrl-U) to unstage multiple files at once.</p>
+<h2 id="3-diff-view">3 <em>Diff View</em></h2>
+<p>The <em>diff view</em> shows the changes for the currently selected file.<br>
+You can <em>select</em> a file by <strong>clicking the filename/path</strong> in the <em>Unstaged Changes</em> list or the <em>Staged Changes</em> list.<br>
+If you selected a file from the <em>Unstaged Changes</em> list, the diff view shows all unstaged changes in that file, i.e. the changes that exist in your working copy, but haven&rsquo;t been committed yet. The diff view also allows to stage just parts of the file; more on that below.<br>
+If you selected a file from the <em>Staged Changes</em> list, the diff view shows all staged changes in that file, i.e. the changes that will be part of the currently edited commit (unless you unstage them again). Again, the diff view allows unstaging parts of the file, see below.</p>
+<h2 id="4-commit-message">4 <em>Commit Message</em></h2>
+<p>This allows you to write the commit message for the currently edited commit.<br>
+You should leave an empty line after the first line.<br>
+You should also generally try to avoid lines that are longer than that input field, unless
+you can absolutely not avoid it (e.g. because you want to add an URL to the commit message and it&rsquo;s too long).
+When the commit is done, you can click the <code>[Commit]</code> <strong>button</strong> to the left of that field to create a commit with the message you entered and all changes that are in the <em>Staged Changes</em> list.</p>
+<ul>
+<li>The <code>[Push]</code> button allows pushing local commits to a git server.</li>
+<li>The <code>[ ] Amend Last Commit</code> checkbox allows editing the last commit, for example if you have already clicked &ldquo;Commit&rdquo; but noticed that you were missing changes or made a typo in the commit message or whatever. If you have <em>already pushed the commit</em>, amending it will lead to conflicts! In feature branches for Pull Requests this is ok, you can just force-push the changes, but don&rsquo;t do this in the main/master branch or similar branches that other people use!</li>
+<li>The <code>[Rescan]</code> button makes Git GUI check if there have been any changes since Git GUI has been opened, for example because you edited source files in your code editor.</li>
+<li>The <code>[Stage Changed]</code> button stages all <em>Unstaged Changes</em> - usually you should not do this, but instead stage changes using the diff view. Remember that even if you want to stage all the changes of several files (or add several new files), the <em>Unstaged Changes</em> list lets you select multiple files that you can stage with <code>Commit</code> menu -&gt; <code>Stage To Commit</code> (or by pressing Ctrl-T), which IMHO is a better way to do this with more control.
+OTOH you can of course still unstage changes to clean up when using this button.</li>
+<li>The <code>[Sign Off]</code> button adds a line to the commit message that&rsquo;s like <code>Signed-off-by: Your Name &lt;your@email.example&gt;</code>. It&rsquo;s mostly relevant for the Linux kernel workflow and similar, not for most projects on Github or similar code forges.</li>
+</ul>
+<h1 id="diff-view-details">Diff View details</h1>
+<p>You can right-click in the diff view to get a context menu:
+<a href="../../../../images/git-gui-diff1.png" title="Click for full size"><img src="../../../../images/git-gui-diff1.png" alt="Git Gui diff view" width=800></a></p>
+<p>This is how you can commit (actually: stage or unstage) just <em>some</em> changes.<br>
+<em>Stage Hunk For Commit</em> would stage all changes from the <em>Hunk</em> you right-clicked in.<br>
+A &ldquo;Hunk&rdquo; is basically a block of changes that are close to each other - after one line that starts with <code>@@ -123,45 ...</code>, to the next similar line (or end of the file if it was the last or only hunk in that file).
+<em>Stage Line For Commit</em> would stage just the line the cursor is currently in. So in this example, the removal of the <code>headModel = spawnArgs.GetString( &quot;def_head&quot;, &quot;&quot; );</code> line would be staged, but the added lines below not.</p>
+<p>Of course (un)staging just a single line isn&rsquo;t always that much fun, so Git GUI also allows you to select multiple lines:
+<a href="../../../../images/git-gui-diff2.png" title="Click for full size"><img src="../../../../images/git-gui-diff2.png" alt="Git Gui diff view multiple lines selected" width=800></a>
+<em>(Note that this time I chose a file from the <em>Staged Changes</em> list, so it says <em><strong>Un</strong>stage Hunk From Commit</em>. Of course selecting multiple lines works for both staged and unstaged changes.)</em></p>
+<p>So now you can (un)stage all selected lines at once.
+Note that only whole lines can be committed, so even though in my screenshot I&rsquo;ve been a bit sloppy and the first and last line are only <em>selected</em> partially, <em>Unstage Lines from Commit</em> would <em>unstage the <strong>full lines</strong></em>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>I hope this helps getting into Git GUI, and that it&rsquo;s clear now how to commit just relevant changes (scroll through the diff view and stage the hunks you want, or select the lines you want and stage them - or first stage the whole file and then use the diff view from the Staged Changes list to unstage changes you don&rsquo;t want in this. Both ways are valid and useful, depending on the situation).</p>
+<p>By the way, if you&rsquo;re done committing changes and have <em>Unstaged Changes</em> that you want to get rid of, you can select the file(s) in the <em>Unstaged Changes</em> list, click the <code>Commit</code> <strong>menu</strong> and select <code>Revert Changes</code>. Afterwards the selected file(s) will be in the state of the latest commit (probably the one you just created) and the other local changes to them are gone.</p>
+<p>Another useful tool that actually kinda integrates with Git Gui (and often is installed with it)
+is <code>gitk</code>. It allows browsing and searching the commit history</p>
+<p><a href="../../../../images/gitk.png" title="Click for full size"><img src="../../../../images/gitk.png" alt="gitk" width=800></a><br>
+(unlike Git Gui it actually allows configuring the colors used in diffs)</p>
+<h1 id="bonus-how-to-make-the-diff-view-colorblind-friendly">Bonus: How to make the diff view colorblind friendly</h1>
+<p>If you&rsquo;d also like your Git Gui to use red and blue instead of red and green for diffs, you
+can patch the <code>git-gui</code> Tcl/Tk script with the following patch (save as <code>git-gui-colorblind.diff</code>):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-diff" data-lang="diff"><span class="line"><span class="cl">#!/bin/sh
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">patch -d /usr/lib/git-core/ &lt; `realpath $0`
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">exit 0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gd">--- /tmp/git-gui        2022-04-25 03:36:29.164807261 +0200
+</span></span></span><span class="line"><span class="cl"><span class="gd"></span><span class="gi">+++ git-gui     2022-04-25 03:38:22.553314531 +0200
+</span></span></span><span class="line"><span class="cl"><span class="gi"></span><span class="gu">@@ -3588,19 +3588,19 @@
+</span></span></span><span class="line"><span class="cl"><span class="gu"></span> 
+</span></span><span class="line"><span class="cl"> $ui_diff tag conf d_cr -elide true
+</span></span><span class="line"><span class="cl"> $ui_diff tag conf d_@ -font font_diffbold
+</span></span><span class="line"><span class="cl"><span class="gd">-$ui_diff tag conf d_+ -foreground {#00a000}
+</span></span></span><span class="line"><span class="cl"><span class="gd"></span><span class="gi">+$ui_diff tag conf d_+ -foreground blue
+</span></span></span><span class="line"><span class="cl"><span class="gi"></span> $ui_diff tag conf d_- -foreground red
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="gd">-$ui_diff tag conf d_++ -foreground {#00a000}
+</span></span></span><span class="line"><span class="cl"><span class="gd"></span><span class="gi">+$ui_diff tag conf d_++ -foreground blue
+</span></span></span><span class="line"><span class="cl"><span class="gi"></span> $ui_diff tag conf d_-- -foreground red
+</span></span><span class="line"><span class="cl"> $ui_diff tag conf d_+s \
+</span></span><span class="line"><span class="cl"><span class="gd">-       -foreground {#00a000} \
+</span></span></span><span class="line"><span class="cl"><span class="gd"></span><span class="gi">+       -foreground blue \
+</span></span></span><span class="line"><span class="cl"><span class="gi"></span>        -background {#e2effa}
+</span></span><span class="line"><span class="cl"> $ui_diff tag conf d_-s \
+</span></span><span class="line"><span class="cl">        -foreground red \
+</span></span><span class="line"><span class="cl">        -background {#e2effa}
+</span></span><span class="line"><span class="cl"> $ui_diff tag conf d_s+ \
+</span></span><span class="line"><span class="cl"><span class="gd">-       -foreground {#00a000} \
+</span></span></span><span class="line"><span class="cl"><span class="gd"></span><span class="gi">+       -foreground blue \
+</span></span></span><span class="line"><span class="cl"><span class="gi"></span>        -background ivory1
+</span></span><span class="line"><span class="cl"> $ui_diff tag conf d_s- \
+</span></span><span class="line"><span class="cl">        -foreground red \
+</span></span></code></pre></div><p>Yes, this patch also happens to be a shellscript (<code>patch</code> ignores everything before the first
+line that starts with <code>---</code>) that patches <code>git-gui</code> in the standard (Linux) installation location.</p>
+<p>If your <code>git-gui</code> Tcl/Tk script also lies in <code>/usr/lib/git-core/git-gui</code>, you can just run<br>
+<code>$ sudo sh ./git-gui-colorblind.diff</code><br>
+to apply it. Otherwise change the path in the script or run <code>patch</code> manually - or just replace all
+occurrences of <code>{#00a000}</code> with <code>blue</code>.</p>
+<p>It&rsquo;s handy to have a working script to do this, because every time git/git-gui is updated, you&rsquo;ll
+have to apply it again&hellip; I hope they eventually add proper settings for the diff colors so they can
+be configured without patching the script.</p>
+<p>On <strong>Windows</strong> the git-gui script can be found at<br>
+<code>C:\Program Files\Git\mingw64\libexec\git-core\git-gui.tcl</code><br>
+(assuming you installed the 64bit version to the standard installation directory).<br>
+You&rsquo;ll need Administrator privileges to modify it.</p>
+    </div>
+  </article>
+
+  
+
+  <hr>
+
+  <div id="gh-comments">
+    <h4>COMMENTS</h4>
+    <div id="gh-comments-list"></div>
+    <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/14"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
+  </div>
+
+  <script type="text/javascript" src="../../../../js/github-comments.js"></script>
+  <script type="text/javascript">
+    DoGithubComments( 14 );
+  </script>
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  for(h=1; h<=6; ++h) 
+  {
+    var hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+

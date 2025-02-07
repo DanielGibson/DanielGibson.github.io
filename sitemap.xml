@@ -3,7 +3,10 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://blog.gibson.sh/</loc>
-    <lastmod>2023-05-28T02:30:20+02:00</lastmod>
+    <lastmod>2025-02-07T13:08:20+02:00</lastmod>
+  </url><url>
+    <loc>http://blog.gibson.sh/2025/02/07/git-gui-introduction/</loc>
+    <lastmod>2025-02-07T13:08:20+02:00</lastmod>
   </url><url>
     <loc>http://blog.gibson.sh/2023/05/28/server-with-wireguard-and-forgejo/</loc>
     <lastmod>2023-05-28T02:30:20+02:00</lastmod>

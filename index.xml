@@ -6,7 +6,20 @@
     <description>Recent content on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 28 May 2023 02:30:20 +0200</lastBuildDate><atom:link href="http://blog.gibson.sh/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Feb 2025 13:08:20 +0200</lastBuildDate><atom:link href="http://blog.gibson.sh/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Introduction to Git Gui</title>
+      <link>http://blog.gibson.sh/2025/02/07/git-gui-introduction/</link>
+      <pubDate>Fri, 07 Feb 2025 13:08:20 +0200</pubDate>
+      
+      <guid>http://blog.gibson.sh/2025/02/07/git-gui-introduction/</guid>
+      <description>&lt;p&gt;In my experience, &lt;code&gt;git gui&lt;/code&gt; is a very useful tool for committing changes to &lt;a href=&#34;https://en.wikipedia.org/wiki/Git&#34;&gt;Git&lt;/a&gt;.&lt;br&gt;
+It makes it very easy to review your own changes before committing them, and only committing the
+changes you actually want to commit, instead of all changes in a file.&lt;/p&gt;
+&lt;p&gt;This helps avoid committing debug prints, temporary hacks used during debugging, TODO comments
+of things you just implemented and other things that can otherwise easily be committed accidentally.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>How to set up a Linux server to host git with LFS behind a VPN</title>
       <link>http://blog.gibson.sh/2023/05/28/server-with-wireguard-and-forgejo/</link>
@@ -38,7 +51,7 @@ a public Forgejo instance, or just a Wireguard server without Forgejo on it).&lt
 &lt;a href=&#34;#further-configuration-in-forgejos-appini&#34;&gt;&lt;code&gt;[git] HOME_PATH&lt;/code&gt; in Forgejo&amp;rsquo;s &lt;code&gt;app.ini&lt;/code&gt;&lt;/a&gt;, which works
 around &lt;a href=&#34;https://codeberg.org/forgejo/forgejo/issues/869&#34;&gt;a Forgejo bug that prevents blobless clones&lt;/a&gt;.&lt;br&gt;
 &lt;strong&gt;UPDATE 3:&lt;/strong&gt; Some small changes, and added a section about &lt;a href=&#34;#enforce-that-git-user-can-only-use-ssh-through-wireguard&#34;&gt;denying Git users SSH access unless they&amp;rsquo;re coming through the Wireguard VPN&lt;/a&gt;.&lt;br&gt;
-&lt;strong&gt;UPDATE 4:&lt;/strong&gt; Replaced suggestions for using Hetzner or vultr with &lt;a href=&#34;#fn:2&#34;&gt;warnings about them&lt;/a&gt;.&lt;/p&gt;</description>
+&lt;strong&gt;UPDATE 4:&lt;/strong&gt; Replaced suggestion for using Hetzner with a &lt;a href=&#34;#fn:2&#34;&gt;warning about them&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
