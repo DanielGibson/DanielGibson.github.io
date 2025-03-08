@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Eclipse on ./gibson.sh --blog</title>
+    <link>http://blog.gibson.sh/tags/eclipse/</link>
+    <description>Recent content in Eclipse on ./gibson.sh --blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 08 Mar 2025 05:08:20 +0200</lastBuildDate>
+    <atom:link href="http://blog.gibson.sh/tags/eclipse/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Setting up C/C&#43;&#43; Projects in Eclipse CDT</title>
+      <link>http://blog.gibson.sh/2025/03/08/eclipse-cdt-setup/</link>
+      <pubDate>Sat, 08 Mar 2025 05:08:20 +0200</pubDate>
+      <guid>http://blog.gibson.sh/2025/03/08/eclipse-cdt-setup/</guid>
+      <description>How to import a C/C++ project into Eclipse CDT I&amp;rsquo;ve been using the Eclipse IDE with its &amp;ldquo;CDT&amp;rdquo; C++ plugin (the Eclipse IDE for C/C++ Developers package) since forever, basically.&#xA;It&amp;rsquo;s generally great, but setting up a project can be a PITA, as it&amp;rsquo;s not exactly intuitive if you want it to actually work.&#xA;First, forget about CMake&amp;rsquo;s ability to generate Eclipse projects, those are in a very outdated format and while Eclipse does open them, they don&amp;rsquo;t work particularly well.</description>
+    </item>
+  </channel>
+</rss>

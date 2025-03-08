@@ -1,30 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Gnome Keyring on ./gibson.sh --blog</title>
+    <title>Gnome-Keyring on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/gnome-keyring/</link>
-    <description>Recent content in Gnome Keyring on ./gibson.sh --blog</description>
+    <description>Recent content in Gnome-Keyring on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 05 May 2010 02:41:30 +0200</lastBuildDate>
-    
-	<atom:link href="http://blog.gibson.sh/tags/gnome-keyring/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <atom:link href="http://blog.gibson.sh/tags/gnome-keyring/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Unlock gnome-keyring on Login with SLiM and PAM</title>
       <link>http://blog.gibson.sh/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/</link>
       <pubDate>Wed, 05 May 2010 02:41:30 +0200</pubDate>
-      
       <guid>http://blog.gibson.sh/2010/05/05/unlock-gnome-keyring-on-login-with-slim-and-pam/</guid>
-      <description>&lt;p&gt;My favorite desktop environment is &lt;a href=&#34;http://www.xfce.org/&#34;&gt;XFCE&lt;/a&gt;, because it&amp;rsquo;s fast, doesn&amp;rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).
-I also use &lt;a href=&#34;https://github.com/iwamatsu/slim&#34;&gt;SLiM&lt;/a&gt; as a display manager because it is slim and looks much better than xdm.&lt;/p&gt;
-
-&lt;p&gt;On my Laptop I also use GNOME&amp;rsquo;s &lt;a href=&#34;http://projects.gnome.org/NetworkManager/&#34;&gt;NetworkManager&lt;/a&gt; because I haven&amp;rsquo;t yet found a better and less bloated alternative for handling wireless networks and VPNs.
-NetworkManager is able to store your passwords (WPA-keys etc) in the &lt;a href=&#34;http://live.gnome.org/GnomeKeyring&#34;&gt;GNOME Keyring&lt;/a&gt; so you don&amp;rsquo;t need to enter them each time your laptop connects to a wireless network. But you still have to enter the password to unlock the keyring.. &lt;em&gt;&lt;strong&gt;unless&lt;/strong&gt;&lt;/em&gt; you let &lt;a href=&#34;http://en.wikipedia.org/wiki/Pluggable_Authentication_Modules&#34;&gt;PAM&lt;/a&gt; handle that on login.
-
-I&amp;rsquo;ll describe how to make PAM unlock your GNOME-Keyring, when you log in with SLiM, so applications like the NetworkManager can access the keyring. I&amp;rsquo;ll focus on how to do that with &lt;a href=&#34;http://debian.org&#34;&gt;Debian&lt;/a&gt; &amp;ldquo;squeeze&amp;rdquo; (the current testing), but it should be directly applicable for Ubuntu (at least &amp;ldquo;Lucid&amp;rdquo;, for older versions you&amp;rsquo;ll have to build your own slim package with PAM support - or maybe use the one from debian) and quite similar in any other Linux distribution.&lt;/p&gt;</description>
+      <description>&lt;p&gt;My favorite desktop environment is &lt;a href=&#34;http://www.xfce.org/&#34;&gt;XFCE&lt;/a&gt;, because it&amp;rsquo;s fast, doesn&amp;rsquo;t need much memory¹ and still is convenient (automounting of CDs and memory sticks, easy unmounting by clicking, a real desktop, etc).&#xA;I also use &lt;a href=&#34;https://github.com/iwamatsu/slim&#34;&gt;SLiM&lt;/a&gt; as a display manager because it is slim and looks much better than xdm.&lt;/p&gt;&#xA;&lt;p&gt;On my Laptop I also use GNOME&amp;rsquo;s &lt;a href=&#34;http://projects.gnome.org/NetworkManager/&#34;&gt;NetworkManager&lt;/a&gt; because I haven&amp;rsquo;t yet found a better and less bloated alternative for handling wireless networks and VPNs.&#xA;NetworkManager is able to store your passwords (WPA-keys etc) in the &lt;a href=&#34;http://live.gnome.org/GnomeKeyring&#34;&gt;GNOME Keyring&lt;/a&gt; so you don&amp;rsquo;t need to enter them each time your laptop connects to a wireless network. But you still have to enter the password to unlock the keyring.. &lt;em&gt;&lt;strong&gt;unless&lt;/strong&gt;&lt;/em&gt; you let &lt;a href=&#34;http://en.wikipedia.org/wiki/Pluggable_Authentication_Modules&#34;&gt;PAM&lt;/a&gt; handle that on login.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

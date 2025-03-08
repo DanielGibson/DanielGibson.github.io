@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Compression on ./gibson.sh --blog</title>
@@ -7,25 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Jul 2015 02:29:24 +0000</lastBuildDate>
-    
-	<atom:link href="http://blog.gibson.sh/tags/compression/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <atom:link href="http://blog.gibson.sh/tags/compression/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Comparing png compression ratios of stb_image_write, LodePNG, miniz and libpng</title>
       <link>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</link>
       <pubDate>Sat, 18 Jul 2015 02:29:24 +0000</pubDate>
-      
       <guid>http://blog.gibson.sh/2015/07/18/comparing-png-compression-ratios-of-stb_image_write-lodepng-miniz-and-libpng/</guid>
-      <description>&lt;p&gt;Because of &lt;a href=&#34;https://github.com/nothings/stb/issues/113&#34;&gt;https://github.com/nothings/stb/issues/113&lt;/a&gt; I was wondering how good/bad
-stb_image_write&amp;rsquo;s PNG compression really is in comparison to other encoders.&lt;/p&gt;
-
-&lt;p&gt;So I did a quick comparison between stb_image_write (v0.98) LodePNG (version 20150418),
-miniz&amp;rsquo;s &lt;code&gt;tdefl_write_image_to_png_file_in_memory_ex()&lt;/code&gt; (v1.15) and libpng (version 1.2.50
-from Ubuntu 14.04), always with the highest possible compression I could configure.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Because of &lt;a href=&#34;https://github.com/nothings/stb/issues/113&#34;&gt;https://github.com/nothings/stb/issues/113&lt;/a&gt; I was wondering how good/bad&#xA;stb_image_write&amp;rsquo;s PNG compression really is in comparison to other encoders.&lt;/p&gt;&#xA;&lt;p&gt;So I did a quick comparison between stb_image_write (v0.98) LodePNG (version 20150418),&#xA;miniz&amp;rsquo;s &lt;code&gt;tdefl_write_image_to_png_file_in_memory_ex()&lt;/code&gt; (v1.15) and libpng (version 1.2.50&#xA;from Ubuntu 14.04), always with the highest possible compression I could configure.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

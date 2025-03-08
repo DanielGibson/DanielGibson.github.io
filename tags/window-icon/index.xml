@@ -1,37 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Window Icon on ./gibson.sh --blog</title>
+    <title>Window-Icon on ./gibson.sh --blog</title>
     <link>http://blog.gibson.sh/tags/window-icon/</link>
-    <description>Recent content in Window Icon on ./gibson.sh --blog</description>
+    <description>Recent content in Window-Icon on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 13 Apr 2015 00:21:27 +0000</lastBuildDate>
-    
-	<atom:link href="http://blog.gibson.sh/tags/window-icon/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <atom:link href="http://blog.gibson.sh/tags/window-icon/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How to integrate your SDL2 window icon (or any image) into your executable</title>
       <link>http://blog.gibson.sh/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</link>
       <pubDate>Mon, 13 Apr 2015 00:21:27 +0000</pubDate>
-      
       <guid>http://blog.gibson.sh/2015/04/13/how-to-integrate-your-sdl2-window-icon-or-any-image-into-your-executable/</guid>
-      <description>&lt;p&gt;Let&amp;rsquo;s assume you have an image that you want to use as a window icon in your
-cross-platform application that uses &lt;a href=&#34;http://www.libsdl.org/&#34;&gt;libSDL2&lt;/a&gt;.&lt;br /&gt;
-A suitable window icon is 64x64pixels big (other sizes should work as well, though)
-and has 32bit RGBA colors, which means it contains an alpha-channel.&lt;/p&gt;
-
-&lt;p&gt;Now it would be handy if the icon could just be part of the executable
-and if this could be achieved in a platform-independent way.&lt;br /&gt;
-Furthermore it&amp;rsquo;d be great if it didn&amp;rsquo;t require additional dependencies (e.g. to decode image files).&lt;/p&gt;
-
-&lt;p&gt;In this tutorial I&amp;rsquo;ll show how to translate the image into C source file
-containing a struct that holds the image data + necessary metadata (width,
-height, color depth) and how to load that struct into a &lt;code&gt;SDL_Surface*&lt;/code&gt;
-and to set that surface as a window icon.
-&lt;/p&gt;</description>
+      <description>&lt;p&gt;Let&amp;rsquo;s assume you have an image that you want to use as a window icon in your&#xA;cross-platform application that uses &lt;a href=&#34;http://www.libsdl.org/&#34;&gt;libSDL2&lt;/a&gt;.&lt;br&gt;&#xA;A suitable window icon is 64x64pixels big (other sizes should work as well, though)&#xA;and has 32bit RGBA colors, which means it contains an alpha-channel.&lt;/p&gt;&#xA;&lt;p&gt;Now it would be handy if the icon could just be part of the executable&#xA;and if this could be achieved in a platform-independent way.&lt;br&gt;&#xA;Furthermore it&amp;rsquo;d be great if it didn&amp;rsquo;t require additional dependencies (e.g. to decode image files).&lt;/p&gt;&#xA;&lt;p&gt;In this tutorial I&amp;rsquo;ll show how to translate the image into C source file&#xA;containing a struct that holds the image data + necessary metadata (width,&#xA;height, color depth) and how to load that struct into a &lt;code&gt;SDL_Surface*&lt;/code&gt;&#xA;and to set that surface as a window icon.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

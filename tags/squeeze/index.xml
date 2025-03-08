@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Squeeze on ./gibson.sh --blog</title>
@@ -7,51 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 31 Dec 2013 04:13:03 +0200</lastBuildDate>
-    
-	<atom:link href="http://blog.gibson.sh/tags/squeeze/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <atom:link href="http://blog.gibson.sh/tags/squeeze/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>(Re)installing GRUB to the MBR</title>
       <link>http://blog.gibson.sh/2013/12/31/reinstalling-grub-to-the-mbr/</link>
       <pubDate>Tue, 31 Dec 2013 04:13:03 +0200</pubDate>
-      
       <guid>http://blog.gibson.sh/2013/12/31/reinstalling-grub-to-the-mbr/</guid>
-      <description>&lt;p&gt;This is just a very short roundup of the relevant commands needed to reinstall grub,
-e.g. when migrating a Linux installation to a new hard drive.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;boot live Linux system (from CD/DVD or USB key, I use
-&lt;a href=&#34;http://grml.org&#34;&gt;grml&lt;/a&gt;, any other live Linux should do)&lt;/li&gt;
-&lt;li&gt;mount root-fs of your installation (e.g. /dev/sda2) to /mnt/&lt;/li&gt;
-&lt;li&gt;if they&amp;rsquo;re in separate partitions, mount the /boot/, /usr/, &amp;hellip;
-partitions of your installation to /mnt/boot, /mnt/usr/, &amp;hellip;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;mount --bind&lt;/code&gt; /dev/ and /sys/ to /mnt/dev and /mnt/sys (maybe also /proc
-for older versions of grub?), grub will need those&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;chroot /mnt&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;execute &lt;code&gt;grub-install $device&lt;/code&gt; (e.g. /dev/sda) to install grub to the MBR of $device&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;update-grub&lt;/code&gt; to upgrade the grub menu entries&lt;/li&gt;
-&lt;li&gt;If names of partitions changed, don&amp;rsquo;t forget to adjust &lt;code&gt;/etc/fstab&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;reboot, remove live linux&lt;/li&gt;
-&lt;li&gt;configure your BIOS/UEFI to boot from that harddisk&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;That&amp;rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations
-&lt;/p&gt;</description>
+      <description>&lt;p&gt;This is just a very short roundup of the relevant commands needed to reinstall grub,&#xA;e.g. when migrating a Linux installation to a new hard drive.&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;boot live Linux system (from CD/DVD or USB key, I use&#xA;&lt;a href=&#34;http://grml.org&#34;&gt;grml&lt;/a&gt;, any other live Linux should do)&lt;/li&gt;&#xA;&lt;li&gt;mount root-fs of your installation (e.g. /dev/sda2) to /mnt/&lt;/li&gt;&#xA;&lt;li&gt;if they&amp;rsquo;re in separate partitions, mount the /boot/, /usr/, &amp;hellip;&#xA;partitions of your installation to /mnt/boot, /mnt/usr/, &amp;hellip;&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;mount --bind&lt;/code&gt; /dev/ and /sys/ to /mnt/dev and /mnt/sys (maybe also /proc&#xA;for older versions of grub?), grub will need those&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;chroot /mnt&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;execute &lt;code&gt;grub-install $device&lt;/code&gt; (e.g. /dev/sda) to install grub to the MBR of $device&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;update-grub&lt;/code&gt; to upgrade the grub menu entries&lt;/li&gt;&#xA;&lt;li&gt;If names of partitions changed, don&amp;rsquo;t forget to adjust &lt;code&gt;/etc/fstab&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;reboot, remove live linux&lt;/li&gt;&#xA;&lt;li&gt;configure your BIOS/UEFI to boot from that harddisk&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;That&amp;rsquo;s all - you should now be greeted by a fresh grub that lets you boot your Linux, BSD, Windows, .. installations&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Linux (Debian Squeeze) on Thinkpad T500</title>
       <link>http://blog.gibson.sh/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</link>
       <pubDate>Wed, 05 Jan 2011 16:55:41 +0200</pubDate>
-      
       <guid>http://blog.gibson.sh/2011/01/05/linux-debian-squeeze-on-thinkpad-t500/</guid>
-      <description>&lt;p&gt;I recently got myself a Lenovo &lt;a href=&#34;http://www.thinkwiki.org/wiki/Category:T500&#34;&gt;Thinkpad T500&lt;/a&gt; (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&amp;rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.&lt;/p&gt;
-
-&lt;p&gt;However, I shrunk the Windows 7 partition (I didn&amp;rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&amp;rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&amp;rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &amp;hellip;) anyway.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;I recently got myself a Lenovo &lt;a href=&#34;http://www.thinkwiki.org/wiki/Category:T500&#34;&gt;Thinkpad T500&lt;/a&gt; (2055V1X) . I chose this older model over the T510 and such, because I prefer a screen resolution of 1680x1050 over a crippled 1600x900 or worse. I write and read a lot of code so I need vertical space on the display and I&amp;rsquo;d definitely miss the 150pixels additional vertical space my old Laptop (Samsung X20 with a resolution of 1400x1050) has.&lt;/p&gt;&#xA;&lt;p&gt;However, I shrunk the Windows 7 partition (I didn&amp;rsquo;t want to dump Windows entirely) and installed Debian Squeeze (AMD64) in the resulting free space. I&amp;rsquo;m very pleased how painless everything was, almost all hardware ran out of the box, but I&amp;rsquo;ll document some interesting stuff (how to shrink windows partition without breaking it, how to make special keys work and display information on Linux, how to make the touchpad and trackpoint behave the way I want, &amp;hellip;) anyway.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>
