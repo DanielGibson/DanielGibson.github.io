@@ -1,26 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Software Development on ./gibson.sh --blog</title>
-    <link>http://blog.gibson.sh/tags/software-development/</link>
-    <description>Recent content in Software Development on ./gibson.sh --blog</description>
+    <title>CDT on ./gibson.sh --blog</title>
+    <link>http://blog.gibson.sh/tags/cdt/</link>
+    <description>Recent content in CDT on ./gibson.sh --blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 08 Mar 2025 05:08:20 +0200</lastBuildDate>
-    <atom:link href="http://blog.gibson.sh/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://blog.gibson.sh/tags/cdt/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How to import a C/C&#43;&#43; project into Eclipse CDT</title>
       <link>http://blog.gibson.sh/2025/03/08/eclipse-cdt-setup/</link>
       <pubDate>Sat, 08 Mar 2025 05:08:20 +0200</pubDate>
       <guid>http://blog.gibson.sh/2025/03/08/eclipse-cdt-setup/</guid>
       <description>&lt;p&gt;I&amp;rsquo;ve been using the Eclipse IDE with its &amp;ldquo;CDT&amp;rdquo; C++ plugin (the &lt;em&gt;Eclipse IDE for C/C++ Developers&lt;/em&gt; package)&#xA;since forever, basically.&lt;/p&gt;&#xA;&lt;p&gt;It&amp;rsquo;s generally great, but setting up a project can be a bit of a PITA if you haven&amp;rsquo;t read this&#xA;article, as it&amp;rsquo;s not exactly intuitive if you want it to actually work.&lt;br&gt;&#xA;&lt;em&gt;&amp;ldquo;Actually work&amp;rdquo; as in: Eclipses source parser/indexer actually finds all included headers and thus&#xA;&amp;ldquo;knows&amp;rdquo; about the functions and types they define, so IDE features like code navigation and&#xA;autocompletion can function.&lt;/em&gt;&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Introduction to Git Gui</title>
-      <link>http://blog.gibson.sh/2025/02/07/git-gui-introduction/</link>
-      <pubDate>Fri, 07 Feb 2025 13:08:20 +0200</pubDate>
-      <guid>http://blog.gibson.sh/2025/02/07/git-gui-introduction/</guid>
-      <description>&lt;p&gt;In my experience, &lt;code&gt;git gui&lt;/code&gt; is a very useful tool for committing changes to &lt;a href=&#34;https://en.wikipedia.org/wiki/Git&#34;&gt;Git&lt;/a&gt;.&lt;br&gt;&#xA;It makes it very easy to review your own changes before committing them, and only committing the&#xA;changes you actually want to commit, instead of all changes in a file.&lt;/p&gt;&#xA;&lt;p&gt;This helps avoid committing debug prints, temporary hacks used during debugging, TODO comments&#xA;of things you just implemented and other things that can otherwise easily be committed accidentally.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

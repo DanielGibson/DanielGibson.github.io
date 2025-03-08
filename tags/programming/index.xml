@@ -9,11 +9,11 @@
     <lastBuildDate>Sat, 08 Mar 2025 05:08:20 +0200</lastBuildDate>
     <atom:link href="http://blog.gibson.sh/tags/programming/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Setting up C/C&#43;&#43; Projects in Eclipse CDT</title>
+      <title>How to import a C/C&#43;&#43; project into Eclipse CDT</title>
       <link>http://blog.gibson.sh/2025/03/08/eclipse-cdt-setup/</link>
       <pubDate>Sat, 08 Mar 2025 05:08:20 +0200</pubDate>
       <guid>http://blog.gibson.sh/2025/03/08/eclipse-cdt-setup/</guid>
-      <description>How to import a C/C++ project into Eclipse CDT I&amp;rsquo;ve been using the Eclipse IDE with its &amp;ldquo;CDT&amp;rdquo; C++ plugin (the Eclipse IDE for C/C++ Developers package) since forever, basically.&#xA;It&amp;rsquo;s generally great, but setting up a project can be a PITA, as it&amp;rsquo;s not exactly intuitive if you want it to actually work.&#xA;First, forget about CMake&amp;rsquo;s ability to generate Eclipse projects, those are in a very outdated format and while Eclipse does open them, they don&amp;rsquo;t work particularly well.</description>
+      <description>&lt;p&gt;I&amp;rsquo;ve been using the Eclipse IDE with its &amp;ldquo;CDT&amp;rdquo; C++ plugin (the &lt;em&gt;Eclipse IDE for C/C++ Developers&lt;/em&gt; package)&#xA;since forever, basically.&lt;/p&gt;&#xA;&lt;p&gt;It&amp;rsquo;s generally great, but setting up a project can be a bit of a PITA if you haven&amp;rsquo;t read this&#xA;article, as it&amp;rsquo;s not exactly intuitive if you want it to actually work.&lt;br&gt;&#xA;&lt;em&gt;&amp;ldquo;Actually work&amp;rdquo; as in: Eclipses source parser/indexer actually finds all included headers and thus&#xA;&amp;ldquo;knows&amp;rdquo; about the functions and types they define, so IDE features like code navigation and&#xA;autocompletion can function.&lt;/em&gt;&lt;/p&gt;</description>
     </item>
     <item>
       <title>Introduction to Git Gui</title>
