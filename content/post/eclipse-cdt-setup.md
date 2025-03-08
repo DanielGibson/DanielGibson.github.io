@@ -64,7 +64,7 @@ If you don't build in your project root, select the build directory to use under
 
 Now switch into the `Behavior` tab:
 
-![Behavior tab of build settings](/images/eclipse-cdt-buildsettings.png)
+![Behavior tab of build settings](/images/eclipse-cdt-build-behavior.png)
 
 If your default build command isn't `make all` (or `ninja all` if you entered "ninja" in the 
 previous step), change the `Build (Incremental build)` argument accordingly (for ninja you probably
