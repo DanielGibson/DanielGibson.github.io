@@ -6,20 +6,25 @@ draft = false
 
 Hi, I'm Daniel.  
 I like Heavy Metal and (mostly oldish) computer games.  
-I write code, usually gamedev/Linux centric (often both).
+I write code, usually gamedev- or Linux-centric (often both).
 Sometimes I write about that. In this Blog.
+
+## I'm currently looking for a job! Click *[here for details incl. CV](../job/)*.
+
+---
 
 Some for-fun/free-time projects I'm involved with:
 
 * [**Yamagi Quake II**](https://www.yamagi.org/quake2/) ([also on Github](https://github.com/yquake2/yquake2))
   co-maintaining, OpenGL3 renderer, ...
 * [**dhewm3**](https://dhewm3.org), a source port of Doom 3: maintaining
-* [**RBDoom3BFG**](https://github.com/RobertBeckebans/RBDOOM-3-BFG/), much of the porting 
-  to Linux + SDL
 * [**Daikatana 1.3**](https://bitbucket.org/daikatana13/daikatana)
   port to Linux (and partly Mac OSX) with SDL+OpenAL, several bugfixes
 * [**Snippets**](https://github.com/DanielGibson/Snippets/) some header-only
   public domain libs (for C/C++) + other (hopefully) useful code snippets I wrote
+* [**texview**](https://github.com/DanielGibson/texview/) a crossplatform texture viewer supporting
+  lots of texture file formats including DDS (with lots of different encodings), KTX and KTX2 and
+  some normal image file formats like JPEG, PNG, BMP, TGA and other formats supported by stb_image.h
 
 ## Licenses of this Blog
 
