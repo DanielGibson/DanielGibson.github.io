@@ -362,6 +362,7 @@ pre {
   padding: 0.5em 1em;
   line-height: 1.2em;
   font-size: 14px;
+  tab-size: 4;
 }
 pre code {
   /* code sets a background color and padding,
@@ -382,7 +383,7 @@ pre code {
 
 @media (min-width: 850px) {
   .header {
-    padding: 25px 0; /**/
+    padding: 25px 0 8px; /* TODO: remove the 8px once job is found */
   }
 
   .nav-logo {

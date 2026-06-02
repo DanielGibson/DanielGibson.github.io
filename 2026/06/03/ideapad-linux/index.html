@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.123.7">
+
+
+<title>Running Linux on an AMD Zen3-based Lenovo IdeaPad Slim 3 - ./gibson.sh --blog</title>
+<meta property="og:title" content="Running Linux on an AMD Zen3-based Lenovo IdeaPad Slim 3 - ./gibson.sh --blog">
+<meta property="og:type" content="summary" />
+<meta property="og:description" content="I had a simple task: Install and configure my mothers new laptop.
+To my surprise she wanted to to try Linux, because Windows 11 again has a new UI and her reasoning
+was that if she needs to get used to something new it might as well be Linux - and I guess the fact
+that Win11 only got buggier over time has reached normies now.
+Now this should be no problem.
+Unfortunately that laptop, a Lenovo IdeaPad Slim 3 16ABR8, turned out to have firmware bugs related
+to suspend (s2idle).
+I debugged the issues and eventually found ways to fix/work around them - this blogpost shows how." />
+
+
+<meta property="og:image" content="http://blog.gibson.sh/images/logo-160.png" />
+
+<link rel="me" href="https://mastodon.gamedev.place/@Doomed_Daniel" />
+
+
+
+<link rel="stylesheet" href="../../../../css/main.css" media="all" />
+<link rel="stylesheet" href="../../../../css/fonts.css" />
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo" title="Home">
+    <img src="../../../../images/logo.png"
+        alt="Home" >
+  </a>
+
+  <ul class="nav-links">
+    <li><b><a href="../../../../">Home</a></b></li>
+    
+    <li><a href="../../../../about/">About</a></li>
+    
+    <li><a href="https://github.com/DanielGibson/">Github</a></li>
+    
+  </ul>
+  <br>
+  <div style="text-align:left;">
+    <i>By the way: <a href="../../../../job" title="Click for infos and contact">I'm looking for a job!</a></i>
+  </div>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+
+    <h1 class="article-title">Running Linux on an AMD Zen3-based Lenovo IdeaPad Slim 3</h1>
+
+    
+    <span class="article-date">June 3, 2026</span>
+    
+
+    <br>
+    <div class="toc">
+      <b>Table of Contents:</b>
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-problems">The Problems</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#avoid-breaking-the-keyboard-and-lid-switch-with-suspend">Avoid breaking the keyboard and lid switch with suspend</a>
+          <ul>
+            <li><a href="#possibly-remaining-problems-with-wakealarm">Possibly remaining problems (with wakealarm)</a></li>
+          </ul>
+        </li>
+        <li><a href="#workaround-for-the-acpi-ae-not-found-problem">Workaround for the ACPI <code>AE_NOT_FOUND</code> problem</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+
+    <div class="article-content">
+      <p>I had a simple task: Install and configure my mothers new laptop.<br>
+To my surprise she wanted to to try Linux, because Windows 11 again has a new UI and her reasoning
+was that if she needs to get used to something new it might as well be Linux - and I guess the fact
+that Win11 only got buggier over time has reached normies now.</p>
+<p>Now this <em>should</em> be no problem.</p>
+<p>Unfortunately that laptop, a Lenovo IdeaPad Slim 3 16ABR8, turned out to have firmware bugs related
+to suspend (s2idle).</p>
+<p>I debugged the issues and eventually found ways to fix/work around them - this blogpost shows how.</p>
+<h1 id="the-problems">The Problems</h1>
+<p>After suspend+resume (<strong>s2idle</strong> standby) the <strong>keyboard stopped working</strong>. Several sources suggested
+setting a kernel parameter (<code>i8042.nopnp</code>), which made the keyboard <em>mostly</em> work after resume,
+except the <strong>Fn keys/multimedia keys didn&rsquo;t</strong>.<br>
+For example, pressing the <code>F1</code>/<code>Mute</code> key only registered as <code>F1</code>, even when pressed together
+with <code>Fn</code>, same for all other <code>Fn</code> combinations.</p>
+<p>The <strong>lid switch also stopped working</strong> after the first suspend+resume, so when closing the laptop
+it didn&rsquo;t go to sleep or at lock the screen or whatever was configured - here I didn&rsquo;t find any
+kernel parameter that helped.</p>
+<p>At least those problems were undone by rebooting&hellip; until the next suspend.</p>
+<p>A minor issue was an <strong>ACPI error</strong> that happened on resume - though of course at the time I didn&rsquo;t
+know whether it&rsquo;s minor or the root of the problems.</p>
+<pre tabindex="0"><code>ACPI: \_SB_.PEP_: Successfully transitioned to state lps0 exit
+ACPI: \_SB_.PEP_: Successfully transitioned to state lps0 ms exit
+ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PC00.LPCB.EC0.SNTM],
+	AE_NOT_FOUND (20251212/psargs-332)
+
+No Local Variables are initialized for Method [_DSM]
+
+Initialized Arguments for Method [_DSM]:  (4 arguments defined for method
+	invocation)
+  Arg0:   000000002ff511a6 &lt;Obj&gt;           Buffer(16) 56 0D E0 11 64 CE CE 47
+  Arg1:   000000005176ebd5 &lt;Obj&gt;           Integer 0000000000000000
+  Arg2:   00000000e877e9f8 &lt;Obj&gt;           Integer 0000000000000004
+  Arg3:   0000000024f78b95 &lt;Obj&gt;           Package 0000000024f78b95
+
+ACPI Error: Aborting method \_SB.PEP._DSM due to previous error (AE_NOT_FOUND)
+	(20251212/psparse-529)
+ACPI: \_SB_.PEP_: Failed to transitioned to state screen on
+</code></pre><h1 id="solutions">Solutions</h1>
+<h2 id="avoid-breaking-the-keyboard-and-lid-switch-with-suspend">Avoid breaking the keyboard and lid switch with suspend</h2>
+<p>It turned out that the laptops EC (embedded controller) <a href="https://bugzilla.kernel.org/show_bug.cgi?id=221383#c27">needs a little me-time before suspend</a>,
+or it becomes uncooperative after waking up<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> and doesn&rsquo;t deliver keyboard and lid switch
+events anymore - this most probably is a firmware bug<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+<p>I have a patch that adds a 2.5 second sleep right before suspend at the appropriate place in the
+<strong>amd_pmc</strong> kernel module, which will <a href="https://lore.kernel.org/platform-driver-x86/20260512202645.1549111-1-daniel@gibson.sh/t/#u">hopefully be merged</a>
+in the Linux kernel.</p>
+<p>Until it has been merged (and that kernel version ends up in your Linux distribution), you can use
+my out-of-tree version of the module that contains the patches and should work with Kernel 6.5 and
+newer. You can find it and installation instructions at <a href="https://github.com/DanielGibson/amd_pmc-ideapad">https://github.com/DanielGibson/amd_pmc-ideapad</a>,
+if it works for you I recommend installing it with DKMS so it gets automatically built and installed
+when your distro ships a kernel update.</p>
+<p>If your device isn&rsquo;t already detected automatically as affected by this issue, the updated <strong>amd_pmc</strong>
+kernel module has a parameter <code>delay_suspend</code> that allows explicitly enabling (or disabling) it;
+the aforementioned Github project has more information on this.</p>
+<h3 id="possibly-remaining-problems-with-wakealarm">Possibly remaining problems (with wakealarm)</h3>
+<p>Unfortunately, this does not <em>completely</em> fix the issues on <em>all</em> devices.</p>
+<p>Normal suspend and resume (with keyboard or lid switch or touchpad, &hellip;) works
+fine, but timer-base suspend+resume<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> still has the old problems on some machines (like my 16ABR8),
+but apparently works fine on others (like <a href="https://bugzilla.kernel.org/show_bug.cgi?id=221383#c66">14ARP10</a>).</p>
+<p>I think this shouldn&rsquo;t be a big problem in practice, but you should probably be
+aware of this.</p>
+<p>At least on 16ABR8 you can still use the <code>i8042.nopnp</code> kernel commandline parameter<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>
+to keep <em>most</em> of the keyboard functional after a timed suspend. That will allow
+you to unlock your screensaver after resume, save your open files and then reboot
+to restore full keyboard and lid switch functionality.</p>
+<h2 id="workaround-for-the-acpi-ae-not-found-problem">Workaround for the ACPI <code>AE_NOT_FOUND</code> problem</h2>
+<p>The aforementioned ACPI error (<code>Could not resolve symbol [\_SB.PC00.LPCB.EC0.SNTM], AE_NOT_FOUND</code>)
+turned out to be unrelated to the keyboard/lid problems and I haven&rsquo;t found any other issues
+caused by it.</p>
+<p>It&rsquo;s still ugly and there&rsquo;s a reasonably easy way to fix it which I&rsquo;d like to describe, if only
+to allow others having similar issues to find it.</p>
+<blockquote>
+<p><strong>NOTE:</strong> While the keyboard issue seems to affect lots of IdeaPads with Zen3 (&ldquo;Barcelo&rdquo;) and
+Zen3+ (&ldquo;Rembrandt&rdquo;) CPUs, this ACPI error seems to be more specific to the <em>IdeaPad Slim 3 16ABR8</em>
+and probably other *ABR8 devices<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>, at least with the current BIOS version (KYCN41WW).<br>
+Don&rsquo;t blindly apply my fix, check first if you have this exact error (about <code>\_SB.PC00.LPCB.EC0.SNTM</code>)
+in dmesg after suspend!</p>
+<p>Maye you have similar <code>AE_NOT_FOUND</code> errors for other symbols, in which case my fix may at least
+show a way to work around them, but you&rsquo;ll have to adapt it.</p>
+</blockquote>
+<p>So the complaint is that the method <code>\_SB.PC00.LPCB.EC0.SNTM</code> can&rsquo;t be found, because it doesn&rsquo;t
+exist. Most probably it should&rsquo;ve been <code>\_SB.PCI0.LPC0.EC0.SNTM</code>, a method from dsdt.dsl that is
+otherwise unused. <code>PCI0</code>, <code>LPC0</code> and <code>EC0</code> are all (nested) devices.</p>
+<p>Thankfully it&rsquo;s possible to create ACPI fake devices (or ACPI dummy devices or ACPI stub
+devices<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>), they&rsquo;re called <strong>&ldquo;Module Device&rdquo;</strong> there and at least when they do <em>not</em>
+contain a <code>_CRS</code> object or method they&rsquo;re <em>&ldquo;simple container objects&rdquo;</em><sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>.</p>
+<p>So one can just create fake devices <code>PC00</code> and <code>LPCB</code> and <code>EC0</code> and a <code>SNTM</code> method in them
+which calls the actual method.<br>
+Alternatively I guess the method could remain empty to do nothing, which would still make the
+ACPI error go away so the ACPI method calling the nonexisting method can finish.</p>
+<p>It looks like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// create stub/fake/dummy devices and a stub method for the
+</span></span></span><span class="line"><span class="cl"><span class="c1">// method missing in the BIOS ACPI tables (\_SB.PC00.LPCB.EC0.SNTM)
+</span></span></span><span class="line"><span class="cl"><span class="c1">// and make it call the proper method (\_SB.PCI0.LPC0.EC0.SNTM)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">DefinitionBlock</span> <span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;SSDT&#34;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#34;LENOVO&#34;</span><span class="p">,</span> <span class="s">&#34;SNTMFIX&#34;</span><span class="p">,</span> <span class="mh">0x00000001</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// the actually existing method from dsdt.dsl
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">External</span> <span class="p">(</span><span class="n">_SB</span><span class="p">.</span><span class="n">PCI0</span><span class="p">.</span><span class="n">LPC0</span><span class="p">.</span><span class="n">EC0</span><span class="p">.</span><span class="n">SNTM</span><span class="p">,</span> <span class="n">MethodObj</span><span class="p">)</span> <span class="c1">// 0 Arguments
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="nf">Scope</span> <span class="p">(</span><span class="err">\</span><span class="n">_SB</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nf">Device</span> <span class="p">(</span><span class="n">PC00</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">// https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="c1">// says that devices with HID &#34;ACPI0004&#34; are &#34;module devices&#34;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="c1">// that act as simple containers if they contain no _CRS object
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nf">Name</span> <span class="p">(</span><span class="n">_HID</span><span class="p">,</span> <span class="s">&#34;ACPI0004&#34;</span> <span class="cm">/* Module Device */</span><span class="p">)</span>  <span class="c1">// _HID: Hardware ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="nf">Device</span> <span class="p">(</span><span class="n">LPCB</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="nf">Name</span> <span class="p">(</span><span class="n">_HID</span><span class="p">,</span> <span class="s">&#34;ACPI0004&#34;</span> <span class="cm">/* Module Device */</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="nf">Device</span> <span class="p">(</span><span class="n">EC0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="nf">Name</span> <span class="p">(</span><span class="n">_HID</span><span class="p">,</span> <span class="s">&#34;ACPI0004&#34;</span> <span class="cm">/* Module Device */</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">					<span class="nf">Method</span> <span class="p">(</span><span class="n">SNTM</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">NotSerialized</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">					<span class="p">{</span>
+</span></span><span class="line"><span class="cl">						<span class="c1">// call real method from dsdt.dsl
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>						<span class="err">\</span><span class="n">_SB</span><span class="p">.</span><span class="n">PCI0</span><span class="p">.</span><span class="n">LPC0</span><span class="p">.</span><span class="n">EC0</span><span class="p">.</span><span class="nf">SNTM</span> <span class="p">()</span>
+</span></span><span class="line"><span class="cl">					<span class="p">}</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Save this as <code>sntmfix.dsl</code> and use <code>iasl</code><sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup> to compile it (<code>iasl sntmfix.dsl</code>).</p>
+<p>If you&rsquo;re using the <strong>grub</strong> bootloader, copy the resulting <code>sntmfix.aml</code> to <code>/boot/</code> and tell
+grub to load it on boot by editing <code>/etc/grub.d/40_custom</code> (or another file that ends up in the
+generated <code>/boot/grub/grub.cfg</code>, or edit that file directly if you don&rsquo;t generate it) and adding
+the following line:<br>
+<code>acpi /boot/sntmfix.aml</code><br>
+<em>(if <code>/boot/</code> has its own partition on your system it should be just <code>acpi /sntmfix.aml</code>)</em></p>
+<p>Afterwards run <code># update-grub</code> or, if that doesn&rsquo;t exist, <code># grub-mkconfig -o /boot/grub/grub.cfg</code>.</p>
+<p>If you&rsquo;re not using grub, see the <a href="https://wiki.archlinux.org/title/DSDT#Using_modified_code">Arch Wiki</a>
+for instructions (yes, they should also work on other distros).</p>
+<!-- below: footnotes -->
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>relatable, to be honest&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>Yes, this means Lenovo could probably fix them with a BIOS update. I have little hope
+that Lenovo actually does that, as they don&rsquo;t officially support Linux on the affected devices,
+and I wouldn&rsquo;t know how to reach anyone at Lenovo who might care and has the means to have
+this fixed anyway.<br>
+The problem was reported in <a href="https://forums.lenovo.com/t5/Other-Linux-Discussions/Keyboard-doesn-t-work-after-suspend-on-Linux-IdeaPad-3-15ABR8-Ryzen-7/m-p/5392909">Lenovos forums</a>,
+and it didn&rsquo;t seem like they care, only other users replied, no one from Lenovo.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>&ldquo;wakealarm&rdquo;, used by <code>rtcwake</code> or the <code>amd-s2idle</code> testprogram, for example.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>In <code>/etc/default/grub</code> add <code>i8042.nopnp</code>. If you already have another option in there,
+separate it with a space, like <code>GRUB_CMDLINE_LINUX=&quot;other_option=3 i8042.nopnp&quot;</code>, if not it&rsquo;s
+just <code>GRUB_CMDLINE_LINUX=&quot;i8042.nopnp&quot;</code>. Afterwards run <code># update-grub</code>.<br>
+If you&rsquo;re not using grub, see <a href="https://wiki.archlinux.org/title/Kernel_parameters">this ArchWiki article</a>
+for how to set kernel commandline options with other boot managers.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>Though it seems like there are different devices called &ldquo;IdeaPad Slim 3 16ABR8&rdquo;
+on the market.. at the very least with different WiFi chips, see <a href="https://wiki.archlinux.org/title/Lenovo_IdeaPad_Slim_3_16ABR8#Wireless">https://wiki.archlinux.org/title/Lenovo_IdeaPad_Slim_3_16ABR8#Wireless</a><br>
+And for other devices it&rsquo;s even wilder: There are different versions of the &ldquo;IdeaPad Slim 3 15ARP10&rdquo;,
+one with &ldquo;model-type&rdquo; <code>83MM</code> and another with model-type <code>83K7</code> (both affected by the keyboard bug).
+And also an &ldquo;Lenovo IdeaPad Slim <strong>5</strong> 15ARP10&rdquo; (<code>83J3</code>; unclear if affected).&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>Hopefully this helps people who need some kind of fake device in  ACPI find this,
+because I couldn&rsquo;t find anything with the terms I could come up with in search engines.
+I only got to this solution because &ldquo;vng3333&rdquo; in the kernel bugtracker mentioned having a minimal
+SSDT with a stub and shared the code, see <a href="https://bugzilla.kernel.org/show_bug.cgi?id=221217#c5">https://bugzilla.kernel.org/show_bug.cgi?id=221217#c5</a><br>
+There the actual method is reimplemented, I simplified it a bit by just calling it.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p><a href="https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device">https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device</a>&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8">
+<p>The <em>ACPI Source Language Compiler</em> by Intel that can compile and disassemble ACPI tables,
+see also <a href="https://www.acpica.org">https://www.acpica.org</a><br>
+On Debian-based distributions like Ubuntu it&rsquo;s in the <code>acpica-tools</code> package.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+    </div>
+  </article>
+
+  
+
+  <hr>
+
+  <div id="gh-comments">
+    <h4>COMMENTS</h4>
+    <div id="gh-comments-list"></div>
+    <a href="javascript:void(0)" id="gh-load-comments" class="btn" style="display:none">Load more comments</a>
+    <noscript>
+      <a href="https://github.com/DanielGibson/DanielGibson.github.io/issues/16"
+         target='_blank' class='btn'>(Javascript is disabled)<br>View Comments on Github</a>
+    </noscript>
+  </div>
+
+  <script type="text/javascript" src="../../../../js/github-comments.js"></script>
+  <script type="text/javascript">
+    DoGithubComments( 16 );
+  </script>
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22" alt="hugo"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+
+    
+  
+  
+  
+  <script>
+  
+
+  for(h=1; h<=6; ++h) 
+  {
+    var hs = document.getElementsByTagName('h'+h);
+    for(i=0; i<hs.length; ++i)
+    {
+      
+      if(hs[i].id)
+      {
+        var l = document.createElement("a");
+        l.href = "#" + hs[i].id;
+        l.innerHTML = "# ";
+        l.className = "headinglink";
+        hs[i].insertBefore(l, hs[i].firstChild);
+      }
+    }
+  }
+  </script>
+  
+  </body>
+  
+</html>
+

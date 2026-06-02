@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Keyboard on ./gibson.sh --blog</title>
+    <link>http://blog.gibson.sh/tags/keyboard/</link>
+    <description>Recent content in Keyboard on ./gibson.sh --blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 03 Jun 2026 01:30:10 +0200</lastBuildDate>
+    <atom:link href="http://blog.gibson.sh/tags/keyboard/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Running Linux on an AMD Zen3-based Lenovo IdeaPad Slim 3</title>
+      <link>http://blog.gibson.sh/2026/06/03/ideapad-linux/</link>
+      <pubDate>Wed, 03 Jun 2026 01:30:10 +0200</pubDate>
+      <guid>http://blog.gibson.sh/2026/06/03/ideapad-linux/</guid>
+      <description>&lt;p&gt;I had a simple task: Install and configure my mothers new laptop.&lt;br&gt;&#xA;To my surprise she wanted to to try Linux, because Windows 11 again has a new UI and her reasoning&#xA;was that if she needs to get used to something new it might as well be Linux - and I guess the fact&#xA;that Win11 only got buggier over time has reached normies now.&lt;/p&gt;&#xA;&lt;p&gt;Now this &lt;em&gt;should&lt;/em&gt; be no problem.&lt;/p&gt;&#xA;&lt;p&gt;Unfortunately that laptop, a Lenovo IdeaPad Slim 3 16ABR8, turned out to have firmware bugs related&#xA;to suspend (s2idle).&lt;/p&gt;&#xA;&lt;p&gt;I debugged the issues and eventually found ways to fix/work around them - this blogpost shows how.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
