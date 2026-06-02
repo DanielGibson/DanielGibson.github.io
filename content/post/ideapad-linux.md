@@ -36,6 +36,9 @@ kernel parameter that helped.
 
 At least those problems were undone by rebooting... until the next suspend.
 
+These problems seem to be common on several IdeaPads (and possibly other notebooks) with Zen3 or Zen3+
+CPUs ("Barcelo" or "Rembrandt")[^fn:common].
+
 A minor issue was an **ACPI error** that happened on resume - though of course at the time I didn't
 know whether it's minor or the root of the problems.
 
@@ -181,6 +184,10 @@ If you're not using grub, see the [Arch Wiki](https://wiki.archlinux.org/title/D
 for instructions (yes, they should also work on other distros).
 
 <!-- below: footnotes -->
+
+[^fn:common]: See for example [this websearch](https://www.startpage.com/sp/search?query=ideapad+linux+suspend+keyboard&language=english).
+    None of the workarounds mentioned there fully worked for me (except for newer posts that suggest
+    trying my patched kernel module, of course).
 
 [^fn:me-time]: relatable, to be honest
 
