@@ -30,7 +30,6 @@ disableKinds = ["taxonomy", "taxonomyTerm", "section", "404"]
 
 [params]
   mainSections = ["post"]
-  twitterhandle = "@Doomed_Daniel"
   description = "Daniel Gibson's Blog"
   [params.logo]
     url = "logo.png"
