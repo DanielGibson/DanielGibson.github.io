@@ -106,6 +106,8 @@ with <code>Fn</code>, same for all other <code>Fn</code> combinations.</p>
 it didn&rsquo;t go to sleep or at lock the screen or whatever was configured - here I didn&rsquo;t find any
 kernel parameter that helped.</p>
 <p>At least those problems were undone by rebooting&hellip; until the next suspend.</p>
+<p>These problems seem to be common on several IdeaPads (and possibly other notebooks) with Zen3 or Zen3+
+CPUs (&ldquo;Barcelo&rdquo; or &ldquo;Rembrandt&rdquo;)<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
 <p>A minor issue was an <strong>ACPI error</strong> that happened on resume - though of course at the time I didn&rsquo;t
 know whether it&rsquo;s minor or the root of the problems.</p>
 <pre tabindex="0"><code>ACPI: \_SB_.PEP_: Successfully transitioned to state lps0 exit
@@ -128,8 +130,8 @@ ACPI: \_SB_.PEP_: Failed to transitioned to state screen on
 </code></pre><h1 id="solutions">Solutions</h1>
 <h2 id="avoid-breaking-the-keyboard-and-lid-switch-with-suspend">Avoid breaking the keyboard and lid switch with suspend</h2>
 <p>It turned out that the laptops EC (embedded controller) <a href="https://bugzilla.kernel.org/show_bug.cgi?id=221383#c27">needs a little me-time before suspend</a>,
-or it becomes uncooperative after waking up<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> and doesn&rsquo;t deliver keyboard and lid switch
-events anymore - this most probably is a firmware bug<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+or it becomes uncooperative after waking up<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> and doesn&rsquo;t deliver keyboard and lid switch
+events anymore - this most probably is a firmware bug<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.</p>
 <p>I have a patch that adds a 2.5 second sleep right before suspend at the appropriate place in the
 <strong>amd_pmc</strong> kernel module, which will <a href="https://lore.kernel.org/platform-driver-x86/20260512202645.1549111-1-daniel@gibson.sh/t/#u">hopefully be merged</a>
 in the Linux kernel.</p>
@@ -144,11 +146,11 @@ the aforementioned Github project has more information on this.</p>
 <h3 id="possibly-remaining-problems-with-wakealarm">Possibly remaining problems (with wakealarm)</h3>
 <p>Unfortunately, this does not <em>completely</em> fix the issues on <em>all</em> devices.</p>
 <p>Normal suspend and resume (with keyboard or lid switch or touchpad, &hellip;) works
-fine, but timer-base suspend+resume<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> still has the old problems on some machines (like my 16ABR8),
+fine, but timer-base suspend+resume<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> still has the old problems on some machines (like my 16ABR8),
 but apparently works fine on others (like <a href="https://bugzilla.kernel.org/show_bug.cgi?id=221383#c66">14ARP10</a>).</p>
 <p>I think this shouldn&rsquo;t be a big problem in practice, but you should probably be
 aware of this.</p>
-<p>At least on 16ABR8 you can still use the <code>i8042.nopnp</code> kernel commandline parameter<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>
+<p>At least on 16ABR8 you can still use the <code>i8042.nopnp</code> kernel commandline parameter<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>
 to keep <em>most</em> of the keyboard functional after a timed suspend. That will allow
 you to unlock your screensaver after resume, save your open files and then reboot
 to restore full keyboard and lid switch functionality.</p>
@@ -161,7 +163,7 @@ to allow others having similar issues to find it.</p>
 <blockquote>
 <p><strong>NOTE:</strong> While the keyboard issue seems to affect lots of IdeaPads with Zen3 (&ldquo;Barcelo&rdquo;) and
 Zen3+ (&ldquo;Rembrandt&rdquo;) CPUs, this ACPI error seems to be more specific to the <em>IdeaPad Slim 3 16ABR8</em>
-and probably other *ABR8 devices<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>, at least with the current BIOS version (KYCN41WW).<br>
+and probably other *ABR8 devices<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>, at least with the current BIOS version (KYCN41WW).<br>
 Don&rsquo;t blindly apply my fix, check first if you have this exact error (about <code>\_SB.PC00.LPCB.EC0.SNTM</code>)
 in dmesg after suspend!</p>
 <p>Maye you have similar <code>AE_NOT_FOUND</code> errors for other symbols, in which case my fix may at least
@@ -171,8 +173,8 @@ show a way to work around them, but you&rsquo;ll have to adapt it.</p>
 exist. Most probably it should&rsquo;ve been <code>\_SB.PCI0.LPC0.EC0.SNTM</code>, a method from dsdt.dsl that is
 otherwise unused. <code>PCI0</code>, <code>LPC0</code> and <code>EC0</code> are all (nested) devices.</p>
 <p>Thankfully it&rsquo;s possible to create ACPI fake devices (or ACPI dummy devices or ACPI stub
-devices<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>), they&rsquo;re called <strong>&ldquo;Module Device&rdquo;</strong> there and at least when they do <em>not</em>
-contain a <code>_CRS</code> object or method they&rsquo;re <em>&ldquo;simple container objects&rdquo;</em><sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>.</p>
+devices<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>), they&rsquo;re called <strong>&ldquo;Module Device&rdquo;</strong> there and at least when they do <em>not</em>
+contain a <code>_CRS</code> object or method they&rsquo;re <em>&ldquo;simple container objects&rdquo;</em><sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>.</p>
 <p>So one can just create fake devices <code>PC00</code> and <code>LPCB</code> and <code>EC0</code> and a <code>SNTM</code> method in them
 which calls the actual method.<br>
 Alternatively I guess the method could remain empty to do nothing, which would still make the
@@ -210,7 +212,7 @@ ACPI error go away so the ACPI method calling the nonexisting method can finish.
 </span></span><span class="line"><span class="cl">		<span class="p">}</span>
 </span></span><span class="line"><span class="cl">	<span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>Save this as <code>sntmfix.dsl</code> and use <code>iasl</code><sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup> to compile it (<code>iasl sntmfix.dsl</code>).</p>
+</span></span></code></pre></div><p>Save this as <code>sntmfix.dsl</code> and use <code>iasl</code><sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup> to compile it (<code>iasl sntmfix.dsl</code>).</p>
 <p>If you&rsquo;re using the <strong>grub</strong> bootloader, copy the resulting <code>sntmfix.aml</code> to <code>/boot/</code> and tell
 grub to load it on boot by editing <code>/etc/grub.d/40_custom</code> (or another file that ends up in the
 generated <code>/boot/grub/grub.cfg</code>, or edit that file directly if you don&rsquo;t generate it) and adding
@@ -225,47 +227,52 @@ for instructions (yes, they should also work on other distros).</p>
 <hr>
 <ol>
 <li id="fn:1">
-<p>relatable, to be honest&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<p>See for example <a href="https://www.startpage.com/sp/search?query=ideapad+linux+suspend+keyboard&amp;language=english">this websearch</a>.
+None of the workarounds mentioned there fully worked for me (except for newer posts that suggest
+trying my patched kernel module, of course).&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:2">
+<p>relatable, to be honest&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
 <p>Yes, this means Lenovo could probably fix them with a BIOS update. I have little hope
 that Lenovo actually does that, as they don&rsquo;t officially support Linux on the affected devices,
 and I wouldn&rsquo;t know how to reach anyone at Lenovo who might care and has the means to have
 this fixed anyway.<br>
 The problem was reported in <a href="https://forums.lenovo.com/t5/Other-Linux-Discussions/Keyboard-doesn-t-work-after-suspend-on-Linux-IdeaPad-3-15ABR8-Ryzen-7/m-p/5392909">Lenovos forums</a>,
-and it didn&rsquo;t seem like they care, only other users replied, no one from Lenovo.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:3">
-<p>&ldquo;wakealarm&rdquo;, used by <code>rtcwake</code> or the <code>amd-s2idle</code> testprogram, for example.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+and it didn&rsquo;t seem like they care, only other users replied, no one from Lenovo.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:4">
+<p>&ldquo;wakealarm&rdquo;, used by <code>rtcwake</code> or the <code>amd-s2idle</code> testprogram, for example.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
 <p>In <code>/etc/default/grub</code> add <code>i8042.nopnp</code>. If you already have another option in there,
 separate it with a space, like <code>GRUB_CMDLINE_LINUX=&quot;other_option=3 i8042.nopnp&quot;</code>, if not it&rsquo;s
 just <code>GRUB_CMDLINE_LINUX=&quot;i8042.nopnp&quot;</code>. Afterwards run <code># update-grub</code>.<br>
 If you&rsquo;re not using grub, see <a href="https://wiki.archlinux.org/title/Kernel_parameters">this ArchWiki article</a>
-for how to set kernel commandline options with other boot managers.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+for how to set kernel commandline options with other boot managers.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:5">
+<li id="fn:6">
 <p>Though it seems like there are different devices called &ldquo;IdeaPad Slim 3 16ABR8&rdquo;
 on the market.. at the very least with different WiFi chips, see <a href="https://wiki.archlinux.org/title/Lenovo_IdeaPad_Slim_3_16ABR8#Wireless">https://wiki.archlinux.org/title/Lenovo_IdeaPad_Slim_3_16ABR8#Wireless</a><br>
 And for other devices it&rsquo;s even wilder: There are different versions of the &ldquo;IdeaPad Slim 3 15ARP10&rdquo;,
 one with &ldquo;model-type&rdquo; <code>83MM</code> and another with model-type <code>83K7</code> (both affected by the keyboard bug).
-And also an &ldquo;Lenovo IdeaPad Slim <strong>5</strong> 15ARP10&rdquo; (<code>83J3</code>; unclear if affected).&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+And also an &ldquo;Lenovo IdeaPad Slim <strong>5</strong> 15ARP10&rdquo; (<code>83J3</code>; unclear if affected).&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:6">
+<li id="fn:7">
 <p>Hopefully this helps people who need some kind of fake device in  ACPI find this,
 because I couldn&rsquo;t find anything with the terms I could come up with in search engines.
 I only got to this solution because &ldquo;vng3333&rdquo; in the kernel bugtracker mentioned having a minimal
 SSDT with a stub and shared the code, see <a href="https://bugzilla.kernel.org/show_bug.cgi?id=221217#c5">https://bugzilla.kernel.org/show_bug.cgi?id=221217#c5</a><br>
-There the actual method is reimplemented, I simplified it a bit by just calling it.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
-</li>
-<li id="fn:7">
-<p><a href="https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device">https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device</a>&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+There the actual method is reimplemented, I simplified it a bit by just calling it.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:8">
+<p><a href="https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device">https://uefi.org/specs/ACPI/6.6/09_ACPI_Defined_Devices_and_Device_Specific_Objects.html#module-device</a>&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:9">
 <p>The <em>ACPI Source Language Compiler</em> by Intel that can compile and disassemble ACPI tables,
 see also <a href="https://www.acpica.org">https://www.acpica.org</a><br>
-On Debian-based distributions like Ubuntu it&rsquo;s in the <code>acpica-tools</code> package.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+On Debian-based distributions like Ubuntu it&rsquo;s in the <code>acpica-tools</code> package.&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </div>
