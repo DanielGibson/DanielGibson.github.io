@@ -16,7 +16,7 @@ that Win11 only got buggier over time has reached normies now.
 Now this *should* be no problem.
 
 Unfortunately that laptop, a Lenovo IdeaPad Slim 3 16ABR8, turned out to have firmware bugs related
-to suspend (s2idle).
+to suspend (s2idle), causing the keyboard and lidswitch to stop working after suspend (s2idle).
 
 I debugged the issues and eventually found ways to fix/work around them - this blogpost shows how.
 
@@ -76,8 +76,9 @@ I have a patch that adds a 2.5 second sleep right before suspend at the appropri
 in the Linux kernel.
 
 Until it has been merged (and that kernel version ends up in your Linux distribution), you can use
-my out-of-tree version of the module that contains the patches and should work with Kernel 6.5 and
-newer. You can find it and installation instructions at https://github.com/DanielGibson/amd_pmc-ideapad,
+**my out-of-tree version of the module** that contains the patches and should work with Kernel 6.5 and
+newer.  
+You can find it and installation instructions at **https://github.com/DanielGibson/amd_pmc-ideapad**,
 if it works for you I recommend installing it with DKMS so it gets automatically built and installed
 when your distro ships a kernel update.
 

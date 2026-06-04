@@ -5,7 +5,7 @@ draft = false
 +++
 
 Hi, I'm Daniel.  
-I like Heavy Metal and (mostly oldish) computer games.  
+I like Heavy Metal, cats, (mostly oldish) computer games and open source software.  
 I write code, usually gamedev- or Linux-centric (often both).
 Sometimes I write about that. In this Blog.
 
@@ -17,7 +17,7 @@ Some for-fun/free-time projects I'm involved with:
 
 * [**Yamagi Quake II**](https://www.yamagi.org/quake2/) ([also on Github](https://github.com/yquake2/yquake2))
   co-maintaining, OpenGL3 renderer, ...
-* [**dhewm3**](https://dhewm3.org), a source port of Doom 3: maintaining
+* [**dhewm3**](https://dhewm3.org), a source port of Doom 3: maintaining, lots of bugfixes and new features
 * [**Daikatana 1.3**](https://bitbucket.org/daikatana13/daikatana)
   port to Linux (and partly Mac OSX) with SDL+OpenAL, several bugfixes
 * [**Snippets**](https://github.com/DanielGibson/Snippets/) some header-only
