@@ -15,7 +15,7 @@ was that if she needs to get used to something new it might as well be Linux - a
 that Win11 only got buggier over time has reached normies now.
 Now this should be no problem.
 Unfortunately that laptop, a Lenovo IdeaPad Slim 3 16ABR8, turned out to have firmware bugs related
-to suspend (s2idle).
+to suspend (s2idle), causing the keyboard and lidswitch to stop working after suspend (s2idle).
 I debugged the issues and eventually found ways to fix/work around them - this blogpost shows how." />
 
 
@@ -94,7 +94,7 @@ was that if she needs to get used to something new it might as well be Linux - a
 that Win11 only got buggier over time has reached normies now.</p>
 <p>Now this <em>should</em> be no problem.</p>
 <p>Unfortunately that laptop, a Lenovo IdeaPad Slim 3 16ABR8, turned out to have firmware bugs related
-to suspend (s2idle).</p>
+to suspend (s2idle), causing the keyboard and lidswitch to stop working after suspend (s2idle).</p>
 <p>I debugged the issues and eventually found ways to fix/work around them - this blogpost shows how.</p>
 <h1 id="the-problems">The Problems</h1>
 <p>After suspend+resume (<strong>s2idle</strong> standby) the <strong>keyboard stopped working</strong>. Several sources suggested
@@ -136,8 +136,9 @@ events anymore - this most probably is a firmware bug<sup id="fnref:3"><a href="
 <strong>amd_pmc</strong> kernel module, which will <a href="https://lore.kernel.org/platform-driver-x86/20260512202645.1549111-1-daniel@gibson.sh/t/#u">hopefully be merged</a>
 in the Linux kernel.</p>
 <p>Until it has been merged (and that kernel version ends up in your Linux distribution), you can use
-my out-of-tree version of the module that contains the patches and should work with Kernel 6.5 and
-newer. You can find it and installation instructions at <a href="https://github.com/DanielGibson/amd_pmc-ideapad">https://github.com/DanielGibson/amd_pmc-ideapad</a>,
+<strong>my out-of-tree version of the module</strong> that contains the patches and should work with Kernel 6.5 and
+newer.<br>
+You can find it and installation instructions at <strong><a href="https://github.com/DanielGibson/amd_pmc-ideapad">https://github.com/DanielGibson/amd_pmc-ideapad</a></strong>,
 if it works for you I recommend installing it with DKMS so it gets automatically built and installed
 when your distro ships a kernel update.</p>
 <p>If your device isn&rsquo;t already detected automatically as affected by this issue, the updated <strong>amd_pmc</strong>
