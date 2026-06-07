@@ -169,7 +169,7 @@ helped a teammate learn C++ and Git</li>
 <li><a href="https://github.com/DanielGibson/texview">texview</a> - <strong>A small self-contained cross-platform texture
 viewer:</strong> Wrote it (using C++, GLFW, OpenGL and Dear ImGui), incl. a custom robust DDS texture
 parser+loader</li>
-<li><a href="https://github.com/DanielGibson/keyboard-adaptor">Keyboard Adaptor</a> - My <strong>USB-to-USB Keyboard Adaptor with Arduino Hardware</strong> to make gaming keyboards work with finicky hardware like KVM switches.
+<li><a href="https://github.com/DanielGibson/keyboard-adaptor">Keyboard Adaptor</a> - My <strong>USB-to-USB Keyboard Adaptor with Arduino Hardware</strong> to make gaming keyboards work with finicky hardware like <a href="https://en.wikipedia.org/wiki/KVM_switch">KVM switches</a>.
 This also lead to small patches with improvements for the
 <a href="https://github.com/arduino/ArduinoCore-avr/pull/383">Arduino AVR core</a> and
 <a href="https://github.com/felis/USB_Host_Shield_2.0/commits?author=DanielGibson">USB Host Shield 2.0 Library</a>
@@ -181,10 +181,13 @@ projects.</li>
 <ul>
 <li><a href="https://www.libsdl.org/">SDL</a> <strong>A cross-platform library for games and similar<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>:</strong>
 Bugfixes, heavily reworked the SDL_main system for SDL3</li>
+<li><a href="https://openrgb.org/">OpenRGB</a> - <strong>A tool to configure LED lighting of various devices</strong>:
+I reverse-engineered the USB-protocol used to configure my keyboard&rsquo;s LEDs and
+<a href="https://gitlab.com/CalcProgrammer1/OpenRGB/-/merge_requests/2183">contributed support for it to OpenRGB</a></li>
 <li><a href="https://github.com/mafredri/asustor-platform-driver">asustor-platform-driver</a> - <strong>Linux kernel driver
 for ASUSTOR NAS hardware:</strong> Support for more devices, refactorings, extended <code>it87</code> SuperIO driver
 so blinking LEDs can be controlled<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup></li>
-<li><a href="https://kernel.org">Linux Kernel</a>
+<li><strong><a href="https://kernel.org">Linux Kernel</a></strong>
 <ul>
 <li>Found, debugged and reported a nasty <a href="https://bugzilla.kernel.org/show_bug.cgi?id=215611">bug in pseudo-terminals</a>, leading to a prompt fix.<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup></li>
 <li>Debugged and implemented workaround for a firmware bug in some Lenovo IdeaPad notebooks,
