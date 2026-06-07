@@ -102,7 +102,7 @@ Some things I did at that job:
 * [texview](https://github.com/DanielGibson/texview) - **A small self-contained cross-platform texture
   viewer:** Wrote it (using C++, GLFW, OpenGL and Dear ImGui), incl. a custom robust DDS texture
   parser+loader
-* [Keyboard Adaptor](https://github.com/DanielGibson/keyboard-adaptor) - My **USB-to-USB Keyboard Adaptor with Arduino Hardware** to make gaming keyboards work with finicky hardware like KVM switches.
+* [Keyboard Adaptor](https://github.com/DanielGibson/keyboard-adaptor) - My **USB-to-USB Keyboard Adaptor with Arduino Hardware** to make gaming keyboards work with finicky hardware like [KVM switches](https://en.wikipedia.org/wiki/KVM_switch).
   This also lead to small patches with improvements for the
   [Arduino AVR core](https://github.com/arduino/ArduinoCore-avr/pull/383) and
   [USB Host Shield 2.0 Library](https://github.com/felis/USB_Host_Shield_2.0/commits?author=DanielGibson) 
@@ -114,10 +114,13 @@ Some things I did at that job:
 
 * [SDL](https://www.libsdl.org/) **A cross-platform library for games and similar[^fn:sdl]:**
   Bugfixes, heavily reworked the SDL_main system for SDL3
+* [OpenRGB](https://openrgb.org/) - **A tool to configure LED lighting of various devices**:
+  I reverse-engineered the USB-protocol used to configure my keyboard's LEDs and
+  [contributed support for it to OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB/-/merge_requests/2183)
 * [asustor-platform-driver](https://github.com/mafredri/asustor-platform-driver) - **Linux kernel driver
   for ASUSTOR NAS hardware:** Support for more devices, refactorings, extended `it87` SuperIO driver
   so blinking LEDs can be controlled[^fn:blinking-leds]
-* [Linux Kernel](https://kernel.org)
+* **[Linux Kernel](https://kernel.org)**
     - Found, debugged and reported a nasty [bug in pseudo-terminals](https://bugzilla.kernel.org/show_bug.cgi?id=215611), leading to a prompt fix.[^fn:pty]
     - Debugged and implemented workaround for a firmware bug in some Lenovo IdeaPad notebooks,
       see also my [blogpost about it](../2026/06/03/ideapad-linux/).
