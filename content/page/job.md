@@ -5,11 +5,11 @@ draft = false
 toc = true
 +++
 
-My previous employer pivoted to "AI" too hard, so I quit and now I'm looking for a new job as a
+My previous employer pivoted to "AI" too hard, so I'm looking for a new job as a
 software developer (not LLM micromanager).
 
-I've been working as professional developer for around 15 years now. I'm a generalist, but my career
-so far was a bit biased towards:
+I've been working as **professional software developer** for around 15 years now.
+I'm a **generalist**, but my career so far was a bit biased towards:
 
 - Development on and for Linux
 - Cross-platform development
