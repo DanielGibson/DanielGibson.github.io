@@ -9,8 +9,6 @@ I like Heavy Metal, cats, (mostly oldish) computer games and open source softwar
 I write code, usually gamedev- or Linux-centric (often both).
 Sometimes I write about that. In this Blog.
 
-## I'm currently looking for a job! Click *[here for details incl. CV](../job/)*.
-
 ---
 
 Some for-fun/free-time projects I'm involved with:

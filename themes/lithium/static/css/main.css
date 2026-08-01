@@ -383,7 +383,7 @@ pre code {
 
 @media (min-width: 850px) {
   .header {
-    padding: 25px 0 8px; /* TODO: remove the 8px once job is found */
+    padding: 25px 0; /**/
   }
 
   .nav-logo {

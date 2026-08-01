@@ -5,8 +5,12 @@ draft = false
 toc = true
 +++
 
-My previous employer pivoted to "AI" too hard, so I'm looking for a new job as a
-software developer (not LLM micromanager).
+My previous employer pivoted to "AI" too hard, so ~~I'm looking for a new job as a
+software developer (not LLM micromanager)~~.
+
+**Update:** Not looking for a job anymore, found one :-)
+
+---
 
 I've been working as **professional software developer** for around 15 years now.
 I'm a **generalist**, but my career so far was a bit biased towards:
@@ -40,7 +44,7 @@ generative AI, user-tracking online ads, gambling, surveillance, ...).
 
 # CV
 
-This is a rough CV that avoids most personal details, [get in touch](#get-in-touch) for the full version.
+This is a rough CV that avoids most personal details.
 
 I was born in the mid-1980s in Northern Germany.
 
@@ -125,14 +129,6 @@ Some things I did at that job:
     - Debugged and implemented workaround for a firmware bug in some Lenovo IdeaPad notebooks,
       see also my [blogpost about it](../2026/06/03/ideapad-linux/).
 
-# Get in touch
-
-If you'd like to work with me me or know someone who does, or want to know more or if you have a
-suggestion for a job I should apply to, please contact me:
-
-<div style="justify-content:center;display:flex;">
-<img src="../images/gibson.png" />
-</div>
 
 <!-- below: footnotes -->
 
