@@ -72,10 +72,12 @@ or it becomes uncooperative after waking up[^fn:me-time] and doesn't deliver key
 events anymore - this most probably is a firmware bug[^fn:fw-bug].
 
 I have a patch that adds a 2.5 second sleep right before suspend at the appropriate place in the
-**amd_pmc** kernel module, which will [hopefully be merged](https://lore.kernel.org/platform-driver-x86/20260512202645.1549111-1-daniel@gibson.sh/t/#u)
-in the Linux kernel.
+**amd_pmc** kernel module.
 
-Until it has been merged (and that kernel version ends up in your Linux distribution), you can use
+**_Update:_**  It is in the upstream Linux kernel now, in kernel 7.2 Release Candidates and
+stable/longterm versions 7.1.5 and 6.18.41 and 6.12.100 and 6.6.147.
+
+Until that ends up in your Linux distribution, you can use
 **my out-of-tree version of the module** that contains the patches and should work with Kernel 6.5 and
 newer.  
 You can find it and installation instructions at **https://github.com/DanielGibson/amd_pmc-ideapad**,
@@ -197,7 +199,9 @@ for instructions (yes, they should also work on other distros).
     and I wouldn't know how to reach anyone at Lenovo who might care and has the means to have
     this fixed anyway.  
     The problem was reported in [Lenovos forums](https://forums.lenovo.com/t5/Other-Linux-Discussions/Keyboard-doesn-t-work-after-suspend-on-Linux-IdeaPad-3-15ABR8-Ryzen-7/m-p/5392909),
-    and it didn't seem like they care, only other users replied, no one from Lenovo.
+    ~~and it didn't seem like they care, only other users replied, no one from Lenovo~~
+    and even got a reply from someone working at Lenovo, but he wasn't very optimistic about being
+    able to reach the right people inside Lenovo that might fix the firmware 🙃.
 
 [^fn:wakealarm]: "wakealarm", used by `rtcwake` or the `amd-s2idle` testprogram, for example.
 
